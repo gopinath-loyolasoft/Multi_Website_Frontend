@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 800" width="100%" height="100%">
+  <defs>
+    <linearGradient id="medGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#021c1e" />
+      <stop offset="50%" stop-color="#083344" />
+      <stop offset="100%" stop-color="#155e75" />
+    </linearGradient>
+    <radialGradient id="cyanGlow" cx="80%" cy="30%" r="50%">
+      <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.3" />
+      <stop offset="60%" stop-color="#0891b2" stop-opacity="0.1" />
+      <stop offset="100%" stop-color="#021c1e" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <rect width="1920" height="800" fill="url(#medGrad2)" />
+  <rect width="1920" height="800" fill="url(#cyanGlow)" />
+
+  <!-- Hexagonal Molecular Structures -->
+  <g opacity="0.25" stroke="#22d3ee" stroke-width="2.5" fill="none">
+    <!-- Molecule 1 -->
+    <polygon points="1250,220 1290,200 1330,220 1330,260 1290,280 1250,260" />
+    <polygon points="1330,220 1370,200 1410,220 1410,260 1370,280 1330,260" />
+    <polygon points="1290,280 1330,300 1330,340 1290,360 1250,340 1250,300" />
+    <circle cx="1250" cy="220" r="5" fill="#22d3ee" />
+    <circle cx="1370" cy="200" r="5" fill="#2dd4bf" />
+    <circle cx="1410" cy="260" r="6" fill="#38bdf8" />
+    <circle cx="1290" cy="360" r="5" fill="#22d3ee" />
+
+    <!-- Molecule 2 -->
+    <polygon points="1500,320 1540,300 1580,320 1580,360 1540,380 1500,360" />
+    <polygon points="1580,320 1620,300 1660,320 1660,360 1620,380 1580,360" />
+    <circle cx="1540" cy="300" r="5" fill="#22d3ee" />
+    <circle cx="1660" cy="320" r="6" fill="#2dd4bf" />
+  </g>
+
+  <!-- Hospital Super-Specialty Silhouette -->
+  <g transform="translate(1450, 120)" opacity="0.2">
+    <rect x="0" y="80" width="160" height="280" fill="#22d3ee" />
+    <rect x="180" y="30" width="200" height="330" fill="#38bdf8" />
+    <rect x="400" y="120" width="120" height="240" fill="#0891b2" />
+    <!-- Hospital Windows -->
+    <g fill="#ffffff" opacity="0.6">
+      <rect x="200" y="60" width="20" height="20" rx="2" />
+      <rect x="240" y="60" width="20" height="20" rx="2" />
+      <rect x="280" y="60" width="20" height="20" rx="2" />
+      <rect x="320" y="60" width="20" height="20" rx="2" />
+      <rect x="200" y="100" width="20" height="20" rx="2" />
+      <rect x="240" y="100" width="20" height="20" rx="2" />
+      <rect x="280" y="100" width="20" height="20" rx="2" />
+      <rect x="320" y="100" width="20" height="20" rx="2" />
+    </g>
+  </g>
+
+  <rect y="440" width="1920" height="360" fill="url(#medGrad2)" opacity="0.75" />
+</svg>

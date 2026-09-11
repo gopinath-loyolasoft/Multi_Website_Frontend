@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 800" width="100%" height="100%">
+  <defs>
+    <linearGradient id="engGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16" />
+      <stop offset="35%" stop-color="#0f172a" />
+      <stop offset="70%" stop-color="#1e1b4b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <radialGradient id="cyberGlow1" cx="75%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.35" />
+      <stop offset="40%" stop-color="#6366f1" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#090d16" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="amberAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#fbbf24" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="1920" height="800" fill="url(#engGrad1)" />
+  <rect width="1920" height="800" fill="url(#cyberGlow1)" />
+
+  <!-- Cyber Grid / Isometric PCB Traces -->
+  <g opacity="0.08" stroke="#38bdf8" stroke-width="1.5">
+    <path d="M 0 200 L 1920 200 M 0 400 L 1920 400 M 0 600 L 1920 600" />
+    <path d="M 300 0 L 300 800 M 600 0 L 600 800 M 900 0 L 900 800 M 1200 0 L 1200 800 M 1500 0 L 1500 800 M 1800 0 L 1800 800" />
+  </g>
+
+  <!-- Circuit Board Traces & Nodes -->
+  <g opacity="0.25" stroke="#38bdf8" stroke-width="2" fill="none">
+    <path d="M 1100 200 L 1220 200 L 1280 260 L 1400 260 L 1440 220 L 1550 220" />
+    <circle cx="1100" cy="200" r="4" fill="#38bdf8" />
+    <circle cx="1280" cy="260" r="4" fill="#38bdf8" />
+    <circle cx="1550" cy="220" r="5" fill="#f59e0b" />
+
+    <path d="M 1200 450 L 1320 450 L 1380 390 L 1600 390 L 1660 450 L 1800 450" />
+    <circle cx="1200" cy="450" r="4" fill="#38bdf8" />
+    <circle cx="1380" cy="390" r="4" fill="#38bdf8" />
+    <circle cx="1800" cy="450" r="5" fill="#38bdf8" />
+
+    <path d="M 1350 150 L 1420 150 L 1470 100 L 1650 100" />
+    <circle cx="1650" cy="100" r="4" fill="#f59e0b" />
+  </g>
+
+  <!-- High-Tech Gear & Robotic Arm Silhouette -->
+  <g transform="translate(1380, 180)" opacity="0.3">
+    <!-- Big Gear -->
+    <circle cx="200" cy="200" r="140" fill="none" stroke="#60a5fa" stroke-width="8" stroke-dasharray="25 15" />
+    <circle cx="200" cy="200" r="100" fill="none" stroke="#60a5fa" stroke-width="3" />
+    <circle cx="200" cy="200" r="35" fill="none" stroke="#f59e0b" stroke-width="6" />
+
+    <!-- Smaller Interlocking Gear -->
+    <circle cx="360" cy="110" r="70" fill="none" stroke="#38bdf8" stroke-width="6" stroke-dasharray="18 10" />
+    <circle cx="360" cy="110" r="20" fill="#38bdf8" />
+
+    <!-- Hexagonal Tech Nodes -->
+    <polygon points="200,30 230,47 230,82 200,100 170,82 170,47" fill="none" stroke="#f59e0b" stroke-width="3" />
+    <polygon points="60,250 90,267 90,302 60,320 30,302 30,267" fill="none" stroke="#38bdf8" stroke-width="2" />
+  </g>
+
+  <!-- Glowing Core / Processor -->
+  <g transform="translate(1550, 350)" opacity="0.4">
+    <rect x="0" y="0" width="80" height="80" rx="8" fill="#1e1b4b" stroke="url(#amberAccent)" stroke-width="3" />
+    <text x="40" y="47" fill="#fbbf24" font-family="monospace" font-size="16" font-weight="bold" text-anchor="middle">AI•CPU</text>
+  </g>
+
+  <rect y="440" width="1920" height="360" fill="url(#engGrad1)" opacity="0.75" />
+</svg>

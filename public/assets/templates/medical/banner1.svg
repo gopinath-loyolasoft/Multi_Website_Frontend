@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 800" width="100%" height="100%">
+  <defs>
+    <linearGradient id="medGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#042f2e" />
+      <stop offset="45%" stop-color="#083344" />
+      <stop offset="85%" stop-color="#0e7490" />
+      <stop offset="100%" stop-color="#042f2e" />
+    </linearGradient>
+    <radialGradient id="medGlow1" cx="75%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.35" />
+      <stop offset="45%" stop-color="#14b8a6" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#042f2e" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <rect width="1920" height="800" fill="url(#medGrad1)" />
+  <rect width="1920" height="800" fill="url(#medGlow1)" />
+
+  <!-- Heartbeat ECG Pulse Waveform -->
+  <path d="M 0 550 L 800 550 L 830 510 L 860 590 L 890 460 L 920 620 L 950 550 L 1920 550" 
+        fill="none" stroke="#22d3ee" stroke-width="3" opacity="0.3" stroke-linecap="round" />
+
+  <!-- DNA Double Helix Silhouette -->
+  <g transform="translate(1300, 100)" opacity="0.25">
+    <path d="M 100 50 Q 150 150 200 250 T 100 450 T 200 650" fill="none" stroke="#22d3ee" stroke-width="4" />
+    <path d="M 200 50 Q 150 150 100 250 T 200 450 T 100 650" fill="none" stroke="#2dd4bf" stroke-width="4" />
+    <!-- Connecting base pairs -->
+    <line x1="120" y1="90" x2="180" y2="90" stroke="#ffffff" stroke-width="2" />
+    <line x1="140" y1="150" x2="160" y2="150" stroke="#ffffff" stroke-width="2" />
+    <line x1="120" y1="210" x2="180" y2="210" stroke="#ffffff" stroke-width="2" />
+    <line x1="100" y1="250" x2="200" y2="250" stroke="#ffffff" stroke-width="2" />
+    <line x1="120" y1="290" x2="180" y2="290" stroke="#ffffff" stroke-width="2" />
+    <line x1="140" y1="350" x2="160" y2="350" stroke="#ffffff" stroke-width="2" />
+    <line x1="120" y1="410" x2="180" y2="410" stroke="#ffffff" stroke-width="2" />
+    <line x1="100" y1="450" x2="200" y2="450" stroke="#ffffff" stroke-width="2" />
+  </g>
+
+  <!-- Medical Red/White Cross & Hospital Wing Silhouette -->
+  <g transform="translate(1560, 200)" opacity="0.35">
+    <!-- Circle Shield -->
+    <circle cx="120" cy="120" r="110" fill="none" stroke="#22d3ee" stroke-width="4" stroke-dasharray="10 5" />
+    <!-- Medical Cross -->
+    <rect x="100" y="50" width="40" height="140" rx="6" fill="#ffffff" />
+    <rect x="50" y="100" width="140" height="40" rx="6" fill="#ffffff" />
+    <!-- Caduceus / Stethoscope Wave -->
+    <circle cx="120" cy="120" r="30" fill="none" stroke="#06b6d4" stroke-width="4" />
+  </g>
+
+  <rect y="440" width="1920" height="360" fill="url(#medGrad1)" opacity="0.7" />
+</svg>

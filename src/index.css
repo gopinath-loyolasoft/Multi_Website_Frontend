@@ -1,0 +1,615 @@
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+:root {
+  --primary-color: #1e40af;
+  --secondary-color: #f59e0b;
+  --accent-color: #3b82f6;
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Base setup */
+html.light {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  font-family: var(--font-family);
+  margin: 0;
+  padding: 0;
+  color: #1f2937;
+  background-color: #f9fafb;
+}
+
+/* Brand overrides - dynamically driven by selected theme skin or default college palette */
+/* ─────────────────────────────────────────────────────────────
+   Public College Website Template Styles
+   ───────────────────────────────────────────────────────────── */
+/* Arts & Science Modern Template */
+html[data-template="ARTS_SCIENCE_MODERN"] {
+  --primary-color: #15803d;
+  --secondary-color: #b45309;
+  --accent-color: #16a34a;
+  --font-family: 'Merriweather', 'Georgia', serif;
+}
+
+html[data-template="ARTS_SCIENCE_MODERN"] .public-website {
+  font-family: 'Merriweather', 'Georgia', serif;
+}
+
+html[data-template="ARTS_SCIENCE_MODERN"] .public-hero-section h1 {
+  font-family: 'Merriweather', 'Georgia', serif !important;
+  letter-spacing: -0.01em !important;
+}
+
+/* Medical & Healthcare Modern Template */
+html[data-template="MEDICAL_MODERN"] {
+  --primary-color: #0891b2;
+  --secondary-color: #e11d48;
+  --accent-color: #0284c7;
+  --font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+html[data-template="MEDICAL_MODERN"] .public-website {
+  font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+/* Engineering & Technology Modern Template */
+html[data-template="ENGINEERING_MODERN"] {
+  --primary-color: #1e40af;
+  --secondary-color: #f59e0b;
+  --accent-color: #3b82f6;
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+html[data-template="ENGINEERING_MODERN"] .public-hero-section h1 {
+  font-family: 'Inter', system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* Brand overrides - dynamically driven by selected theme skin or default college palette */
+.bg-primary {
+  background-color: var(--color-primary, var(--primary-color)) !important;
+}
+
+.text-primary {
+  color: var(--color-primary, var(--primary-color)) !important;
+}
+
+.border-primary {
+  border-color: var(--color-primary, var(--primary-color)) !important;
+}
+
+.bg-secondary {
+  background-color: var(--color-secondary, var(--secondary-color)) !important;
+}
+
+.text-secondary {
+  color: var(--color-secondary, var(--secondary-color)) !important;
+}
+
+.border-secondary {
+  border-color: var(--color-secondary, var(--secondary-color)) !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   SuperAdmin & Admin Light Theme Adaptations (Default: Light)
+   ───────────────────────────────────────────────────────────── */
+
+/* Neutral Surfaces - Scoped to Admin & SuperAdmin Panels */
+html.light :is(.admin-layout, .superadmin-layout) [class*="bg-slate-950"]:not(.preview-monitor, .preview-monitor *, .public-hero-section, .public-hero-section *, .live-preview-modal, .live-preview-modal *, .drawer-backdrop, [data-drawer-backdrop], .modal-backdrop, [data-modal-backdrop]) {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+}
+
+html.light :is(.admin-layout, .superadmin-layout) [class*="bg-slate-900"]:not(.preview-monitor, .preview-monitor *, .public-hero-section, .public-hero-section *, .live-preview-modal, .live-preview-modal *, .public-website *, .drawer-backdrop, [data-drawer-backdrop], .modal-backdrop, [data-modal-backdrop]) {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+}
+
+html.light :is(.admin-layout, .superadmin-layout) [class*="bg-slate-800"]:not(.preview-monitor, .preview-monitor *, .public-hero-section, .public-hero-section *, .live-preview-modal, .live-preview-modal *, .drawer-backdrop, [data-drawer-backdrop], .modal-backdrop, [data-modal-backdrop]) {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+}
+
+html.light :is(.admin-layout, .superadmin-layout) [class*="bg-indigo-950"] {
+  background-color: #eef2ff !important;
+  border-color: #c7d2fe !important;
+  color: #312e81 !important;
+}
+
+/* Eliminate dark slate gradients in light mode for admin (preserve in preview monitors and hero sections) */
+html.light :is(.admin-layout, .superadmin-layout) [class*="from-slate-"]:not(.preview-monitor, .preview-monitor *, .public-hero-section, .public-hero-section *, .live-preview-modal, .live-preview-modal *) {
+  background-image: none !important;
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+}
+
+/* Borders */
+html.light :is(.admin-layout, .superadmin-layout) .border-slate-800:not(.preview-monitor, .preview-monitor *, .public-hero-section, .public-hero-section *, .live-preview-modal, .live-preview-modal *),
+html.light :is(.admin-layout, .superadmin-layout) .border-slate-800\/80:not(.preview-monitor, .preview-monitor *, .public-hero-section, .public-hero-section *, .live-preview-modal, .live-preview-modal *),
+html.light :is(.admin-layout, .superadmin-layout) .border-slate-800\/60:not(.preview-monitor, .preview-monitor *, .public-hero-section, .public-hero-section *, .live-preview-modal, .live-preview-modal *),
+html.light :is(.admin-layout, .superadmin-layout) .border-slate-800\/40:not(.preview-monitor, .preview-monitor *, .public-hero-section, .public-hero-section *, .live-preview-modal, .live-preview-modal *),
+html.light :is(.admin-layout, .superadmin-layout) .border-slate-700:not(.preview-monitor, .preview-monitor *, .public-hero-section, .public-hero-section *, .live-preview-modal, .live-preview-modal *),
+html.light :is(.admin-layout, .superadmin-layout) .border-slate-700\/50:not(.preview-monitor, .preview-monitor *, .public-hero-section, .public-hero-section *, .live-preview-modal, .live-preview-modal *) {
+  border-color: #e2e8f0 !important;
+}
+
+html.light :is(.admin-layout, .superadmin-layout) .divide-slate-800 > :not([hidden]) ~ :not([hidden]),
+html.light :is(.admin-layout, .superadmin-layout) .divide-slate-800\/60 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #e2e8f0 !important;
+}
+
+/* Text Hierarchy in Admin (preserve text colors in preview monitors and hero sections) */
+html.light :is(.admin-layout, .superadmin-layout) .text-slate-100:not(.preview-monitor, .preview-monitor *, .public-hero-section, .public-hero-section *, .live-preview-modal, .live-preview-modal *),
+html.light :is(.admin-layout, .superadmin-layout) header .text-white,
+html.light :is(.admin-layout, .superadmin-layout) main .text-white:not(.preview-monitor, .preview-monitor *, .public-hero-section, .public-hero-section *, .live-preview-modal, .live-preview-modal *, button *, a *) {
+  color: #0f172a !important;
+}
+
+html.light :is(.admin-layout, .superadmin-layout) .text-slate-300:not(.preview-monitor, .preview-monitor *, .public-hero-section, .public-hero-section *, .live-preview-modal, .live-preview-modal *),
+html.light :is(.admin-layout, .superadmin-layout) .text-slate-400:not(.preview-monitor, .preview-monitor *, .public-hero-section, .public-hero-section *, .live-preview-modal, .live-preview-modal *) {
+  color: #475569 !important;
+}
+
+html.light :is(.admin-layout, .superadmin-layout) .text-slate-500:not(.preview-monitor, .preview-monitor *, .public-hero-section, .public-hero-section *, .live-preview-modal, .live-preview-modal *) {
+  color: #64748b !important;
+}
+
+/* Table styling in light mode */
+html.light :is(.admin-layout, .superadmin-layout) thead {
+  background-color: #f8fafc !important;
+  border-bottom-color: #e2e8f0 !important;
+}
+
+html.light :is(.admin-layout, .superadmin-layout) thead th {
+  color: #64748b !important;
+}
+
+html.light :is(.admin-layout, .superadmin-layout) tbody tr:hover,
+html.light :is(.admin-layout, .superadmin-layout) .hover\:bg-slate-800\/40:hover,
+html.light :is(.admin-layout, .superadmin-layout) .hover\:bg-slate-800:hover {
+  background-color: #f8fafc !important;
+}
+
+/* Public Website & Live Preview Monitor protections */
+.public-website {
+  background-color: #f8fafc;
+}
+
+.preview-monitor,
+.public-hero-section {
+  color-scheme: dark !important;
+  background-color: #020617 !important;
+  color: #ffffff !important;
+  position: relative !important;
+}
+
+.preview-monitor *,
+.public-hero-section * {
+  box-sizing: border-box;
+}
+
+.preview-monitor img,
+.public-hero-section img {
+  display: block !important;
+  opacity: 0.8 !important;
+}
+
+.preview-monitor h1,
+.public-hero-section h1 {
+  color: #ffffff !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7) !important;
+}
+
+html[data-template="ARTS_SCIENCE_MODERN"] .preview-monitor h1,
+html[data-template="ARTS_SCIENCE_MODERN"] .public-hero-section h1 {
+  color: #ecfdf5 !important;
+}
+
+.preview-monitor p,
+.public-hero-section p {
+  color: #e2e8f0 !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6) !important;
+}
+
+.preview-monitor [class*="from-slate-"],
+.public-hero-section [class*="from-slate-"] {
+  background-color: transparent !important;
+}
+
+.preview-monitor [class*="bg-slate-950"],
+.public-hero-section [class*="bg-slate-950"] {
+  background-color: #020617 !important;
+  color: #ffffff !important;
+}
+
+.preview-monitor [class*="bg-slate-900"],
+.public-hero-section [class*="bg-slate-900"] {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+}
+
+/* Secondary & Action Buttons that use bg-slate-800 in light mode */
+html.light button.bg-slate-800,
+html.light a.bg-slate-800 {
+  background-color: #f8fafc !important;
+  color: #334155 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+html.light button.bg-slate-800:hover,
+html.light a.bg-slate-800:hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+/* Form Inputs */
+html.light input[type="text"],
+html.light input[type="email"],
+html.light input[type="password"],
+html.light input[type="number"],
+html.light select,
+html.light textarea {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+html.light input::placeholder,
+html.light textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Modals & Drawers backdrop - keep translucent so underlying page is clearly viewable */
+html.light .bg-black\/80 {
+  background-color: rgba(15, 23, 42, 0.4) !important;
+}
+
+.drawer-backdrop,
+[data-drawer-backdrop="true"] {
+  background-color: rgba(15, 23, 42, 0.22) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html.dark .drawer-backdrop,
+html.dark [data-drawer-backdrop="true"] {
+  background-color: rgba(0, 0, 0, 0.45) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.modal-backdrop,
+[data-modal-backdrop="true"] {
+  background-color: rgba(15, 23, 42, 0.35) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html.dark .modal-backdrop,
+html.dark [data-modal-backdrop="true"] {
+  background-color: rgba(0, 0, 0, 0.55) !important;
+}
+
+/* Accent badges & indicators in light mode */
+html.light .text-amber-400 {
+  color: #b45309 !important;
+}
+
+html.light .text-emerald-400 {
+  color: #059669 !important;
+}
+
+html.light .text-purple-400 {
+  color: #7c3aed !important;
+}
+
+html.light .text-teal-400 {
+  color: #0d9488 !important;
+}
+
+html.light .text-yellow-300,
+html.light .text-yellow-400 {
+  color: #b45309 !important;
+}
+
+html.light .text-red-400 {
+  color: #dc2626 !important;
+}
+
+html.light .bg-amber-500\/10 {
+  background-color: rgba(245, 158, 11, 0.12) !important;
+  border-color: rgba(245, 158, 11, 0.25) !important;
+}
+
+html.light .bg-emerald-500\/10 {
+  background-color: rgba(16, 185, 129, 0.12) !important;
+  border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+html.light .bg-purple-500\/10,
+html.light .bg-purple-500\/20,
+html.light .bg-purple-600\/20 {
+  background-color: rgba(168, 85, 247, 0.12) !important;
+  border-color: rgba(168, 85, 247, 0.25) !important;
+}
+
+html.light .bg-red-950\/40,
+html.light .bg-red-950\/50 {
+  background-color: #fef2f2 !important;
+  border-color: #fecaca !important;
+}
+
+html.light .text-red-300 {
+  color: #b91c1c !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Admin Customizer Controls & Radio Card Styles
+   ───────────────────────────────────────────────────────────── */
+.card-radio {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.card-radio .form-label {
+  display: block;
+  cursor: pointer;
+  border-radius: 0.75rem;
+  padding: 0.25rem;
+  border: 2px solid transparent;
+  transition: all 0.2s ease-in-out;
+  background-color: #f8fafc;
+}
+
+.dark .card-radio .form-label {
+  background-color: #0f172a;
+}
+
+.card-radio input[type="radio"]:checked + .form-label {
+  border-color: var(--primary-color, #1e40af);
+  box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.2);
+}
+
+.card-radio input[type="radio"]:checked ~ h5 {
+  color: var(--primary-color, #1e40af) !important;
+  font-weight: 700;
+}
+
+/* Layout width support */
+html[data-layout-width="boxed"] body {
+  max-width: 1440px;
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: 0 0 40px rgba(0,0,0,0.08);
+}
+
+/* Sidenav Color customizations from Customizer */
+html[data-menu-color="light"] aside {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-right-color: #e2e8f0 !important;
+}
+html[data-menu-color="light"] aside h1,
+html[data-menu-color="light"] aside span {
+  color: #0f172a !important;
+}
+html[data-menu-color="light"] aside nav a:not([class*="bg-primary"]) {
+  color: #475569 !important;
+}
+html[data-menu-color="light"] aside nav a:not([class*="bg-primary"]):hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+html[data-menu-color="gray"] aside {
+  background-color: #1e293b !important;
+  border-right-color: #334155 !important;
+}
+
+html[data-menu-color="gradient"] aside {
+  background: linear-gradient(180deg, #0f172a 0%, #1e1b4b 100%) !important;
+  border-right-color: #312e81 !important;
+}
+
+/* Topbar Color customizations from Customizer */
+html[data-topbar-color="dark"] header {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  border-bottom-color: #1e293b !important;
+}
+html[data-topbar-color="dark"] header h2 {
+  color: #ffffff !important;
+}
+html[data-topbar-color="gray"] header {
+  background-color: #f1f5f9 !important;
+  border-bottom-color: #cbd5e1 !important;
+}
+html[data-topbar-color="gradient"] header {
+  background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%) !important;
+  border-bottom-color: #334155 !important;
+}
+html[data-topbar-color="gradient"] header h2 {
+  color: #ffffff !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Sidenav View Modes (Default, Compact, Condensed, On-Hover, On-Hover-Active, Offcanvas)
+   ───────────────────────────────────────────────────────────── */
+
+/* Universal aside fixed position & no-scroll container */
+aside {
+  position: sticky !important;
+  top: 0 !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+  z-index: 30;
+}
+
+aside nav::-webkit-scrollbar {
+  width: 4px;
+}
+aside nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+aside nav::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.2);
+  border-radius: 4px;
+}
+aside nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.4);
+}
+
+/* 1. Default Mode */
+html[data-sidenav-size="default"] aside {
+  width: 16rem !important; /* 256px */
+  transition: width 0.25s ease-in-out, transform 0.25s ease-in-out;
+}
+
+/* 2. Compact Mode */
+html[data-sidenav-size="compact"] aside {
+  width: 11rem !important; /* 176px */
+  transition: width 0.25s ease-in-out;
+}
+html[data-sidenav-size="compact"] aside h1 {
+  font-size: 0.85rem !important;
+}
+html[data-sidenav-size="compact"] aside nav a span {
+  font-size: 0.75rem !important;
+}
+
+/* 3. Condensed Mode (Icon-Only View, 76px) */
+html[data-sidenav-size="condensed"] aside {
+  width: 4.75rem !important; /* 76px */
+  transition: width 0.25s ease-in-out;
+}
+html[data-sidenav-size="condensed"] aside .sidebar-brand-text,
+html[data-sidenav-size="condensed"] aside .sidebar-nav-text,
+html[data-sidenav-size="condensed"] aside .sidebar-section-title,
+html[data-sidenav-size="condensed"] aside .sidebar-footer-info,
+html[data-sidenav-size="condensed"] aside .sidebar-footer-text {
+  display: none !important;
+}
+html[data-sidenav-size="condensed"] aside .sidebar-logo-container {
+  justify-content: center !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+html[data-sidenav-size="condensed"] aside .sidebar-logo-container > div {
+  justify-content: center !important;
+  gap: 0 !important;
+}
+html[data-sidenav-size="condensed"] aside nav a,
+html[data-sidenav-size="condensed"] aside .sidebar-footer-link {
+  justify-content: center !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* 4. On-Hover Mode (Collapsed by default, expands cleanly on mouse hover) */
+html[data-sidenav-size="on-hover"] aside {
+  width: 4.75rem !important;
+  transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-x: hidden !important;
+  z-index: 40;
+}
+/* When NOT hovered */
+html[data-sidenav-size="on-hover"] aside:not(:hover) .sidebar-brand-text,
+html[data-sidenav-size="on-hover"] aside:not(:hover) .sidebar-nav-text,
+html[data-sidenav-size="on-hover"] aside:not(:hover) .sidebar-section-title,
+html[data-sidenav-size="on-hover"] aside:not(:hover) .sidebar-footer-info,
+html[data-sidenav-size="on-hover"] aside:not(:hover) .sidebar-footer-text {
+  display: none !important;
+}
+html[data-sidenav-size="on-hover"] aside:not(:hover) .sidebar-logo-container {
+  justify-content: center !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+html[data-sidenav-size="on-hover"] aside:not(:hover) .sidebar-logo-container > div {
+  justify-content: center !important;
+  gap: 0 !important;
+}
+html[data-sidenav-size="on-hover"] aside:not(:hover) nav a,
+html[data-sidenav-size="on-hover"] aside:not(:hover) .sidebar-footer-link {
+  justify-content: center !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* When hovered */
+html[data-sidenav-size="on-hover"] aside:hover {
+  width: 16rem !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+}
+html[data-sidenav-size="on-hover"] aside:hover .sidebar-brand-text,
+html[data-sidenav-size="on-hover"] aside:hover .sidebar-nav-text,
+html[data-sidenav-size="on-hover"] aside:hover .sidebar-section-title,
+html[data-sidenav-size="on-hover"] aside:hover .sidebar-footer-info,
+html[data-sidenav-size="on-hover"] aside:hover .sidebar-footer-text {
+  display: block !important;
+}
+html[data-sidenav-size="on-hover"] aside:hover .sidebar-logo-container {
+  justify-content: flex-start !important;
+  padding-left: 1.5rem !important;
+  padding-right: 1.5rem !important;
+}
+html[data-sidenav-size="on-hover"] aside:hover .sidebar-logo-container > div {
+  gap: 0.75rem !important;
+}
+html[data-sidenav-size="on-hover"] aside:hover nav a,
+html[data-sidenav-size="on-hover"] aside:hover .sidebar-footer-link {
+  justify-content: flex-start !important;
+  padding-left: 0.875rem !important;
+  padding-right: 0.875rem !important;
+}
+
+/* 5. On-Hover Active Mode */
+html[data-sidenav-size="on-hover-active"] aside {
+  width: 16rem !important;
+  transition: width 0.25s ease-in-out;
+}
+
+/* 6. Offcanvas Mode (Hidden off-screen) */
+html[data-sidenav-size="offcanvas"] aside {
+  transform: translateX(-100%);
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 50;
+  transition: transform 0.3s ease-in-out;
+}
+html[data-sidenav-size="offcanvas"].sidenav-enable aside {
+  transform: translateX(0);
+}
+
+/* 7. Right-Side Drawer Slide-In Animation */
+@keyframes drawerSlideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0.7;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-drawer-slide-in {
+  animation: drawerSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
