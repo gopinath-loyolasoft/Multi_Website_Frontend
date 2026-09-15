@@ -158,19 +158,32 @@ export const ArtsScienceHeroTemplate: React.FC<HeroTemplateProps> = ({
 
       {/* Bottom-Anchored 3-Column Parchment Ribbon (Campus Highlights Card) */}
       {showRightCard && (
-        <div className="relative z-10 w-full bg-slate-950/90 border-t border-emerald-500/30 backdrop-blur-xl py-4 sm:py-5 px-6 sm:px-10 lg:px-16 shadow-2xl">
-          <div className="max-w-screen-2xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 items-center divide-y md:divide-y-0 md:divide-x divide-emerald-500/20">
+        <div className="relative z-10 w-full bg-slate-950/95 border-t border-emerald-500/30 backdrop-blur-xl py-5 px-6 sm:px-10 lg:px-16 shadow-2xl">
+          <div className="max-w-screen-2xl mx-auto grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-emerald-500/20">
             {cardItems.slice(0, 3).map((item, idx) => {
               const IconComp = idx === 0 ? Landmark : idx === 1 ? BookOpen : GraduationCap;
               return (
-                <div key={idx} className={`flex items-start gap-3.5 ${idx > 0 ? 'pt-4 md:pt-0 md:pl-6' : ''}`}>
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center text-emerald-300 shrink-0 mt-0.5">
+                <div
+                  key={idx}
+                  className={`flex items-center gap-4 py-3 md:py-1 ${
+                    idx === 0
+                      ? 'md:pr-8 md:pl-2'
+                      : idx === 1
+                      ? 'md:px-8'
+                      : 'md:pl-8 md:pr-2'
+                  }`}
+                >
+                  <div className="w-11 h-11 rounded-xl bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center text-emerald-300 shrink-0 shadow-xs">
                     <IconComp className="w-5 h-5" />
                   </div>
-                  <div>
-                    <h4 className="font-serif font-bold text-emerald-100 text-sm">{item.title}</h4>
+                  <div className="min-w-0 flex-1">
+                    <h4 className="font-serif font-bold text-emerald-100 text-sm leading-snug tracking-wide">
+                      {item.title}
+                    </h4>
                     {item.desc && (
-                      <p className="text-slate-300 text-xs mt-0.5 leading-snug line-clamp-2">{item.desc}</p>
+                      <p className="text-slate-300 text-xs mt-0.5 leading-relaxed line-clamp-2">
+                        {item.desc}
+                      </p>
                     )}
                   </div>
                 </div>
