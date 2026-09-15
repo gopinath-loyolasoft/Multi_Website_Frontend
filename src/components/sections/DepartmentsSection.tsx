@@ -22,7 +22,7 @@ interface DepartmentsProps {
 }
 
 export const DepartmentsSection: React.FC<DepartmentsProps> = ({ content }) => {
-  const { isArtsAndScience, isMedical, isEngineering, isUniversity } = useTheme();
+  const { isArtsAndScience, isMedical, isUniversity } = useTheme();
   const { styles } = useTemplateTheme();
   const deptStyles = styles.departments;
 
@@ -52,87 +52,84 @@ export const DepartmentsSection: React.FC<DepartmentsProps> = ({ content }) => {
 
   const depts = content.departments && content.departments.length > 0 ? content.departments : fetchedDepts;
   if (error && !loading) {
-    return <SectionError message={error} className="bg-slate-50 dark:bg-slate-950" />;
+    return <SectionError message={error} className="bg-slate-950 text-white" />;
   }
   if (!loading && depts.length === 0) return null;
 
-  // Template Visual Configurations
   const BadgeIcon = isArtsAndScience ? BookOpen : isMedical ? Stethoscope : isUniversity ? Landmark : Building2;
 
-  const tagClass = deptStyles.tagBadge;
-  const headingFont = deptStyles.headingFont;
-  const cardBorderClass = `${deptStyles.cardBorder} ${deptStyles.cardHover}`;
-  const iconBoxClass = deptStyles.iconBg;
-  const linkTextClass = deptStyles.accentText;
-
   return (
-    <section className="py-16 bg-slate-50 dark:bg-slate-950 transition-colors">
+    <section className={deptStyles.sectionBg}>
       <div className="max-w-screen-2xl mx-auto px-6 sm:px-10 lg:px-16">
+        
+        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
           <div>
-            <div className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold mb-2.5 ${tagClass}`}>
+            <div className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold mb-2.5 ${deptStyles.sectionHeaderBadge}`}>
               <BadgeIcon className="w-3.5 h-3.5" />
               <span>{isMedical ? 'Medical & Clinical Faculties' : isArtsAndScience ? 'Arts, Science & Humanities' : isUniversity ? 'University Schools & Colleges' : 'Academic Divisions'}</span>
             </div>
-            <h2 className={`text-3xl sm:text-4xl text-slate-900 dark:text-white tracking-tight ${headingFont}`}>
+            <h2 className={deptStyles.headingFont}>
               {content.title || (isUniversity ? 'Faculties & Research Schools' : isMedical ? 'Clinical Departments & Specialty Wings' : 'Departments & Academic Schools')}
             </h2>
             {content.subtitle && (
-              <p className={`text-sm text-slate-600 dark:text-slate-400 mt-1.5 max-w-2xl ${isArtsAndScience || isUniversity ? 'font-serif' : ''}`}>
+              <p className={deptStyles.subtitleFont}>
                 {content.subtitle}
               </p>
             )}
           </div>
           <Link
             to="/departments"
-            className={`inline-flex items-center gap-1.5 text-xs font-bold hover:underline self-start md:self-auto ${linkTextClass}`}
+            className={`inline-flex items-center gap-1.5 text-xs font-bold self-start md:self-auto ${deptStyles.accentText}`}
           >
             <span>All Departments</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
+        {/* 3-Column Departments Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {depts.map((d, idx) => (
             <div
               key={idx}
-              className={`bg-white dark:bg-slate-900 p-6 border shadow-sm hover:shadow-xl transition duration-300 flex flex-col justify-between ${cardBorderClass}`}
+              className={`${deptStyles.cardBg} ${deptStyles.cardBorder} ${deptStyles.cardHover} flex flex-col justify-between`}
             >
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${iconBoxClass}`}>
+                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${deptStyles.iconBg}`}>
                     <BadgeIcon className="w-5 h-5" />
                   </div>
                   {d.code && (
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                    <span className={`px-2 py-0.5 rounded text-[10px] uppercase ${deptStyles.tagBadge}`}>
                       {d.code}
                     </span>
                   )}
                 </div>
 
-                <h3 className={`text-xl font-bold text-slate-900 dark:text-white leading-snug ${isArtsAndScience || isUniversity ? 'font-serif' : ''}`}>
+                <h3 className={`text-xl font-bold leading-snug ${isArtsAndScience || isUniversity ? 'font-serif' : ''}`}>
                   {d.name}
                 </h3>
 
                 {d.description && (
-                  <p className={`text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-3 ${isArtsAndScience ? 'font-serif' : ''}`}>
+                  <p className="text-xs text-slate-400 leading-relaxed line-clamp-3">
                     {d.description}
                   </p>
                 )}
               </div>
 
               {d.headOfDepartment && (
-                <div className="pt-4 mt-5 border-t border-slate-100 dark:border-slate-800/80 text-xs text-slate-500 flex items-center justify-between">
+                <div className="pt-4 mt-5 border-t border-white/10 text-xs text-slate-400 flex items-center justify-between">
                   <div>
-                    <span className="block text-[10px] uppercase font-bold tracking-wider text-slate-400">Head of Department</span>
-                    <span className={`font-semibold text-slate-800 dark:text-slate-200 ${isArtsAndScience || isUniversity ? 'font-serif' : ''}`}>{d.headOfDepartment}</span>
+                    <span className="block text-[10px] uppercase font-bold tracking-wider opacity-60">Head of Department</span>
+                    <span className="font-semibold text-slate-200">{d.headOfDepartment}</span>
                   </div>
-                  <ShieldCheck className="w-4 h-4 text-emerald-500/60" />
+                  <ShieldCheck className="w-4 h-4 text-emerald-400/80" />
                 </div>
               )}
             </div>
           ))}
         </div>
+
       </div>
     </section>
   );

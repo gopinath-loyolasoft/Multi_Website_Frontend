@@ -25,7 +25,7 @@ interface CoursesProps {
 }
 
 export const CoursesSection: React.FC<CoursesProps> = ({ content }) => {
-  const { isArtsAndScience, isMedical, isEngineering, isUniversity } = useTheme();
+  const { isArtsAndScience, isMedical, isUniversity } = useTheme();
   const { styles } = useTemplateTheme();
   const courseStyles = styles.courses;
 
@@ -57,82 +57,79 @@ export const CoursesSection: React.FC<CoursesProps> = ({ content }) => {
 
   const courses = content.courses && content.courses.length > 0 ? content.courses : fetchedCourses;
   if (error && !loading) {
-    return <SectionError message={error} className="bg-white dark:bg-slate-900" />;
+    return <SectionError message={error} className="bg-slate-950 text-white" />;
   }
   if (!loading && courses.length === 0) return null;
 
-  // Template Styling Tokens
   const TagIcon = isArtsAndScience ? BookOpen : isMedical ? HeartPulse : isUniversity ? GraduationCap : Award;
 
-  const tagClass = courseStyles.badge;
-  const badgeLevelClass = courseStyles.badge;
-  const cardBorderClass = courseStyles.cardBorder;
-  const applyBtnClass = courseStyles.accentText;
-
   return (
-    <section className="py-16 bg-white dark:bg-slate-900 transition-colors">
+    <section className={courseStyles.sectionBg}>
       <div className="max-w-screen-2xl mx-auto px-6 sm:px-10 lg:px-16">
+        
+        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
           <div>
-            <div className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold mb-2.5 ${tagClass}`}>
+            <div className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold mb-2.5 ${courseStyles.sectionHeaderBadge}`}>
               <TagIcon className="w-3.5 h-3.5" />
               <span>{isMedical ? 'Medical & Health Degree Programs' : isArtsAndScience ? 'Humanities & Pure Science Programs' : isUniversity ? 'Faculties & Degree Programs' : 'Degree Programs'}</span>
             </div>
-            <h2 className={`text-3xl sm:text-4xl text-slate-900 dark:text-white tracking-tight ${isArtsAndScience || isUniversity ? 'font-serif font-bold' : 'font-sans font-black'}`}>
+            <h2 className={courseStyles.headingFont}>
               {content.title || (isUniversity ? 'University Curricula & Degrees' : isMedical ? 'Clinical & Medical Degrees' : 'Explore Academic Programs')}
             </h2>
             {content.subtitle && (
-              <p className={`text-sm text-slate-600 dark:text-slate-400 mt-1.5 max-w-2xl ${isArtsAndScience || isUniversity ? 'font-serif' : ''}`}>
+              <p className={courseStyles.subtitleFont}>
                 {content.subtitle}
               </p>
             )}
           </div>
           <Link
             to="/courses"
-            className={`inline-flex items-center gap-1.5 text-xs font-bold hover:underline self-start md:self-auto ${applyBtnClass}`}
+            className={`inline-flex items-center gap-1.5 text-xs font-bold self-start md:self-auto ${courseStyles.accentText}`}
           >
             <span>View All Programs</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
+        {/* 4-Column Courses Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {courses.map((c, idx) => (
             <div
               key={idx}
-              className={`bg-slate-50 dark:bg-slate-950 p-6 border transition duration-300 flex flex-col justify-between ${cardBorderClass}`}
+              className={`${courseStyles.cardBg} ${courseStyles.cardBorder} flex flex-col justify-between`}
             >
               <div className="space-y-3.5">
                 <div className="flex items-center justify-between gap-2">
-                  <span className={`px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider ${badgeLevelClass}`}>
+                  <span className={`px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${courseStyles.badge}`}>
                     {c.degreeLevel || 'Degree'}
                   </span>
                   {c.duration && (
-                    <span className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1 font-medium">
+                    <span className="text-[11px] text-slate-400 flex items-center gap-1 font-medium">
                       <Clock className="w-3 h-3" />
                       <span>{c.duration}</span>
                     </span>
                   )}
                 </div>
 
-                <h3 className={`text-base font-bold text-slate-900 dark:text-white leading-snug ${isArtsAndScience || isUniversity ? 'font-serif' : ''}`}>
+                <h3 className={`text-base font-bold leading-snug ${isArtsAndScience || isUniversity ? 'font-serif' : ''}`}>
                   {c.name}
                 </h3>
 
                 {c.description && (
-                  <p className={`text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-3 ${isArtsAndScience ? 'font-serif' : ''}`}>
+                  <p className="text-xs text-slate-400 leading-relaxed line-clamp-3">
                     {c.description}
                   </p>
                 )}
               </div>
 
-              <div className="pt-4 mt-4 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
-                <span className={`text-[11px] font-semibold text-slate-500 dark:text-slate-400 ${isArtsAndScience || isUniversity ? 'font-serif' : ''}`}>
+              <div className="pt-4 mt-4 border-t border-white/10 flex items-center justify-between">
+                <span className="text-[11px] font-semibold text-slate-400">
                   {c.department || 'Academic School'}
                 </span>
                 <Link
                   to="/admissions"
-                  className={`text-xs font-bold flex items-center gap-1 hover:underline ${applyBtnClass}`}
+                  className={`text-xs font-bold flex items-center gap-1 px-3 py-1.5 rounded-lg ${courseStyles.primaryBtn}`}
                 >
                   <span>Apply</span>
                   <ArrowRight className="w-3 h-3" />
@@ -141,6 +138,7 @@ export const CoursesSection: React.FC<CoursesProps> = ({ content }) => {
             </div>
           ))}
         </div>
+
       </div>
     </section>
   );
