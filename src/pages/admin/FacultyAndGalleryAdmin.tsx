@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 import { slugify, copyToClipboard } from '../../utils/helpers';
+import { FormDrawer, DrawerMode, FileUploadInput, ConfirmDialog } from '../../UI_Componentes/ui';
 
 interface Faculty {
   id: string;
@@ -501,14 +502,16 @@ export const GalleryManagementPage: React.FC = () => {
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
   const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
 
-  // Modal State
-  const [showModal, setShowModal] = useState(false);
+  // Drawer State
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [drawerMode, setDrawerMode] = useState<DrawerMode>('create');
   const [editingGallery, setEditingGallery] = useState<Gallery | null>(null);
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
   const [autoSlug, setAutoSlug] = useState(true);
   const [description, setDescription] = useState('');
   const [coverImageUrl, setCoverImageUrl] = useState('');
+  const [isPublished, setIsPublished] = useState(true);
 
   const showNotification = (text: string, type: 'success' | 'error' = 'success') => {
     setMessage({ text, type });
@@ -556,7 +559,9 @@ export const GalleryManagementPage: React.FC = () => {
     setAutoSlug(true);
     setDescription('');
     setCoverImageUrl('');
-    setShowModal(true);
+    setIsPublished(true);
+    setDrawerMode('create');
+    setIsDrawerOpen(true);
   };
 
   const handleOpenEdit = (g: Gallery) => {
@@ -566,7 +571,9 @@ export const GalleryManagementPage: React.FC = () => {
     setAutoSlug(false);
     setDescription(g.description || '');
     setCoverImageUrl(g.coverImageUrl || '');
-    setShowModal(true);
+    setIsPublished(g.isPublished !== false);
+    setDrawerMode('edit');
+    setIsDrawerOpen(true);
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -580,7 +587,7 @@ export const GalleryManagementPage: React.FC = () => {
           slug: finalSlug,
           description,
           coverImageUrl,
-          isPublished: editingGallery.isPublished !== false,
+          isPublished,
         });
         showNotification('Gallery album updated');
       } else {
@@ -589,11 +596,11 @@ export const GalleryManagementPage: React.FC = () => {
           slug: finalSlug,
           description,
           coverImageUrl: coverImageUrl || 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=600&q=80',
-          isPublished: true,
+          isPublished,
         });
         showNotification('Gallery album created');
       }
-      setShowModal(false);
+      setIsDrawerOpen(false);
       fetchGalleries();
     } catch (err) {
       showNotification('Failed to save gallery', 'error');
@@ -790,138 +797,144 @@ export const GalleryManagementPage: React.FC = () => {
         </div>
       )}
 
-      {/* Modal for Creating / Editing Album */}
-      {showModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-4 border border-slate-200 dark:border-slate-800">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                {editingGallery ? 'Edit Gallery Album' : 'Create Gallery Album'}
-              </h3>
-              <button
-                onClick={() => setShowModal(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-600"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+      {/* FormDrawer for Creating / Editing Gallery Album */}
+      <FormDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        title={
+          drawerMode === 'create'
+            ? 'Create Gallery Album'
+            : drawerMode === 'edit'
+            ? 'Edit Gallery Album'
+            : editingGallery?.title || 'Album Details'
+        }
+        subtitle={
+          drawerMode === 'create'
+            ? 'Upload photos and create a new campus event album'
+            : drawerMode === 'edit'
+            ? 'Update album title, slug, cover image, or details'
+            : 'Gallery album preview and settings'
+        }
+        icon={<ImageIcon className="w-5 h-5 text-primary" />}
+        mode={drawerMode}
+        onSubmit={handleSave}
+        onEditClick={() => setDrawerMode('edit')}
+        loading={actionLoading}
+        size="md"
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-xs font-bold uppercase text-slate-600 dark:text-slate-300 mb-1">
+              Album Title *
+            </label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => handleTitleChange(e.target.value)}
+              placeholder="e.g. Annual Convocation 2026"
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:outline-none"
+              required
+            />
+          </div>
 
-            <form onSubmit={handleSave} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold uppercase text-slate-600 dark:text-slate-300 mb-1">
-                  Album Title *
-                </label>
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => handleTitleChange(e.target.value)}
-                  placeholder="e.g. Annual Convocation 2026"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white text-sm"
-                  required
-                />
-              </div>
-
-              {/* URL Slug Field with Auto-Sync & Custom toggles */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <label className="block text-xs font-bold uppercase text-slate-600 dark:text-slate-300">
-                    URL Slug *
-                  </label>
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const next = !autoSlug;
-                        setAutoSlug(next);
-                        if (next && title) {
-                          setSlug(slugify(title));
-                        }
-                      }}
-                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium transition ${
-                        autoSlug
-                          ? 'bg-primary/10 text-primary hover:bg-primary/20'
-                          : 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300'
-                      }`}
-                      title={autoSlug ? 'Auto-generating from title (click to unlock custom edit)' : 'Custom slug mode (click to re-enable auto-sync)'}
-                    >
-                      {autoSlug ? <Lock className="w-2.5 h-2.5" /> : <Unlock className="w-2.5 h-2.5" />}
-                      <span>{autoSlug ? 'Auto-Sync' : 'Custom'}</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSlug(slugify(title))}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 text-slate-700 transition"
-                      title="Sync slug with current title"
-                    >
-                      <RotateCcw className="w-2.5 h-2.5" />
-                      <span>Sync</span>
-                    </button>
-                  </div>
-                </div>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={slug}
-                    onChange={(e) => {
-                      setAutoSlug(false);
-                      setSlug(slugify(e.target.value));
-                    }}
-                    placeholder="e.g. annual-convocation-2026"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white font-mono text-xs focus:ring-2 focus:ring-primary focus:outline-none"
-                    required
-                  />
-                </div>
-                <p className="text-[11px] text-slate-400">
-                  Public URL: <span className="font-mono text-primary">/gallery/{slug || 'album-slug'}</span>
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase text-slate-600 dark:text-slate-300 mb-1">
-                  Cover Image URL
-                </label>
-                <input
-                  type="text"
-                  value={coverImageUrl}
-                  onChange={(e) => setCoverImageUrl(e.target.value)}
-                  placeholder="https://images.unsplash.com/..."
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white text-xs font-mono"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase text-slate-600 dark:text-slate-300 mb-1">
-                  Album Description
-                </label>
-                <textarea
-                  rows={3}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Moments captured from campus ceremonies..."
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white text-xs"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+          {/* URL Slug Field with Auto-Sync & Custom toggles */}
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-bold uppercase text-slate-600 dark:text-slate-300">
+                URL Slug *
+              </label>
+              <div className="flex items-center gap-1.5">
                 <button
                   type="button"
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+                  onClick={() => {
+                    const next = !autoSlug;
+                    setAutoSlug(next);
+                    if (next && title) {
+                      setSlug(slugify(title));
+                    }
+                  }}
+                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium transition cursor-pointer ${
+                    autoSlug
+                      ? 'bg-primary/10 text-primary hover:bg-primary/20'
+                      : 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300'
+                  }`}
+                  title={autoSlug ? 'Auto-generating from title (click to unlock custom edit)' : 'Custom slug mode (click to re-enable auto-sync)'}
                 >
-                  Cancel
+                  {autoSlug ? <Lock className="w-2.5 h-2.5" /> : <Unlock className="w-2.5 h-2.5" />}
+                  <span>{autoSlug ? 'Auto-Sync' : 'Custom'}</span>
                 </button>
                 <button
-                  type="submit"
-                  disabled={actionLoading}
-                  className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-primary hover:opacity-90"
+                  type="button"
+                  onClick={() => setSlug(slugify(title))}
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 text-slate-700 transition cursor-pointer"
+                  title="Sync slug with current title"
                 >
-                  {actionLoading ? 'Saving...' : editingGallery ? 'Save Changes' : 'Create Album'}
+                  <RotateCcw className="w-2.5 h-2.5" />
+                  <span>Sync</span>
                 </button>
               </div>
-            </form>
+            </div>
+            <input
+              type="text"
+              value={slug}
+              onChange={(e) => {
+                setAutoSlug(false);
+                setSlug(slugify(e.target.value));
+              }}
+              placeholder="e.g. annual-convocation-2026"
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white font-mono text-xs focus:ring-2 focus:ring-primary focus:outline-none"
+              required
+            />
+            <p className="text-[11px] text-slate-400">
+              Public Route: <span className="font-mono text-primary">/gallery/{slug || 'album-slug'}</span>
+            </p>
+          </div>
+
+          {/* Local File Upload for Cover Image */}
+          <FileUploadInput
+            label="COVER IMAGE"
+            value={coverImageUrl}
+            onChange={setCoverImageUrl}
+            placeholder="/assets/templates/... or upload local image"
+            helpText="Upload an album cover photo from your computer or paste an image URL."
+            accept="image/*"
+          />
+
+          <div>
+            <label className="block text-xs font-bold uppercase text-slate-600 dark:text-slate-300 mb-1">
+              Album Description
+            </label>
+            <textarea
+              rows={3}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Moments captured from campus ceremonies, student festivals, and sports..."
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:outline-none"
+            />
+          </div>
+
+          {/* Published Status Toggle */}
+          <div className="flex items-center justify-between p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700">
+            <div>
+              <span className="text-xs font-bold uppercase text-slate-700 dark:text-slate-200 block">Album Visibility</span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                {isPublished ? 'Visible to public visitors on live site' : 'Hidden as draft'}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsPublished(!isPublished)}
+              className={`px-3 py-1 rounded-xl text-xs font-bold transition ${
+                isPublished
+                  ? 'bg-emerald-600 text-white'
+                  : 'bg-slate-300 text-slate-700 dark:bg-slate-700 dark:text-slate-300'
+              }`}
+            >
+              {isPublished ? 'Published' : 'Draft'}
+            </button>
           </div>
         </div>
-      )}
+      </FormDrawer>
     </div>
   );
 };
