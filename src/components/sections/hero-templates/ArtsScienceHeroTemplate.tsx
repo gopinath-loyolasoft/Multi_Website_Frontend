@@ -3,10 +3,6 @@ import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ArrowRight, BookOpen, Landmark, Award, GraduationCap, CheckCircle2, ShieldCheck, Sparkles } from 'lucide-react';
 import { HeroTemplateProps } from './heroTypes';
 
-const toRoman = (num: number): string => {
-  const romans = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
-  return romans[num] || String(num + 1);
-};
 
 export const ArtsScienceHeroTemplate: React.FC<HeroTemplateProps> = ({
   slides,
@@ -123,9 +119,9 @@ export const ArtsScienceHeroTemplate: React.FC<HeroTemplateProps> = ({
           )}
         </div>
 
-        {/* Centered Roman Numeral Slider Pagination */}
+        {/* Centered Dot Slider Pagination */}
         {totalSlides > 1 && (
-          <div className="pt-3 flex items-center justify-center gap-4">
+          <div className="pt-3 flex items-center justify-center gap-3">
             <button
               onClick={onPrevSlide}
               aria-label="Previous Slide"
@@ -140,14 +136,12 @@ export const ArtsScienceHeroTemplate: React.FC<HeroTemplateProps> = ({
                   key={idx}
                   onClick={() => onSelectSlide(idx)}
                   aria-label={`Go to slide ${idx + 1}`}
-                  className={`px-3 py-1 rounded-md font-serif text-xs font-bold tracking-widest transition-all ${
+                  className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
                     idx === currentSlide
-                      ? 'bg-amber-500/20 text-amber-300 border border-amber-400/50 shadow-md'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                      ? 'w-8 bg-emerald-400 shadow-md shadow-emerald-400/50'
+                      : 'w-2.5 bg-emerald-900/60 border border-emerald-500/40 hover:bg-emerald-700/60'
                   }`}
-                >
-                  {toRoman(idx)}
-                </button>
+                />
               ))}
             </div>
 

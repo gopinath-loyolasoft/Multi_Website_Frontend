@@ -147,25 +147,19 @@ export const MedicalHeroTemplate: React.FC<HeroTemplateProps> = ({
 
             {/* Vital Signs / Heartbeat Pulse Navigation Slider */}
             {totalSlides > 1 && (
-              <div className="pt-4 flex items-center gap-3">
-                <span className="text-xs font-bold text-cyan-300">
-                  SLIDE {String(currentSlide + 1)} / {String(totalSlides)}
-                </span>
-                
-                <div className="flex items-center gap-2">
-                  {slides.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => onSelectSlide(i)}
-                      aria-label={`Go to slide ${i + 1}`}
-                      className={`h-2.5 rounded-full transition-all duration-500 cursor-pointer ${
-                        i === currentSlide
-                          ? 'w-8 bg-cyan-400 shadow-md shadow-cyan-400/50'
-                          : 'w-2.5 bg-slate-700/80 hover:bg-slate-500'
-                      }`}
-                    />
-                  ))}
-                </div>
+              <div className="pt-4 flex items-center gap-2">
+                {slides.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => onSelectSlide(i)}
+                    aria-label={`Go to slide ${i + 1}`}
+                    className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
+                      i === currentSlide
+                        ? 'w-8 bg-cyan-400 shadow-md shadow-cyan-400/50'
+                        : 'w-2.5 bg-slate-700/80 hover:bg-slate-500'
+                    }`}
+                  />
+                ))}
               </div>
             )}
           </div>

@@ -140,31 +140,21 @@ export const EngineeringHeroTemplate: React.FC<HeroTemplateProps> = ({
               </div>
             )}
 
-            {/* Segmented Tech Progress Bar Controls */}
+            {/* Tech Dot Slider Controls */}
             {totalSlides > 1 && (
-              <div className="pt-4 flex items-center gap-4">
-                <span className="font-mono text-xs font-bold text-amber-300 tracking-wider">
-                  [{String(currentSlide + 1).padStart(2, '0')}]
-                </span>
-                
-                <div className="flex items-center gap-1.5 flex-1 max-w-[200px]">
-                  {slides.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => onSelectSlide(i)}
-                      aria-label={`Go to slide ${i + 1}`}
-                      className={`h-2 rounded-sm transition-all duration-500 cursor-pointer flex-1 ${
-                        i === currentSlide
-                          ? 'bg-amber-400 shadow-md shadow-amber-400/50'
-                          : 'bg-slate-700/80 hover:bg-slate-500'
-                      }`}
-                    />
-                  ))}
-                </div>
-
-                <span className="font-mono text-xs text-slate-400">
-                  [{String(totalSlides).padStart(2, '0')}]
-                </span>
+              <div className="pt-4 flex items-center gap-2">
+                {slides.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => onSelectSlide(i)}
+                    aria-label={`Go to slide ${i + 1}`}
+                    className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
+                      i === currentSlide
+                        ? 'w-8 bg-amber-400 shadow-md shadow-amber-400/50'
+                        : 'w-2.5 bg-slate-700/80 hover:bg-slate-500'
+                    }`}
+                  />
+                ))}
               </div>
             )}
           </div>

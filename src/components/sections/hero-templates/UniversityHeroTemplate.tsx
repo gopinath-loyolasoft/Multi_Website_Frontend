@@ -133,27 +133,21 @@ export const UniversityHeroTemplate: React.FC<HeroTemplateProps> = ({
               </div>
             )}
 
-            {/* Royal Gold Slider Tracker (01 / 03 — Headline) */}
+            {/* Royal Gold Dot Slider Controls */}
             {totalSlides > 1 && (
-              <div className="pt-4 flex items-center gap-3">
-                <span className="font-serif text-xs font-bold text-amber-300 tracking-wider">
-                  {String(currentSlide + 1).padStart(2, '0')} / {String(totalSlides).padStart(2, '0')}
-                </span>
-                
-                <div className="flex items-center gap-1.5 flex-1 max-w-[180px]">
-                  {slides.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => onSelectSlide(i)}
-                      aria-label={`Go to slide ${i + 1}`}
-                      className={`h-1.5 rounded-full transition-all duration-500 cursor-pointer flex-1 ${
-                        i === currentSlide
-                          ? 'bg-amber-400 shadow-md shadow-amber-400/60'
-                          : 'bg-slate-700/80 hover:bg-slate-500'
-                      }`}
-                    />
-                  ))}
-                </div>
+              <div className="pt-4 flex items-center gap-2">
+                {slides.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => onSelectSlide(i)}
+                    aria-label={`Go to slide ${i + 1}`}
+                    className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
+                      i === currentSlide
+                        ? 'w-8 bg-amber-400 shadow-md shadow-amber-400/60'
+                        : 'w-2.5 bg-slate-700/80 hover:bg-slate-500'
+                    }`}
+                  />
+                ))}
               </div>
             )}
           </div>
