@@ -39,21 +39,21 @@ export const UniversityHeroTemplate: React.FC<HeroTemplateProps> = ({
             <img
               src={s.imageUrl}
               alt={s.headline || 'University Banner Slide'}
-              className="w-full h-full object-cover object-center opacity-85 transition-transform duration-1000 ease-out transform scale-105"
+              className="w-full h-full object-cover object-center opacity-100 transition-opacity duration-700"
             />
           )}
-          {/* Monumental Royal Crimson & Navy Overlay */}
+          {/* Subtle Collegiate Contrast Overlay */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              backgroundImage: 'linear-gradient(to right, rgba(2,6,23,0.96) 0%, rgba(136,19,55,0.45) 55%, rgba(15,23,42,0.30) 100%)',
+              backgroundImage: 'linear-gradient(to right, rgba(2,6,23,0.80) 0%, rgba(136,19,55,0.30) 50%, rgba(15,23,42,0.15) 100%)',
             }}
           />
-          {/* Subtle Archival Texture / Vignette */}
+          {/* Soft Edge Vignette */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: 'linear-gradient(to top, rgba(2, 6, 23, 0.90) 0%, transparent 55%, rgba(2, 6, 23, 0.45) 100%)',
+              background: 'linear-gradient(to top, rgba(2, 6, 23, 0.45) 0%, transparent 35%, rgba(2, 6, 23, 0.25) 100%)',
             }}
           />
         </div>

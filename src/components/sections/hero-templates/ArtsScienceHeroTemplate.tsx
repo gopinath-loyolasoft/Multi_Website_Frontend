@@ -40,21 +40,21 @@ export const ArtsScienceHeroTemplate: React.FC<HeroTemplateProps> = ({
             <img
               src={s.imageUrl}
               alt={s.headline || 'Heritage Banner Slide'}
-              className="w-full h-full object-cover object-center opacity-85 transition-transform duration-1000 ease-out transform scale-105"
+              className="w-full h-full object-cover object-center opacity-100 transition-opacity duration-700"
             />
           )}
-          {/* Classical Royal Green & Gold Overlay */}
+          {/* Subtle Heritage Contrast Overlay */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              backgroundImage: 'radial-gradient(ellipse at center, rgba(6,78,59,0.30) 0%, rgba(2,6,23,0.92) 85%)',
+              backgroundImage: 'radial-gradient(ellipse at center, rgba(6,78,59,0.15) 0%, rgba(2,6,23,0.70) 90%)',
             }}
           />
-          {/* Subtle Top & Bottom Archival Vignette */}
+          {/* Soft Edge Vignette */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: 'linear-gradient(to top, rgba(2, 6, 23, 0.95) 0%, transparent 60%, rgba(2, 6, 23, 0.50) 100%)',
+              background: 'linear-gradient(to top, rgba(2, 6, 23, 0.50) 0%, transparent 40%, rgba(2, 6, 23, 0.25) 100%)',
             }}
           />
         </div>
