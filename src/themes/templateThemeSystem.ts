@@ -39,6 +39,7 @@ export interface ModuleThemeStyles {
   statistics: {
     sectionBg: string;
     bgPatternOverlay: React.CSSProperties;
+    headerAlignment: string;
     headerBadge: string;
     headerTitleFont: string;
     headerSubtitleFont: string;
@@ -54,6 +55,8 @@ export interface ModuleThemeStyles {
   // Quote / Leadership Section
   quote: {
     sectionBg: string;
+    isCentered: boolean;
+    layoutContainer: string;
     photoContainer: string;
     photoFrame: string;
     quoteBox: string;

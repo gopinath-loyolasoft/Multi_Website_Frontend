@@ -44,6 +44,7 @@ export const ENGINEERING_THEME: ModuleThemeStyles = {
       backgroundSize: '28px 28px',
       opacity: 0.1,
     },
+    headerAlignment: 'text-left max-w-3xl',
     headerBadge: 'bg-slate-900 border-amber-400/40 text-amber-300',
     headerTitleFont: 'font-sans font-black uppercase tracking-tight text-white',
     headerSubtitleFont: 'font-mono text-slate-400',
@@ -60,6 +61,8 @@ export const ENGINEERING_THEME: ModuleThemeStyles = {
   // Quote / Leadership Section
   quote: {
     sectionBg: 'bg-slate-950 text-white border-y border-slate-800',
+    isCentered: false,
+    layoutContainer: 'grid grid-cols-1 lg:grid-cols-12 gap-8 items-center',
     photoContainer: 'lg:col-span-4 bg-slate-900/90 backdrop-blur-xl border border-amber-400/30 rounded-3xl p-6 sm:p-7 shadow-2xl space-y-4',
     photoFrame: 'aspect-square rounded-2xl overflow-hidden border border-slate-700 bg-slate-800',
     quoteBox: 'lg:col-span-8 bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 sm:p-10 shadow-2xl space-y-5',

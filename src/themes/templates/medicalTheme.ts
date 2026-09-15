@@ -44,6 +44,7 @@ export const MEDICAL_THEME: ModuleThemeStyles = {
       backgroundSize: '36px 36px',
       opacity: 1,
     },
+    headerAlignment: 'text-left max-w-3xl',
     headerBadge: 'bg-cyan-100 border-cyan-300 text-cyan-800 font-sans font-bold',
     headerTitleFont: 'font-sans font-extrabold tracking-tight text-slate-900 text-2xl sm:text-4xl',
     headerSubtitleFont: 'font-sans text-slate-600 text-xs sm:text-sm',
@@ -57,9 +58,11 @@ export const MEDICAL_THEME: ModuleThemeStyles = {
     tagBadge: 'text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-cyan-100 text-cyan-800 border border-cyan-200',
   },
 
-  // Quote / Leadership Section (Medical Director Station)
+  // Quote / Leadership Section (Medical Director Clinical Station)
   quote: {
     sectionBg: 'bg-white text-slate-900 border-y border-cyan-100',
+    isCentered: false,
+    layoutContainer: 'grid grid-cols-1 lg:grid-cols-12 gap-8 items-center',
     photoContainer: 'lg:col-span-4 bg-slate-50 border border-cyan-200 rounded-3xl p-6 sm:p-7 shadow-lg space-y-4',
     photoFrame: 'aspect-square rounded-2xl overflow-hidden border-2 border-cyan-200 bg-white',
     quoteBox: 'lg:col-span-8 bg-cyan-50/50 border border-cyan-200/80 rounded-3xl p-8 sm:p-10 shadow-lg space-y-5',

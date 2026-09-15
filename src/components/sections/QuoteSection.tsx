@@ -33,10 +33,56 @@ export const QuoteSection: React.FC<QuoteSectionProps> = ({ content }) => {
     return null;
   }
 
+  // Centered Plaque Layout (Arts & Science, University)
+  if (q.isCentered) {
+    return (
+      <section className={`py-16 sm:py-20 relative overflow-hidden ${q.sectionBg}`}>
+        <div className={`${q.layoutContainer} px-6 sm:px-10 relative z-10 animate-in fade-in duration-700`}>
+          
+          {/* Crest Badge */}
+          <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs ${q.badgeClass}`}>
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>{content?.title || "Leadership Vision & Academic Charter"}</span>
+            <Sparkles className="w-3.5 h-3.5" />
+          </div>
+
+          {/* Grand Centered Quote */}
+          <div className="relative pt-3">
+            <Quote className={`w-10 h-10 mx-auto mb-4 ${q.iconColor}`} />
+            <blockquote className={q.quoteTextFont}>
+              "{quoteText}"
+            </blockquote>
+          </div>
+
+          {/* Cameo / Author Card */}
+          <div className={q.photoContainer}>
+            <div className={q.photoFrame}>
+              <img
+                src={authorImage}
+                alt={authorName}
+                className="w-full h-full object-cover rounded-full"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/assets/templates/common/leader_portrait.svg';
+                }}
+              />
+            </div>
+            <div className="text-center">
+              <div className={q.authorNameFont}>{authorName}</div>
+              <div className={q.authorTitleFont}>{authorTitle}</div>
+              {subText && <div className={q.subTextFont}>{subText}</div>}
+            </div>
+          </div>
+
+        </div>
+      </section>
+    );
+  }
+
+  // Split Screen Industrial / Clinical Layout (Engineering, Medical)
   return (
     <section className={`py-14 sm:py-18 relative overflow-hidden ${q.sectionBg}`}>
       <div className="max-w-screen-2xl mx-auto px-6 sm:px-10 lg:px-16 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div className={q.layoutContainer}>
           
           {/* Photo & Author Card */}
           <div className={q.photoContainer}>

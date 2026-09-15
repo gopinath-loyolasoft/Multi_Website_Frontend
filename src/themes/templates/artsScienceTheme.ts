@@ -2,7 +2,7 @@ import React from 'react';
 import { ModuleThemeStyles } from '../templateThemeSystem';
 
 export const ARTS_SCIENCE_THEME: ModuleThemeStyles = {
-  // Hero Section (Retains atmospheric classical backdrop with emerald/gold overlay)
+  // Hero Section
   hero: {
     overlayGradient: {
       backgroundImage: 'radial-gradient(ellipse at center, rgba(6,78,59,0.30) 0%, rgba(2,6,23,0.92) 85%)',
@@ -43,6 +43,7 @@ export const ARTS_SCIENCE_THEME: ModuleThemeStyles = {
       backgroundImage: 'radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 70%)',
       opacity: 1,
     },
+    headerAlignment: 'text-center max-w-3xl mx-auto',
     headerBadge: 'bg-emerald-100 text-emerald-800 border border-emerald-300 font-serif font-bold',
     headerTitleFont: 'font-serif font-bold text-emerald-950 text-2xl sm:text-4xl tracking-normal',
     headerSubtitleFont: 'font-serif text-slate-600 italic text-sm',
@@ -56,10 +57,12 @@ export const ARTS_SCIENCE_THEME: ModuleThemeStyles = {
     tagBadge: 'font-serif text-[10px] uppercase px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200',
   },
 
-  // Quote / Leadership Section (Classical Editorial Plaque)
+  // Quote / Leadership Section (Centered Classical Editorial Plaque)
   quote: {
     sectionBg: 'bg-[#f5f2eb] text-slate-900 border-y border-emerald-900/10',
-    photoContainer: 'max-w-4xl mx-auto text-center space-y-8',
+    isCentered: true,
+    layoutContainer: 'max-w-4xl mx-auto text-center space-y-8',
+    photoContainer: 'pt-4 flex flex-col items-center space-y-3',
     photoFrame: 'w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-3 border-emerald-600 shadow-xl p-1 bg-white mx-auto',
     quoteBox: 'relative text-center',
     quoteTextFont: 'font-serif italic text-emerald-950 text-xl sm:text-2xl lg:text-3xl leading-relaxed max-w-3xl mx-auto',

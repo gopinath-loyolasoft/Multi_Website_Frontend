@@ -43,6 +43,7 @@ export const UNIVERSITY_THEME: ModuleThemeStyles = {
       backgroundImage: 'radial-gradient(circle at 50% 30%, rgba(136,19,55,0.05) 0%, transparent 70%)',
       opacity: 1,
     },
+    headerAlignment: 'text-center max-w-3xl mx-auto',
     headerBadge: 'bg-rose-100 border-rose-300 text-rose-900 font-serif font-bold',
     headerTitleFont: 'font-serif font-bold text-rose-950 text-2xl sm:text-4xl tracking-normal drop-shadow-sm',
     headerSubtitleFont: 'font-serif text-slate-600 text-sm',
@@ -56,13 +57,15 @@ export const UNIVERSITY_THEME: ModuleThemeStyles = {
     tagBadge: 'font-serif text-[10px] uppercase px-2 py-0.5 rounded bg-rose-100 text-rose-900 border border-rose-200',
   },
 
-  // Quote / Leadership Section (Chancellor's Grand Archival Chamber)
+  // Quote / Leadership Section (Chancellor's Grand Archival Chamber - Centered)
   quote: {
     sectionBg: 'bg-[#f7f4ee] text-slate-900 border-y border-stone-200',
-    photoContainer: 'max-w-5xl mx-auto text-center space-y-8',
-    photoFrame: 'w-16 h-16 rounded-full overflow-hidden border-2 border-rose-900 shadow-md shrink-0 mx-auto',
+    isCentered: true,
+    layoutContainer: 'max-w-4xl mx-auto text-center space-y-8',
+    photoContainer: 'pt-4 flex items-center justify-center gap-4 max-w-md mx-auto p-4 rounded-2xl bg-white border border-stone-200 shadow-md',
+    photoFrame: 'w-16 h-16 rounded-full overflow-hidden border-2 border-rose-900 shadow-sm shrink-0',
     quoteBox: 'relative text-center',
-    quoteTextFont: 'font-serif font-bold text-rose-950 text-xl sm:text-2xl lg:text-3xl leading-relaxed max-w-4xl mx-auto',
+    quoteTextFont: 'font-serif font-bold text-rose-950 text-xl sm:text-2xl lg:text-3xl leading-relaxed max-w-3xl mx-auto',
     authorNameFont: 'font-serif font-bold text-base text-rose-900',
     authorTitleFont: 'font-serif text-xs text-amber-700',
     subTextFont: 'font-serif text-[11px] text-slate-500',

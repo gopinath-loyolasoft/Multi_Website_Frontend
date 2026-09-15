@@ -141,7 +141,7 @@ export const StatisticsSection: React.FC<StatisticsProps> = ({ content }) => {
       <div className="max-w-screen-2xl mx-auto px-6 sm:px-10 lg:px-16 relative z-10">
         
         {/* Section Header */}
-        <div className="mb-10 space-y-2">
+        <div className={`mb-10 space-y-2 ${s.headerAlignment}`}>
           <div className={`inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${s.headerBadge}`}>
             <Sparkles className="w-3.5 h-3.5" />
             <span>Key Metrics & Institutional Record</span>
