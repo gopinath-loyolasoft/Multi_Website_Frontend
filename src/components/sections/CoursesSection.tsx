@@ -63,34 +63,60 @@ export const CoursesSection: React.FC<CoursesProps> = ({ content }) => {
 
   const TagIcon = isArtsAndScience ? BookOpen : isMedical ? HeartPulse : isUniversity ? GraduationCap : Award;
 
+  const isCenterAligned = isArtsAndScience || isUniversity;
+
   return (
     <section className={courseStyles.sectionBg}>
       <div className="max-w-screen-2xl mx-auto px-6 sm:px-10 lg:px-16">
         
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
-          <div>
-            <div className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold mb-2.5 ${courseStyles.sectionHeaderBadge}`}>
+        {isCenterAligned ? (
+          <div className="text-center max-w-3xl mx-auto mb-12 space-y-3 flex flex-col items-center">
+            <div className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold ${courseStyles.sectionHeaderBadge}`}>
               <TagIcon className="w-3.5 h-3.5" />
-              <span>{isMedical ? 'Medical & Health Degree Programs' : isArtsAndScience ? 'Humanities & Pure Science Programs' : isUniversity ? 'Faculties & Degree Programs' : 'Degree Programs'}</span>
+              <span>{isArtsAndScience ? 'Humanities & Pure Science Programs' : 'Faculties & Degree Programs'}</span>
             </div>
             <h2 className={courseStyles.headingFont}>
-              {content.title || (isUniversity ? 'University Curricula & Degrees' : isMedical ? 'Clinical & Medical Degrees' : 'Explore Academic Programs')}
+              {content.title || (isUniversity ? 'University Curricula & Degrees' : 'Explore Academic Programs')}
             </h2>
             {content.subtitle && (
-              <p className={courseStyles.subtitleFont}>
+              <p className={`${courseStyles.subtitleFont} max-w-2xl mx-auto`}>
                 {content.subtitle}
               </p>
             )}
+            <Link
+              to="/courses"
+              className={`inline-flex items-center gap-1.5 text-xs font-bold pt-1 ${courseStyles.accentText}`}
+            >
+              <span>View All Programs</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
-          <Link
-            to="/courses"
-            className={`inline-flex items-center gap-1.5 text-xs font-bold self-start md:self-auto ${courseStyles.accentText}`}
-          >
-            <span>View All Programs</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
+        ) : (
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+            <div>
+              <div className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold mb-2.5 ${courseStyles.sectionHeaderBadge}`}>
+                <TagIcon className="w-3.5 h-3.5" />
+                <span>{isMedical ? 'Medical & Health Degree Programs' : 'Degree Programs'}</span>
+              </div>
+              <h2 className={courseStyles.headingFont}>
+                {content.title || (isMedical ? 'Clinical & Medical Degrees' : 'Explore Academic Programs')}
+              </h2>
+              {content.subtitle && (
+                <p className={courseStyles.subtitleFont}>
+                  {content.subtitle}
+                </p>
+              )}
+            </div>
+            <Link
+              to="/courses"
+              className={`inline-flex items-center gap-1.5 text-xs font-bold self-start md:self-auto ${courseStyles.accentText}`}
+            >
+              <span>View All Programs</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        )}
 
         {/* 4-Column Courses Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

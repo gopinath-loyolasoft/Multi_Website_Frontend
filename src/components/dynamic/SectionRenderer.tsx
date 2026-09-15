@@ -36,98 +36,89 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({ section }) => 
   if (!section.isVisible) return null;
 
   const settings = section.settings || {};
-  const isHero = ['HERO', 'HERO_SLIDER', 'BANNERS'].includes(section.sectionType.toUpperCase());
+  const isSelfContained = [
+    'HERO',
+    'HERO_SLIDER',
+    'BANNERS',
+    'QUOTE',
+    'STATISTICS',
+    'STATS',
+    'DEPARTMENTS',
+    'COURSES',
+    'FACULTY',
+    'NEWS',
+    'EVENTS',
+    'NOTICES',
+    'GALLERY',
+    'TESTIMONIALS',
+    'CALL_TO_ACTION',
+    'CTA',
+    'CONTACT',
+    'MAP',
+    'FAQ',
+    'LOGO_GRID',
+    'VIDEO',
+    'CARDS',
+    'ICON_CARDS',
+  ].includes(section.sectionType.toUpperCase());
 
-  const bgClass =
-    settings.background === 'muted'
-      ? 'bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100'
-      : settings.background === 'dark'
-      ? 'bg-slate-900 dark:bg-black text-white'
-      : settings.background === 'gradient'
-      ? 'bg-gradient-to-b from-primary/10 via-white to-slate-50 dark:from-slate-950 dark:to-slate-900 text-slate-900 dark:text-slate-100'
-      : 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100';
-
-  const spacingClass =
-    settings.spacing === 'compact'
-      ? 'py-8'
-      : settings.spacing === 'large'
-      ? 'py-20 md:py-28'
-      : 'py-12 md:py-16';
-
-  const widthClass =
-    settings.containerWidth === 'narrow'
-      ? 'max-w-4xl mx-auto px-4'
-      : settings.containerWidth === 'full'
-      ? 'w-full px-4 sm:px-6'
-      : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8';
-
-  const alignClass = isArtsAndScience 
-    ? 'text-center'
-    : isUniversity
-    ? 'text-center'
-    : settings.alignment === 'left'
-    ? 'text-left'
-    : 'text-left md:text-center';
-
-  const titleFontClass = isArtsAndScience 
-    ? 'font-serif font-black tracking-normal text-emerald-950 dark:text-emerald-100'
-    : isUniversity
-    ? 'font-serif font-extrabold tracking-tight text-slate-900 dark:text-white'
-    : isMedical
-    ? 'font-sans font-black tracking-tight text-teal-950 dark:text-teal-100'
-    : 'font-sans font-black tracking-tight text-slate-900 dark:text-white';
+  const effectiveContent = {
+    ...section.content,
+    title: section.content?.title || section.title,
+    subtitle: section.content?.subtitle || section.subtitle,
+  };
 
   const renderContent = () => {
     switch (section.sectionType.toUpperCase()) {
       case 'HERO':
-        return <HeroSection content={section.content || {}} />;
+        return <HeroSection content={effectiveContent} />;
       case 'HERO_SLIDER':
       case 'BANNERS':
-        return <HeroSliderSection content={section.content || {}} />;
+        return <HeroSliderSection content={effectiveContent} />;
       case 'QUOTE':
-        return <QuoteSection content={section.content || {}} />;
+        return <QuoteSection content={effectiveContent} />;
       case 'TEXT':
-        return <TextSection content={section.content || {}} />;
+        return <TextSection content={effectiveContent} />;
       case 'IMAGE':
-        return <ImageSection content={section.content || {}} />;
+        return <ImageSection content={effectiveContent} />;
       case 'IMAGE_TEXT':
-        return <ImageTextSection content={section.content || {}} />;
+        return <ImageTextSection content={effectiveContent} />;
       case 'CARDS':
-        return <CardsSection content={section.content || {}} />;
+        return <CardsSection content={effectiveContent} />;
       case 'STATISTICS':
       case 'STATS':
-        return <StatisticsSection content={section.content || {}} />;
+        return <StatisticsSection content={effectiveContent} />;
       case 'ICON_CARDS':
-        return <IconCardsSection content={section.content || {}} />;
+        return <IconCardsSection content={effectiveContent} />;
       case 'NEWS':
-        return <NewsSection content={section.content || {}} />;
+        return <NewsSection content={effectiveContent} />;
       case 'EVENTS':
-        return <EventsSection content={section.content || {}} />;
+        return <EventsSection content={effectiveContent} />;
       case 'NOTICES':
-        return <NoticesSection content={section.content || {}} />;
+        return <NoticesSection content={effectiveContent} />;
       case 'COURSES':
-        return <CoursesSection content={section.content || {}} />;
+        return <CoursesSection content={effectiveContent} />;
       case 'DEPARTMENTS':
-        return <DepartmentsSection content={section.content || {}} />;
+        return <DepartmentsSection content={effectiveContent} />;
       case 'FACULTY':
-        return <FacultySection content={section.content || {}} />;
+        return <FacultySection content={effectiveContent} />;
       case 'GALLERY':
-        return <GallerySection content={section.content || {}} />;
+        return <GallerySection content={effectiveContent} />;
       case 'TESTIMONIALS':
-        return <TestimonialsSection content={section.content || {}} />;
+        return <TestimonialsSection content={effectiveContent} />;
       case 'CALL_TO_ACTION':
       case 'CTA':
-        return <CtaSection content={section.content || {}} />;
+        return <CtaSection content={effectiveContent} />;
       case 'VIDEO':
-        return <VideoSection content={section.content || {}} />;
+        return <VideoSection content={effectiveContent} />;
       case 'LOGO_GRID':
-        return <LogoGridSection content={section.content || {}} />;
+        return <LogoGridSection content={effectiveContent} />;
       case 'FAQ':
-        return <FaqSection content={section.content || {}} />;
+        return <FaqSection content={effectiveContent} />;
       case 'CONTACT':
-        return <ContactSection content={section.content || {}} />;
+        return <ContactSection content={effectiveContent} />;
       case 'MAP':
-        return <MapSection content={section.content || {}} />;
+        return <MapSection content={effectiveContent} />;
       default:
         return (
           <div className="p-8 my-4 max-w-6xl mx-auto bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-sm">
@@ -185,9 +176,9 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({ section }) => 
 
   const anchorId = getSectionAnchorId(section);
 
-  if (isHero) {
+  if (isSelfContained) {
     return (
-      <section
+      <div
         id={anchorId}
         data-section-id={section.id}
         data-section-type={section.sectionType}
@@ -195,9 +186,48 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({ section }) => 
         style={{ scrollMarginTop: '85px' }}
       >
         {renderContent()}
-      </section>
+      </div>
     );
   }
+
+  const bgClass =
+    settings.background === 'muted'
+      ? 'bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100'
+      : settings.background === 'dark'
+      ? 'bg-slate-900 dark:bg-black text-white'
+      : settings.background === 'gradient'
+      ? 'bg-gradient-to-b from-primary/10 via-white to-slate-50 dark:from-slate-950 dark:to-slate-900 text-slate-900 dark:text-slate-100'
+      : 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100';
+
+  const spacingClass =
+    settings.spacing === 'compact'
+      ? 'py-8'
+      : settings.spacing === 'large'
+      ? 'py-20 md:py-28'
+      : 'py-12 md:py-16';
+
+  const widthClass =
+    settings.containerWidth === 'narrow'
+      ? 'max-w-4xl mx-auto px-4'
+      : settings.containerWidth === 'full'
+      ? 'w-full px-4 sm:px-6'
+      : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8';
+
+  const alignClass = isArtsAndScience 
+    ? 'text-center'
+    : isUniversity
+    ? 'text-center'
+    : settings.alignment === 'left'
+    ? 'text-left'
+    : 'text-left md:text-center';
+
+  const titleFontClass = isArtsAndScience 
+    ? 'font-serif font-black tracking-normal text-emerald-950 dark:text-emerald-100'
+    : isUniversity
+    ? 'font-serif font-extrabold tracking-tight text-slate-900 dark:text-white'
+    : isMedical
+    ? 'font-sans font-black tracking-tight text-teal-950 dark:text-teal-100'
+    : 'font-sans font-black tracking-tight text-slate-900 dark:text-white';
 
   return (
     <section

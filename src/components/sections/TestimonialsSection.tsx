@@ -3,6 +3,7 @@ import { Star, MessageSquare } from 'lucide-react';
 
 import { apiClient } from '../../services/apiClient';
 import { SectionError } from './SectionError';
+import { useTheme } from '../../themes/ThemeContext';
 
 interface TestimonialItem {
   name: string;
@@ -22,7 +23,10 @@ interface TestimonialsProps {
 }
 
 export const TestimonialsSection: React.FC<TestimonialsProps> = ({ content }) => {
-const [fetchedList, setFetchedList] = React.useState<TestimonialItem[]>([]);
+  const { isArtsAndScience, isMedical, isUniversity } = useTheme();
+  const isCenterAligned = isArtsAndScience || isUniversity;
+
+  const [fetchedList, setFetchedList] = React.useState<TestimonialItem[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -53,16 +57,32 @@ const [fetchedList, setFetchedList] = React.useState<TestimonialItem[]>([]);
   }
   if (!loading && list.length === 0) return null;
 
+  const badgeClass = isArtsAndScience 
+    ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 font-serif' 
+    : isUniversity 
+    ? 'bg-rose-100 text-rose-900 border border-rose-200 font-serif' 
+    : isMedical 
+    ? 'bg-teal-100 text-teal-800 border border-teal-200 font-sans' 
+    : 'bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300 font-sans';
+
+  const headingFont = isArtsAndScience 
+    ? 'font-serif font-bold text-emerald-950 dark:text-emerald-50 text-3xl sm:text-4xl' 
+    : isUniversity 
+    ? 'font-serif font-bold text-rose-950 dark:text-amber-50 text-3xl sm:text-4xl' 
+    : isMedical 
+    ? 'font-sans font-extrabold text-slate-900 dark:text-white text-3xl sm:text-4xl' 
+    : 'font-sans font-black text-slate-900 dark:text-white text-3xl sm:text-4xl';
+
   return (
     <section className="py-16 bg-white dark:bg-slate-900 transition-colors">
       <div className="max-w-screen-2xl mx-auto px-6 sm:px-10 lg:px-16">
         {(content.title || content.subtitle) && (
-          <div className="text-center max-w-2xl mx-auto mb-12 space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300">
+          <div className={`${isCenterAligned ? 'text-center max-w-2xl mx-auto' : 'text-left max-w-2xl'} mb-12 space-y-2`}>
+            <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${badgeClass}`}>
               <MessageSquare className="w-3.5 h-3.5" />
               <span>Voices of Success</span>
             </div>
-            <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+            <h2 className={headingFont}>
               {content.title || 'What Our Alumni Say'}
             </h2>
             {content.subtitle && (

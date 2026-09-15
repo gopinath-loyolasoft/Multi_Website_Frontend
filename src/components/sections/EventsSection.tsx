@@ -4,19 +4,28 @@ import { CalendarDays, MapPin, ArrowRight } from 'lucide-react';
 import { EventItem } from '../../types';
 import { apiClient } from '../../services/apiClient';
 import { SectionError } from './SectionError';
+import { useTheme } from '../../themes/ThemeContext';
 
 interface EventsSectionProps {
   content: {
     heading?: string;
     subheading?: string;
+    title?: string;
+    subtitle?: string;
     limit?: number;
   };
 }
 
 export const EventsSection: React.FC<EventsSectionProps> = ({ content }) => {
-const [events, setEvents] = useState<EventItem[]>([]);
+  const { isArtsAndScience, isMedical, isUniversity } = useTheme();
+  const isCenterAligned = isArtsAndScience || isUniversity;
+
+  const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const title = content.title || content.heading || 'Upcoming Campus Events';
+  const subtitle = content.subtitle || content.subheading || 'Key academic conferences, symposiums, and student activities';
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -43,22 +52,52 @@ const [events, setEvents] = useState<EventItem[]>([]);
 
   if (!loading && events.length === 0) return null;
 
+  const headingFont = isArtsAndScience 
+    ? 'font-serif font-bold text-emerald-950 dark:text-emerald-50 text-3xl sm:text-4xl' 
+    : isUniversity 
+    ? 'font-serif font-bold text-rose-950 dark:text-amber-50 text-3xl sm:text-4xl' 
+    : isMedical 
+    ? 'font-sans font-extrabold text-slate-900 dark:text-white text-3xl sm:text-4xl' 
+    : 'font-sans font-black text-slate-900 dark:text-white text-3xl sm:text-4xl';
+
+  const linkColor = isArtsAndScience 
+    ? 'text-emerald-700 hover:text-emerald-900 font-serif' 
+    : isUniversity 
+    ? 'text-rose-900 hover:text-amber-700 font-serif' 
+    : isMedical 
+    ? 'text-cyan-700 hover:text-cyan-900' 
+    : 'text-primary hover:underline';
+
   return (
     <section className="py-16 bg-slate-50 border-b border-slate-100">
       <div className="max-w-6xl mx-auto px-6">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
-          <div>
-            <h2 className="text-3xl font-extrabold text-slate-900">{content.heading || 'Upcoming Events'}</h2>
-            <p className="text-slate-500 mt-1">{content.subheading || 'Key academic & student activities'}</p>
+        {isCenterAligned ? (
+          <div className="text-center max-w-3xl mx-auto mb-10 space-y-2 flex flex-col items-center">
+            <h2 className={headingFont}>{title}</h2>
+            <p className="text-slate-500 text-sm max-w-2xl mx-auto">{subtitle}</p>
+            <Link
+              to="/events"
+              className={`inline-flex items-center gap-1.5 font-semibold text-sm pt-1 ${linkColor}`}
+            >
+              <span>View Full Calendar</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
-          <Link
-            to="/events"
-            className="inline-flex items-center gap-1.5 font-semibold text-primary hover:underline text-sm"
-          >
-            <span>View Full Calendar</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
+        ) : (
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
+            <div>
+              <h2 className={headingFont}>{title}</h2>
+              <p className="text-slate-500 text-sm mt-1">{subtitle}</p>
+            </div>
+            <Link
+              to="/events"
+              className={`inline-flex items-center gap-1.5 font-semibold text-sm ${linkColor} self-start sm:self-auto`}
+            >
+              <span>View Full Calendar</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        )}
 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-pulse">

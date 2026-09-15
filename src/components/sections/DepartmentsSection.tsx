@@ -58,34 +58,60 @@ export const DepartmentsSection: React.FC<DepartmentsProps> = ({ content }) => {
 
   const BadgeIcon = isArtsAndScience ? BookOpen : isMedical ? Stethoscope : isUniversity ? Landmark : Building2;
 
+  const isCenterAligned = isArtsAndScience || isUniversity;
+
   return (
     <section className={deptStyles.sectionBg}>
       <div className="max-w-screen-2xl mx-auto px-6 sm:px-10 lg:px-16">
         
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
-          <div>
-            <div className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold mb-2.5 ${deptStyles.sectionHeaderBadge}`}>
+        {isCenterAligned ? (
+          <div className="text-center max-w-3xl mx-auto mb-12 space-y-3 flex flex-col items-center">
+            <div className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold ${deptStyles.sectionHeaderBadge}`}>
               <BadgeIcon className="w-3.5 h-3.5" />
-              <span>{isMedical ? 'Medical & Clinical Faculties' : isArtsAndScience ? 'Arts, Science & Humanities' : isUniversity ? 'University Schools & Colleges' : 'Academic Divisions'}</span>
+              <span>{isArtsAndScience ? 'Arts, Science & Humanities' : 'University Schools & Colleges'}</span>
             </div>
             <h2 className={deptStyles.headingFont}>
-              {content.title || (isUniversity ? 'Faculties & Research Schools' : isMedical ? 'Clinical Departments & Specialty Wings' : 'Departments & Academic Schools')}
+              {content.title || (isUniversity ? 'Faculties & Research Schools' : 'Departments & Academic Schools')}
             </h2>
             {content.subtitle && (
-              <p className={deptStyles.subtitleFont}>
+              <p className={`${deptStyles.subtitleFont} max-w-2xl mx-auto`}>
                 {content.subtitle}
               </p>
             )}
+            <Link
+              to="/departments"
+              className={`inline-flex items-center gap-1.5 text-xs font-bold pt-1 ${deptStyles.accentText}`}
+            >
+              <span>All Departments</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
-          <Link
-            to="/departments"
-            className={`inline-flex items-center gap-1.5 text-xs font-bold self-start md:self-auto ${deptStyles.accentText}`}
-          >
-            <span>All Departments</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
+        ) : (
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+            <div>
+              <div className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold mb-2.5 ${deptStyles.sectionHeaderBadge}`}>
+                <BadgeIcon className="w-3.5 h-3.5" />
+                <span>{isMedical ? 'Medical & Clinical Faculties' : 'Academic Divisions'}</span>
+              </div>
+              <h2 className={deptStyles.headingFont}>
+                {content.title || (isMedical ? 'Clinical Departments & Specialty Wings' : 'Departments & Academic Schools')}
+              </h2>
+              {content.subtitle && (
+                <p className={deptStyles.subtitleFont}>
+                  {content.subtitle}
+                </p>
+              )}
+            </div>
+            <Link
+              to="/departments"
+              className={`inline-flex items-center gap-1.5 text-xs font-bold self-start md:self-auto ${deptStyles.accentText}`}
+            >
+              <span>All Departments</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        )}
 
         {/* 3-Column Departments Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

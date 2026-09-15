@@ -1,16 +1,11 @@
 import React from 'react';
 import { 
-
-
-
   Globe2, 
   Award, 
-
-
-
   Compass,
   Lightbulb
 } from 'lucide-react';
+import { useTheme } from '../../themes/ThemeContext';
 
 interface IconCardItem {
   title: string;
@@ -28,6 +23,9 @@ interface IconCardsProps {
 }
 
 export const IconCardsSection: React.FC<IconCardsProps> = ({ content }) => {
+  const { isArtsAndScience, isUniversity } = useTheme();
+  const isCenterAligned = isArtsAndScience || isUniversity;
+
   const items = content.items && content.items.length > 0 ? content.items : [];
   if (items.length === 0) return null;
   const colClass = content.columns === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-4';
@@ -45,7 +43,7 @@ export const IconCardsSection: React.FC<IconCardsProps> = ({ content }) => {
     <section className="py-16 bg-white dark:bg-slate-900 transition-colors">
       <div className="max-w-screen-2xl mx-auto px-6 sm:px-10 lg:px-16">
         {(content.title || content.subtitle) && (
-          <div className="text-center max-w-2xl mx-auto mb-12 space-y-2">
+          <div className={`${isCenterAligned ? 'text-center max-w-2xl mx-auto' : 'text-left max-w-2xl'} mb-12 space-y-2`}>
             {content.title && (
               <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
                 {content.title}

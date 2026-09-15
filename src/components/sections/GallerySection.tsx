@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 
 import { apiClient } from '../../services/apiClient';
 import { SectionError } from './SectionError';
+import { useTheme } from '../../themes/ThemeContext';
 
 interface GalleryImg {
   title?: string;
@@ -19,7 +20,10 @@ interface GalleryProps {
 }
 
 export const GallerySection: React.FC<GalleryProps> = ({ content }) => {
-const [fetchedImages, setFetchedImages] = useState<GalleryImg[]>([]);
+  const { isArtsAndScience, isMedical, isUniversity } = useTheme();
+  const isCenterAligned = isArtsAndScience || isUniversity;
+
+  const [fetchedImages, setFetchedImages] = useState<GalleryImg[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,32 +52,80 @@ const [fetchedImages, setFetchedImages] = useState<GalleryImg[]>([]);
   }
   if (!loading && images.length === 0) return null;
 
+  const badgeClass = isArtsAndScience 
+    ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 font-serif' 
+    : isUniversity 
+    ? 'bg-rose-100 text-rose-900 border border-rose-200 font-serif' 
+    : isMedical 
+    ? 'bg-teal-100 text-teal-800 border border-teal-200 font-sans' 
+    : 'bg-primary/10 text-primary font-sans';
+
+  const headingFont = isArtsAndScience 
+    ? 'font-serif font-bold text-emerald-950 dark:text-emerald-50 text-3xl sm:text-4xl' 
+    : isUniversity 
+    ? 'font-serif font-bold text-rose-950 dark:text-amber-50 text-3xl sm:text-4xl' 
+    : isMedical 
+    ? 'font-sans font-extrabold text-slate-900 dark:text-white text-3xl sm:text-4xl' 
+    : 'font-sans font-black text-slate-900 dark:text-white text-3xl sm:text-4xl';
+
+  const linkColor = isArtsAndScience 
+    ? 'text-emerald-700 hover:text-emerald-900 font-serif' 
+    : isUniversity 
+    ? 'text-rose-900 hover:text-amber-700 font-serif' 
+    : isMedical 
+    ? 'text-cyan-700 hover:text-cyan-900' 
+    : 'text-primary hover:underline';
+
   return (
     <section className="py-16 bg-slate-50 dark:bg-slate-950 transition-colors">
       <div className="max-w-screen-2xl mx-auto px-6 sm:px-10 lg:px-16">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
-          <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary mb-2">
+        {isCenterAligned ? (
+          <div className="text-center max-w-3xl mx-auto mb-12 space-y-3 flex flex-col items-center">
+            <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${badgeClass}`}>
               <Camera className="w-3.5 h-3.5" />
               <span>Campus Visual Tour</span>
             </div>
-            <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+            <h2 className={headingFont}>
               {content.title || 'Campus Photo & Video Gallery'}
             </h2>
             {content.subtitle && (
-              <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+              <p className="text-sm text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
                 {content.subtitle}
               </p>
             )}
+            <Link
+              to="/gallery"
+              className={`inline-flex items-center gap-1 text-xs font-bold pt-1 ${linkColor}`}
+            >
+              <span>Explore All Albums</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
-          <Link
-            to="/gallery"
-            className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline self-start md:self-auto"
-          >
-            <span>Explore All Albums</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
+        ) : (
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+            <div>
+              <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold mb-2 ${badgeClass}`}>
+                <Camera className="w-3.5 h-3.5" />
+                <span>Campus Visual Tour</span>
+              </div>
+              <h2 className={headingFont}>
+                {content.title || 'Campus Photo & Video Gallery'}
+              </h2>
+              {content.subtitle && (
+                <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                  {content.subtitle}
+                </p>
+              )}
+            </div>
+            <Link
+              to="/gallery"
+              className={`inline-flex items-center gap-1 text-xs font-bold self-start md:self-auto ${linkColor}`}
+            >
+              <span>Explore All Albums</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {images.map((img, idx) => (

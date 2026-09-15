@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { useTemplateTheme } from '../../themes/ThemeContext';
+import { useTheme, useTemplateTheme } from '../../themes/ThemeContext';
 
 interface CardItem {
   title: string;
@@ -21,6 +21,8 @@ interface CardsProps {
 }
 
 export const CardsSection: React.FC<CardsProps> = ({ content }) => {
+  const { isArtsAndScience, isUniversity } = useTheme();
+  const isCenterAligned = isArtsAndScience || isUniversity;
   const { styles } = useTemplateTheme();
   const cardStyles = styles.cards;
 
@@ -33,7 +35,7 @@ export const CardsSection: React.FC<CardsProps> = ({ content }) => {
     <section className="py-16 bg-slate-50 dark:bg-slate-950 transition-colors">
       <div className="max-w-screen-2xl mx-auto px-6 sm:px-10 lg:px-16">
         {(content.title || content.subtitle) && (
-          <div className="text-center max-w-2xl mx-auto mb-12 space-y-2">
+          <div className={`${isCenterAligned ? 'text-center max-w-2xl mx-auto' : 'text-left max-w-2xl'} mb-12 space-y-2`}>
             {content.title && (
               <h2 className={`text-3xl font-black text-slate-900 dark:text-white tracking-tight ${cardStyles.headingFont}`}>
                 {content.title}
