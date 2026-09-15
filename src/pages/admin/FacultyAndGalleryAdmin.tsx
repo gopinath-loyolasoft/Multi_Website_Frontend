@@ -41,6 +41,7 @@ interface Gallery {
   slug: string;
   description: string;
   coverImageUrl: string;
+  category?: string;
   isPublished: boolean;
 }
 
@@ -495,12 +496,26 @@ export const FacultyManagementPage: React.FC = () => {
   );
 };
 
+const GALLERY_CATEGORIES = [
+  'Campus',
+  'Academics',
+  'Sports',
+  'Cultural',
+  'Convocation',
+  'Events & Fests',
+  'Seminars & Conferences',
+  'Research & Expo',
+  'Hostel & Student Life',
+  'Placements & Alumni',
+];
+
 export const GalleryManagementPage: React.FC = () => {
   const [galleries, setGalleries] = useState<Gallery[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
   const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
+  const [selectedFilterCategory, setSelectedFilterCategory] = useState('ALL');
 
   // Drawer State
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -511,6 +526,9 @@ export const GalleryManagementPage: React.FC = () => {
   const [autoSlug, setAutoSlug] = useState(true);
   const [description, setDescription] = useState('');
   const [coverImageUrl, setCoverImageUrl] = useState('');
+  const [category, setCategory] = useState('Campus');
+  const [customCategory, setCustomCategory] = useState('');
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
   const [isPublished, setIsPublished] = useState(true);
 
   const showNotification = (text: string, type: 'success' | 'error' = 'success') => {
@@ -559,6 +577,9 @@ export const GalleryManagementPage: React.FC = () => {
     setAutoSlug(true);
     setDescription('');
     setCoverImageUrl('');
+    setCategory('Campus');
+    setCustomCategory('');
+    setIsCustomCategory(false);
     setIsPublished(true);
     setDrawerMode('create');
     setIsDrawerOpen(true);
@@ -571,6 +592,16 @@ export const GalleryManagementPage: React.FC = () => {
     setAutoSlug(false);
     setDescription(g.description || '');
     setCoverImageUrl(g.coverImageUrl || '');
+    const galCat = g.category || 'Campus';
+    if (GALLERY_CATEGORIES.includes(galCat)) {
+      setCategory(galCat);
+      setIsCustomCategory(false);
+      setCustomCategory('');
+    } else {
+      setCategory('Custom');
+      setIsCustomCategory(true);
+      setCustomCategory(galCat);
+    }
     setIsPublished(g.isPublished !== false);
     setDrawerMode('edit');
     setIsDrawerOpen(true);
@@ -579,6 +610,7 @@ export const GalleryManagementPage: React.FC = () => {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     const finalSlug = slugify(slug || title);
+    const finalCategory = isCustomCategory ? (customCategory.trim() || 'Campus') : category;
     try {
       setActionLoading(true);
       if (editingGallery) {
@@ -587,6 +619,7 @@ export const GalleryManagementPage: React.FC = () => {
           slug: finalSlug,
           description,
           coverImageUrl,
+          category: finalCategory,
           isPublished,
         });
         showNotification('Gallery album updated');
@@ -596,6 +629,7 @@ export const GalleryManagementPage: React.FC = () => {
           slug: finalSlug,
           description,
           coverImageUrl: coverImageUrl || 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=600&q=80',
+          category: finalCategory,
           isPublished,
         });
         showNotification('Gallery album created');
@@ -618,6 +652,7 @@ export const GalleryManagementPage: React.FC = () => {
         slug: g.slug,
         description: g.description,
         coverImageUrl: g.coverImageUrl,
+        category: g.category || 'Campus',
         isPublished: nextStatus,
       });
       showNotification(`"${g.title}" is now ${nextStatus ? 'PUBLISHED' : 'UNPUBLISHED (Draft)'}`);
@@ -643,6 +678,20 @@ export const GalleryManagementPage: React.FC = () => {
     }
   };
 
+  // Compute available filter categories for admin toolbar
+  const adminCategories = React.useMemo(() => {
+    const cats = new Set<string>();
+    galleries.forEach((g) => {
+      if (g.category && g.category.trim()) cats.add(g.category.trim());
+    });
+    return Array.from(cats);
+  }, [galleries]);
+
+  const filteredGalleries = galleries.filter((g) => {
+    if (selectedFilterCategory === 'ALL') return true;
+    return (g.category || 'Campus').toLowerCase() === selectedFilterCategory.toLowerCase();
+  });
+
   return (
     <div className="space-y-6 max-w-6xl mx-auto pb-12">
       {/* Header */}
@@ -660,7 +709,7 @@ export const GalleryManagementPage: React.FC = () => {
 
         <button
           onClick={handleOpenCreate}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-white bg-primary hover:opacity-90 transition shadow-sm text-sm"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-white bg-primary hover:opacity-90 transition shadow-sm text-sm cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>New Album</span>
@@ -686,11 +735,44 @@ export const GalleryManagementPage: React.FC = () => {
         </div>
       )}
 
+      {/* Category Filter Bar in Admin */}
+      {adminCategories.length > 0 && (
+        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider pl-1">Filter:</span>
+          <button
+            onClick={() => setSelectedFilterCategory('ALL')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${
+              selectedFilterCategory === 'ALL'
+                ? 'bg-primary text-white shadow-sm'
+                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:bg-slate-100'
+            }`}
+          >
+            All Types ({galleries.length})
+          </button>
+          {adminCategories.map((cat) => {
+            const count = galleries.filter((g) => (g.category || 'Campus').toLowerCase() === cat.toLowerCase()).length;
+            return (
+              <button
+                key={cat}
+                onClick={() => setSelectedFilterCategory(cat)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${
+                  selectedFilterCategory === cat
+                    ? 'bg-primary text-white shadow-sm'
+                    : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:bg-slate-100'
+                }`}
+              >
+                {cat} ({count})
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {loading ? (
         <div className="p-12 text-center text-slate-500 font-semibold bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800">
           Loading gallery albums...
         </div>
-      ) : galleries.length === 0 ? (
+      ) : filteredGalleries.length === 0 ? (
         <div className="p-12 text-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-4">
           <ImageIcon className="w-8 h-8 text-slate-400 mx-auto" />
           <h3 className="text-base font-bold text-slate-900 dark:text-white">No Photo Albums Found</h3>
@@ -698,10 +780,11 @@ export const GalleryManagementPage: React.FC = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {galleries.map((gal) => {
+          {filteredGalleries.map((gal) => {
             const isPub = gal.isPublished !== false;
             const albumSlug = gal.slug || slugify(gal.title);
             const isCopied = copiedSlug === albumSlug;
+            const galCategory = gal.category || 'Campus';
 
             return (
               <div
@@ -722,6 +805,12 @@ export const GalleryManagementPage: React.FC = () => {
                       (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=600&q=80';
                     }}
                   />
+                  {/* Category & Published Badges */}
+                  <div className="absolute top-3 left-3">
+                    <span className="px-2.5 py-1 rounded-xl text-xs font-bold bg-slate-900/80 backdrop-blur-md text-white border border-white/20 shadow-sm">
+                      {galCategory}
+                    </span>
+                  </div>
                   <div className="absolute top-3 right-3">
                     <button
                       onClick={() => toggleStatus(gal)}
@@ -837,6 +926,61 @@ export const GalleryManagementPage: React.FC = () => {
             />
           </div>
 
+          {/* Category / Type Field with Preset Chips + Custom input */}
+          <div className="space-y-2">
+            <label className="block text-xs font-bold uppercase text-slate-600 dark:text-slate-300">
+              Album Category / Type *
+            </label>
+            <div className="flex flex-wrap gap-1.5">
+              {GALLERY_CATEGORIES.map((catOption) => {
+                const isSelected = !isCustomCategory && category === catOption;
+                return (
+                  <button
+                    key={catOption}
+                    type="button"
+                    onClick={() => {
+                      setIsCustomCategory(false);
+                      setCategory(catOption);
+                    }}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                      isSelected
+                        ? 'bg-primary text-white shadow-sm'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    {catOption}
+                  </button>
+                );
+              })}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsCustomCategory(true);
+                }}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                  isCustomCategory
+                    ? 'bg-primary text-white shadow-sm'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                }`}
+              >
+                + Custom Type
+              </button>
+            </div>
+
+            {isCustomCategory && (
+              <div className="pt-1">
+                <input
+                  type="text"
+                  value={customCategory}
+                  onChange={(e) => setCustomCategory(e.target.value)}
+                  placeholder="Enter custom category (e.g. NCC & NSS, Workshop, Robotics Expo)"
+                  className="w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white text-xs focus:ring-2 focus:ring-primary focus:outline-none"
+                  required={isCustomCategory}
+                />
+              </div>
+            )}
+          </div>
+
           {/* URL Slug Field with Auto-Sync & Custom toggles */}
           <div className="space-y-1">
             <div className="flex items-center justify-between">
@@ -924,7 +1068,7 @@ export const GalleryManagementPage: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsPublished(!isPublished)}
-              className={`px-3 py-1 rounded-xl text-xs font-bold transition ${
+              className={`px-3 py-1 rounded-xl text-xs font-bold transition cursor-pointer ${
                 isPublished
                   ? 'bg-emerald-600 text-white'
                   : 'bg-slate-300 text-slate-700 dark:bg-slate-700 dark:text-slate-300'
