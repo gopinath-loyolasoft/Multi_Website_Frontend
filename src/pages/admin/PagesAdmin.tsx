@@ -519,6 +519,82 @@ export const PagesAdminPage: React.FC = () => {
   };
 
   const [sectionIdOrderRunning, setsectionIdOrderRunning] = useState<string | number | null>(null);
+  const [isSeedingSections, setIsSeedingSections] = useState(false);
+
+  const handleSeedDefaultSections = async () => {
+    if (!sectionsPage) return;
+    setIsSeedingSections(true);
+    try {
+      // 1. Try dedicated backend seed endpoint
+      try {
+        const res = await apiClient.post(`/admin/pages/${sectionsPage.id}/sections/seed-default`);
+        if (res.data?.success) {
+          const list = res.data.data;
+          setSections(Array.isArray(list) ? list : []);
+          notify('All default college module sections synchronized successfully!');
+          refreshConfig?.();
+          await fetchPages();
+          return;
+        }
+      } catch (e) {
+        console.warn('Backend seed-default endpoint returned error, using direct API sync fallback...', e);
+      }
+
+      // 2. Fallback: Add missing sections via standard section POST API
+      const existingTypes = new Set(sections.map((s) => s.sectionType?.toUpperCase()));
+      const defaultBlueprint = [
+        { type: 'HERO_SLIDER', title: 'Hero Slider & Highlights', subtitle: 'Campus showcase and online admissions call to action' },
+        { type: 'STATISTICS', title: 'Key Statistics & Milestones', subtitle: 'Institutional track record, accreditations, and student excellence' },
+        { type: 'QUOTE', title: 'Leadership & Vision', subtitle: 'Message from the Chancellor & Academic Directorate' },
+        { type: 'DEPARTMENTS', title: 'Academic Departments', subtitle: 'Specialized schools offering cutting-edge undergraduate & postgraduate disciplines' },
+        { type: 'COURSES', title: 'Degree Programs & Curricula', subtitle: 'Industry-aligned academic pathways and career-oriented certifications' },
+        { type: 'FACULTY', title: 'Distinguished Faculty', subtitle: 'Renowned professors, doctorate researchers, and industry fellows' },
+        { type: 'NEWS', title: 'Latest Campus News', subtitle: 'Campus events, research breakthroughs, honors, and press announcements' },
+        { type: 'EVENTS', title: 'Upcoming Campus Events', subtitle: 'Academic conferences, symposiums, student fests, and cultural celebrations' },
+        { type: 'NOTICES', title: 'Official Notice Board', subtitle: 'Important administrative updates, examination schedules, and circulars' },
+        { type: 'GALLERY', title: 'Campus Photo Gallery', subtitle: 'A visual journey across our world-class laboratories, library, and campus architecture' },
+        { type: 'TESTIMONIALS', title: 'Placement Records & Testimonials', subtitle: 'Top corporate recruiters and success stories from our graduates' },
+        { type: 'CONTACT', title: 'Campus Helpdesk & Location', subtitle: 'Reach our admissions desk, administrative offices, and visit our campus' },
+      ];
+
+      let currentMaxSort = sections.length;
+      for (const item of defaultBlueprint) {
+        const hasHero = existingTypes.has('HERO') || existingTypes.has('HERO_SLIDER');
+        if (item.type === 'HERO_SLIDER' && hasHero) continue;
+        if (existingTypes.has(item.type)) continue;
+
+        currentMaxSort++;
+        await apiClient.post(`/admin/pages/${sectionsPage.id}/sections`, {
+          sectionType: item.type,
+          title: item.title,
+          subtitle: item.subtitle,
+          content: {},
+          settings: {
+            columns: 3,
+            cardVariant: 'standard',
+            alignment: 'center',
+            background: 'light',
+            spacing: 'normal',
+            containerWidth: 'standard',
+          },
+          sortOrder: currentMaxSort,
+          isVisible: true,
+        });
+      }
+
+      const fresh = await apiClient.get(`/admin/pages/${sectionsPage.id}/sections`);
+      const data = fresh.data?.data;
+      const updatedList = Array.isArray(data) ? data : Array.isArray(data?.items) ? data.items : [];
+      setSections(updatedList);
+      notify('All default college module sections populated successfully!');
+      refreshConfig?.();
+      await fetchPages();
+    } catch (err: any) {
+      notify(err?.response?.data?.message || err?.message || 'Failed to auto-seed sections', 'error');
+    } finally {
+      setIsSeedingSections(false);
+    }
+  };
 
   // ---------------- Render helpers ----------------
 
@@ -912,22 +988,35 @@ export const PagesAdminPage: React.FC = () => {
         size="xl"
         closeOnOutsideClick={false}
         footer={
-          <div className="flex items-center justify-end gap-3 w-full">
+          <div className="flex items-center justify-between gap-3 w-full">
             <button
               type="button"
-              onClick={closeSections}
-              className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer"
+              onClick={handleSeedDefaultSections}
+              disabled={isSeedingSections || sectionsLoading}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-900 transition cursor-pointer shadow-xs disabled:opacity-50"
+              title="Populate missing standard college module sections (Hero, Stats, Quote, Departments, Courses, Faculty, News, Events, Notices, Gallery, Placements, Contact)"
             >
-              Close
+              <Sparkles className={`w-4 h-4 ${isSeedingSections ? 'animate-spin' : 'text-indigo-600'}`} />
+              <span>{isSeedingSections ? 'Syncing Sections...' : '⚡ Auto-Generate All Sections'}</span>
             </button>
-            <button
-              type="button"
-              onClick={openCreateSection}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-white bg-primary hover:opacity-90 transition cursor-pointer shadow-sm shadow-primary/20"
-            >
-              <Plus className="w-4 h-4" />
-              Add Section
-            </button>
+
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={closeSections}
+                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={openCreateSection}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-white bg-primary hover:opacity-90 transition cursor-pointer shadow-sm shadow-primary/20"
+              >
+                <Plus className="w-4 h-4" />
+                Add Custom Section
+              </button>
+            </div>
           </div>
         }
       >
@@ -941,115 +1030,179 @@ export const PagesAdminPage: React.FC = () => {
             {sectionsError}
           </div>
         ) : sections.length === 0 ? (
-          <div className="py-14 text-center space-y-3">
-            <div className="mx-auto w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-              <LayoutTemplate className="w-6 h-6 text-slate-400" />
+          <div className="py-14 text-center space-y-4">
+            <div className="mx-auto w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 flex items-center justify-center shadow-xs">
+              <Sparkles className="w-7 h-7" />
             </div>
-            <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">
-              This page has no sections yet
-            </p>
-            <p className="text-[11px] text-slate-400 max-w-xs mx-auto">
-              Add a Hero, Text, CTA, Image + Text or any other section to start building the page.
-            </p>
-            <button
-              onClick={openCreateSection}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-white bg-primary hover:opacity-90 transition cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-              Add your first section
-            </button>
+            <div>
+              <p className="text-sm font-bold text-slate-800 dark:text-slate-100">
+                This page has no sections configured yet
+              </p>
+              <p className="text-xs text-slate-400 max-w-sm mx-auto mt-1">
+                You can auto-generate the complete suite of institutional sections with 1-click or add custom sections manually.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+              <button
+                onClick={handleSeedDefaultSections}
+                disabled={isSeedingSections}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition shadow-md shadow-indigo-200 dark:shadow-none cursor-pointer"
+              >
+                <Sparkles className={`w-4 h-4 ${isSeedingSections ? 'animate-spin' : ''}`} />
+                <span>{isSeedingSections ? 'Populating...' : '⚡ Auto-Generate All College Module Sections'}</span>
+              </button>
+              <button
+                onClick={openCreateSection}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 transition cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                Add Single Section
+              </button>
+            </div>
           </div>
         ) : (
-          <div className="space-y-2.5">
-            <div className="flex items-center gap-2 px-1 text-[11px] text-slate-400 font-semibold">
-              <LayoutTemplate className="w-3.5 h-3.5" />
-              <span>
-                {sections.length} section{sections.length !== 1 ? 's' : ''} — use arrows to reorder (top renders first)
-              </span>
-            </div>
-            {sections.map((section, index) => (
-              <div
-                key={section.id}
-                className={`p-3.5 rounded-xl border transition ${
-                  !section.isVisible
-                    ? 'border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-950/40 opacity-70'
-                    : 'border-slate-200 dark:border-slate-700/70 bg-white dark:bg-slate-900'
-                }`}
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <span className="text-[10px] font-black text-slate-300 dark:text-slate-600 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded w-6 text-center">
-                      {index + 1}
-                    </span>
-                    <div className="min-w-0">
-                      <p className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
-                        {section.title ||
-                          sectionTypeLabel(section.sectionType)}
-                      </p>
-                      <p className="text-[10px] text-slate-400 truncate">
-                        {sectionTypeLabel(section.sectionType)}
-                        {section.subtitle ? ` — ${section.subtitle}` : ''}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 shrink-0">
-                    <span
-                      className={`hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                        section.isVisible
-                          ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400'
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
-                      }`}
-                    >
-                      {section.isVisible ? 'Visible' : 'Hidden'}
-                    </span>
-                    <button
-                      onClick={() => handleReorder(index, -1)}
-                      disabled={index === 0 || sectionIdOrderRunning !== null}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition disabled:opacity-30 cursor-pointer"
-                      title="Move up"
-                    >
-                      <ArrowUp className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={() => handleReorder(index, 1)}
-                      disabled={index === sections.length - 1 || sectionIdOrderRunning !== null}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition disabled:opacity-30 cursor-pointer"
-                      title="Move down"
-                    >
-                      <ArrowDown className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={() => handleToggleSectionVisibility(section)}
-                      disabled={busyId === section.id}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition cursor-pointer disabled:opacity-40"
-                      title={section.isVisible ? 'Hide section' : 'Show section'}
-                    >
-                      {busyId === section.id ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      ) : section.isVisible ? (
-                        <EyeOff className="w-3.5 h-3.5" />
-                      ) : (
-                        <Eye className="w-3.5 h-3.5" />
-                      )}
-                    </button>
-                    <button
-                      onClick={() => openEditSection(section)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition cursor-pointer"
-                      title="Edit section"
-                    >
-                      <Pencil className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={() => setDeleteSectionTarget(section)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition cursor-pointer"
-                      title="Delete section"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+          <div className="space-y-3">
+            {/* Quick Setup Recommendation Banner when Home page has fewer than 6 sections */}
+            {sectionsPage?.slug === 'home' && sections.length < 8 && (
+              <div className="p-3.5 rounded-2xl bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-900/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-start gap-2.5">
+                  <Sparkles className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs font-bold text-indigo-900 dark:text-indigo-200">
+                      Home Page Quick-Setup Available
+                    </p>
+                    <p className="text-[11px] text-indigo-700/80 dark:text-indigo-300/80 leading-relaxed">
+                      Your home page currently has {sections.length} section(s). Click to sync all 12 default modules (Hero, Stats, Quote, Departments, Courses, Faculty, News, Events, Notices, Gallery, Placements, Contact).
+                    </p>
                   </div>
                 </div>
+                <button
+                  type="button"
+                  onClick={handleSeedDefaultSections}
+                  disabled={isSeedingSections}
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition shadow-xs shrink-0 self-end sm:self-auto cursor-pointer"
+                >
+                  {isSeedingSections ? 'Syncing...' : 'Sync All 12 Sections'}
+                </button>
               </div>
-            ))}
+            )}
+
+            <div className="flex items-center justify-between px-1 text-[11px] text-slate-400 font-semibold">
+              <div className="flex items-center gap-2">
+                <LayoutTemplate className="w-3.5 h-3.5" />
+                <span>
+                  {sections.length} section{sections.length !== 1 ? 's' : ''} on page — use arrows (↑ ↓) to reorder scroll sequence
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={handleSeedDefaultSections}
+                disabled={isSeedingSections}
+                className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
+              >
+                <Sparkles className="w-3 h-3" />
+                <span>Sync Modules</span>
+              </button>
+            </div>
+
+            {sections.map((section, index) => {
+              const isModule = [
+                'HERO', 'HERO_SLIDER', 'BANNERS', 'STATISTICS', 'STATS', 'QUOTE', 
+                'DEPARTMENTS', 'COURSES', 'FACULTY', 'NEWS', 'EVENTS', 'NOTICES', 
+                'GALLERY', 'TESTIMONIALS', 'PLACEMENTS', 'CONTACT', 'MAP'
+              ].includes(section.sectionType?.toUpperCase());
+
+              return (
+                <div
+                  key={section.id}
+                  className={`p-3.5 rounded-2xl border transition shadow-2xs ${
+                    !section.isVisible
+                      ? 'border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-950/40 opacity-70'
+                      : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="text-[11px] font-black text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg min-w-[28px] text-center font-mono">
+                        {index + 1}
+                      </span>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
+                            {section.title || sectionTypeLabel(section.sectionType)}
+                          </p>
+                          {isModule && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900/50">
+                              <Sparkles className="w-2.5 h-2.5 text-blue-600" />
+                              <span>{section.sectionType.toUpperCase()}</span>
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                          {sectionTypeLabel(section.sectionType)}
+                          {section.subtitle ? ` — ${section.subtitle}` : ''}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <span
+                        className={`hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                          section.isVisible
+                            ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900'
+                            : 'bg-slate-100 dark:bg-slate-800 text-slate-400 border border-slate-200 dark:border-slate-700'
+                        }`}
+                      >
+                        {section.isVisible ? 'Visible' : 'Hidden'}
+                      </span>
+                      <button
+                        onClick={() => handleReorder(index, -1)}
+                        disabled={index === 0 || sectionIdOrderRunning !== null}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition disabled:opacity-30 cursor-pointer"
+                        title="Move up (scrolls earlier on homepage)"
+                      >
+                        <ArrowUp className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleReorder(index, 1)}
+                        disabled={index === sections.length - 1 || sectionIdOrderRunning !== null}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition disabled:opacity-30 cursor-pointer"
+                        title="Move down (scrolls later on homepage)"
+                      >
+                        <ArrowDown className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleToggleSectionVisibility(section)}
+                        disabled={busyId === section.id}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition cursor-pointer disabled:opacity-40"
+                        title={section.isVisible ? 'Hide from public site' : 'Make visible on public site'}
+                      >
+                        {busyId === section.id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : section.isVisible ? (
+                          <EyeOff className="w-3.5 h-3.5" />
+                        ) : (
+                          <Eye className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+                      <button
+                        onClick={() => openEditSection(section)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition cursor-pointer"
+                        title="Edit section"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => setDeleteSectionTarget(section)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition cursor-pointer"
+                        title="Delete section"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </Drawer>
