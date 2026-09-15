@@ -68,19 +68,19 @@ export const DepartmentsPage: React.FC = () => {
   const heroBg = isArtsAndScience
     ? 'bg-gradient-to-r from-emerald-950 via-emerald-900 to-slate-950'
     : isMedical
-    ? 'bg-gradient-to-r from-teal-950 via-teal-900 to-slate-950'
-    : isUniversity
-    ? 'bg-gradient-to-r from-rose-950 via-slate-950 to-slate-900'
-    : 'bg-gradient-to-r from-slate-950 via-blue-950 to-slate-900';
+      ? 'bg-gradient-to-r from-teal-950 via-teal-900 to-slate-950'
+      : isUniversity
+        ? 'bg-gradient-to-r from-rose-950 via-slate-950 to-slate-900'
+        : 'bg-gradient-to-r from-slate-950 via-blue-950 to-slate-900';
 
   const titleFont = isArtsAndScience || isUniversity ? 'font-serif' : 'font-sans';
   const cardBadgeStyle = isArtsAndScience
     ? 'bg-emerald-100 text-emerald-800 border-emerald-200 font-serif'
     : isMedical
-    ? 'bg-teal-100 text-teal-800 border-teal-200'
-    : isUniversity
-    ? 'bg-rose-100 text-rose-900 border-rose-200'
-    : 'bg-blue-100 text-blue-800 border-blue-200';
+      ? 'bg-teal-100 text-teal-800 border-teal-200'
+      : isUniversity
+        ? 'bg-rose-100 text-rose-900 border-rose-200'
+        : 'bg-blue-100 text-blue-800 border-blue-200';
 
   return (
     <div className={`min-h-screen ${isArtsAndScience ? 'bg-amber-50/30' : isMedical ? 'bg-teal-50/20' : 'bg-slate-50'}`}>
@@ -93,7 +93,7 @@ export const DepartmentsPage: React.FC = () => {
             <span>{isArtsAndScience ? 'Scholarly Faculties & Humanities' : isMedical ? 'Clinical & Medical Disciplines' : isUniversity ? 'Multi-Faculty Research Schools' : 'Engineering & Technology Disciplines'}</span>
           </div>
           <h1 className={`text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white mb-4 ${titleFont}`}>
-            Schools & Academic Departments
+            Academic Departments
           </h1>
           <p className={`text-slate-200 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed ${isArtsAndScience ? 'font-serif' : ''}`}>
             Discover our world-renowned academic faculties, accredited research laboratories, and interdisciplinary programs designed to mold pioneering innovators.
@@ -111,11 +111,10 @@ export const DepartmentsPage: React.FC = () => {
                 <button
                   key={st}
                   onClick={() => setSelectedStream(st)}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                    selectedStream === st
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${selectedStream === st
                       ? 'bg-primary text-white shadow-sm'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                  }`}
+                    }`}
                 >
                   {st}
                 </button>

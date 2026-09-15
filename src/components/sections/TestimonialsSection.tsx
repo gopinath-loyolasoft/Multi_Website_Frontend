@@ -23,7 +23,7 @@ interface TestimonialsProps {
 }
 
 export const TestimonialsSection: React.FC<TestimonialsProps> = ({ content }) => {
-  const { isArtsAndScience, isMedical, isUniversity, isEngineering } = useTheme();
+  const { isArtsAndScience, isMedical, isUniversity } = useTheme();
   const isCenterAligned = isArtsAndScience || isUniversity;
 
   const [fetchedList, setFetchedList] = React.useState<TestimonialItem[]>([]);
@@ -73,24 +73,8 @@ export const TestimonialsSection: React.FC<TestimonialsProps> = ({ content }) =>
     ? 'font-sans font-extrabold text-slate-900 dark:text-white text-3xl sm:text-4xl' 
     : 'font-sans font-black text-slate-900 dark:text-white text-3xl sm:text-4xl';
 
-  const sectionBg = isEngineering
-    ? 'py-16 bg-slate-900 text-white border-y border-slate-800'
-    : isArtsAndScience
-    ? 'py-16 bg-[#f5f2eb] text-slate-900 border-y border-emerald-900/10'
-    : isMedical
-    ? 'py-16 bg-slate-50 text-slate-900 border-y border-cyan-100'
-    : 'py-16 bg-[#f7f4ee] text-slate-900 border-y border-stone-200';
-
-  const cardBg = isEngineering
-    ? 'p-8 rounded-2xl bg-slate-950 text-white border border-slate-800 hover:border-amber-400/60 shadow-xl flex flex-col justify-between space-y-4'
-    : isArtsAndScience
-    ? 'p-8 rounded-2xl bg-white text-slate-900 border-2 border-emerald-800/15 hover:border-emerald-600 shadow-sm flex flex-col justify-between space-y-4'
-    : isMedical
-    ? 'p-8 rounded-2xl bg-white text-slate-900 border border-cyan-200 hover:border-cyan-500 shadow-sm flex flex-col justify-between space-y-4'
-    : 'p-8 rounded-2xl bg-white text-slate-900 border-t-4 border-t-rose-900 border-x border-b border-stone-200 hover:border-rose-700 shadow-sm flex flex-col justify-between space-y-4';
-
   return (
-    <section className={sectionBg}>
+    <section className="py-16 bg-white dark:bg-slate-900 transition-colors">
       <div className="max-w-screen-2xl mx-auto px-6 sm:px-10 lg:px-16">
         {(content.title || content.subtitle) && (
           <div className={`${isCenterAligned ? 'text-center max-w-2xl mx-auto' : 'text-left max-w-2xl'} mb-12 space-y-2`}>
@@ -102,7 +86,7 @@ export const TestimonialsSection: React.FC<TestimonialsProps> = ({ content }) =>
               {content.title || 'What Our Alumni Say'}
             </h2>
             {content.subtitle && (
-              <p className="opacity-80 text-sm">
+              <p className="text-slate-600 dark:text-slate-400 text-sm">
                 {content.subtitle}
               </p>
             )}
@@ -113,7 +97,7 @@ export const TestimonialsSection: React.FC<TestimonialsProps> = ({ content }) =>
           {list.map((t, idx) => (
             <div
               key={idx}
-              className={cardBg}
+              className="p-8 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between space-y-4"
             >
               <div className="space-y-3">
                 <div className="flex items-center gap-1 text-amber-400">
@@ -121,12 +105,12 @@ export const TestimonialsSection: React.FC<TestimonialsProps> = ({ content }) =>
                     <Star key={i} className="w-4 h-4 fill-amber-400" />
                   ))}
                 </div>
-                <p className={`text-xs sm:text-sm leading-relaxed italic opacity-90 ${isArtsAndScience || isUniversity ? 'font-serif' : 'font-sans'}`}>
+                <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed italic">
                   "{t.quote}"
                 </p>
               </div>
 
-              <div className="flex items-center gap-3 pt-3 border-t border-current/10">
+              <div className="flex items-center gap-3 pt-3 border-t border-slate-200/60 dark:border-slate-800">
                 {t.avatarUrl ? (
                   <img
                     src={t.avatarUrl}

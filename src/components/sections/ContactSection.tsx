@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Phone, Mail, MapPin, Send, CheckCircle, AlertCircle } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
-import { useTheme } from '../../themes/ThemeContext';
 
 interface ContactProps {
   content: {
@@ -15,8 +14,6 @@ interface ContactProps {
 }
 
 export const ContactSection: React.FC<ContactProps> = ({ content }) => {
-  const { isArtsAndScience, isMedical, isUniversity, isEngineering } = useTheme();
-
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -43,45 +40,21 @@ export const ContactSection: React.FC<ContactProps> = ({ content }) => {
     }
   };
 
-  const sectionBg = isEngineering
-    ? 'py-16 bg-slate-950 text-white border-y border-slate-900'
-    : isArtsAndScience
-    ? 'py-16 bg-[#fbf9f4] text-slate-900 border-y border-emerald-900/10'
-    : isMedical
-    ? 'py-16 bg-white text-slate-900 border-y border-cyan-100'
-    : 'py-16 bg-[#fcfaf7] text-slate-900 border-y border-stone-200';
-
-  const badgeClass = isArtsAndScience 
-    ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 font-serif' 
-    : isUniversity 
-    ? 'bg-rose-100 text-rose-900 border border-rose-200 font-serif' 
-    : isMedical 
-    ? 'bg-teal-100 text-teal-800 border border-teal-200 font-sans' 
-    : 'bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300 font-sans';
-
-  const headingFont = isArtsAndScience 
-    ? 'font-serif font-bold text-emerald-950 dark:text-emerald-50 text-3xl sm:text-4xl' 
-    : isUniversity 
-    ? 'font-serif font-bold text-rose-950 dark:text-amber-50 text-3xl sm:text-4xl' 
-    : isMedical 
-    ? 'font-sans font-extrabold text-slate-900 dark:text-white text-3xl sm:text-4xl' 
-    : 'font-sans font-black text-slate-900 dark:text-white text-3xl sm:text-4xl';
-
   return (
-    <section className={sectionBg}>
+    <section className="py-16 bg-slate-50 dark:bg-slate-950 transition-colors">
       <div className="max-w-screen-2xl mx-auto px-6 sm:px-10 lg:px-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           {/* Contact Details */}
           <div className="lg:col-span-5 space-y-6">
             <div>
-              <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold mb-2 ${badgeClass}`}>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary mb-2">
                 <Phone className="w-3.5 h-3.5" />
                 <span>Get In Touch</span>
               </div>
-              <h2 className={headingFont}>
+              <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
                 {content.title || 'Contact Admissions & Campus Office'}
               </h2>
-              <p className="text-sm opacity-80 mt-2">
+              <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
                 {content.subtitle || 'Our administrative counselors are available Monday through Saturday to answer questions regarding admission prerequisites and scholarships.'}
               </p>
             </div>

@@ -104,12 +104,12 @@ export const MEDICAL_THEME: ModuleThemeStyles = {
 
   // Call to Action (CTA)
   cta: {
-    sectionBg: 'py-16 sm:py-20 bg-gradient-to-r from-cyan-900 via-cyan-950 to-slate-950 text-white relative overflow-hidden border-y border-cyan-800',
-    badgeClass: 'bg-cyan-950/80 border-cyan-400/40 text-cyan-200 font-sans font-bold uppercase',
+    sectionBg: 'py-16 sm:py-20 bg-gradient-to-r from-cyan-600 via-teal-600 to-cyan-700 text-white relative overflow-hidden shadow-2xl',
+    badgeClass: 'bg-cyan-950/40 border-white/40 text-cyan-100 font-sans font-bold uppercase',
     headlineFont: 'font-sans font-extrabold tracking-tight leading-tight text-white text-3xl sm:text-4xl lg:text-5xl',
-    subheadlineFont: 'font-sans text-cyan-100/90 text-sm sm:text-base',
-    primaryBtnClass: 'bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-bold shadow-xl shadow-cyan-900/50',
-    secondaryBtnClass: 'bg-rose-600 hover:bg-rose-500 border border-rose-500/40 text-white font-bold shadow-xl shadow-rose-950/50',
+    subheadlineFont: 'font-sans text-cyan-50 text-sm sm:text-base',
+    primaryBtnClass: 'bg-white hover:bg-cyan-50 text-cyan-950 font-bold shadow-xl shadow-cyan-900/30',
+    secondaryBtnClass: 'bg-rose-600 hover:bg-rose-500 border border-rose-400 text-white font-bold shadow-xl',
   },
 
   // Cards Section
