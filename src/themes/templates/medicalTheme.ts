@@ -36,84 +36,84 @@ export const MEDICAL_THEME: ModuleThemeStyles = {
     rightCardBorder: 'bg-slate-950/90 border-cyan-500/30 text-white shadow-2xl shadow-cyan-950/60',
   },
 
-  // Statistics Section
+  // Statistics Section (Crisp Sterile Clinical Light Theme)
   statistics: {
-    sectionBg: 'bg-slate-950 text-white border-y border-cyan-900/60',
+    sectionBg: 'bg-slate-50 text-slate-900 border-y border-cyan-100',
     bgPatternOverlay: {
-      backgroundImage: 'linear-gradient(rgba(6, 182, 212, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(6, 182, 212, 0.3) 1px, transparent 1px)',
+      backgroundImage: 'linear-gradient(rgba(6, 182, 212, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(6, 182, 212, 0.08) 1px, transparent 1px)',
       backgroundSize: '36px 36px',
-      opacity: 0.1,
+      opacity: 1,
     },
-    headerBadge: 'bg-cyan-950/80 border-cyan-400/40 text-cyan-200',
-    headerTitleFont: 'font-sans font-extrabold tracking-tight text-white text-2xl sm:text-4xl',
-    headerSubtitleFont: 'font-sans text-cyan-100/80 text-xs sm:text-sm',
-    cardContainer: 'bg-slate-900/90 backdrop-blur-xl border border-cyan-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl grid grid-cols-2 lg:grid-cols-4 gap-6 divide-y sm:divide-y-0 sm:divide-x divide-cyan-900/50',
+    headerBadge: 'bg-cyan-100 border-cyan-300 text-cyan-800 font-sans font-bold',
+    headerTitleFont: 'font-sans font-extrabold tracking-tight text-slate-900 text-2xl sm:text-4xl',
+    headerSubtitleFont: 'font-sans text-slate-600 text-xs sm:text-sm',
+    cardContainer: 'bg-white border border-cyan-200 rounded-3xl p-6 sm:p-8 shadow-xl shadow-cyan-900/5 grid grid-cols-2 lg:grid-cols-4 gap-6 divide-y sm:divide-y-0 sm:divide-x divide-cyan-100',
     cardBg: 'flex items-center gap-4',
-    cardTopAccent: 'bg-cyan-400',
-    iconBox: 'w-13 h-13 rounded-2xl bg-cyan-500/15 border border-cyan-400/30 text-cyan-300 shrink-0 p-3 shadow-inner',
-    valueFont: 'font-sans font-black text-white text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-none',
-    suffixFont: 'font-sans text-cyan-400 font-bold',
-    labelFont: 'font-sans text-xs font-bold text-cyan-100/80 mt-1 uppercase tracking-wide',
-    tagBadge: 'text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-cyan-950 text-cyan-200 border border-cyan-400/40',
+    cardTopAccent: 'bg-cyan-500',
+    iconBox: 'w-13 h-13 rounded-2xl bg-cyan-50 border border-cyan-200 text-cyan-700 shrink-0 p-3 shadow-sm flex items-center justify-center',
+    valueFont: 'font-sans font-black text-cyan-950 text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-none',
+    suffixFont: 'font-sans text-cyan-600 font-bold',
+    labelFont: 'font-sans text-xs font-bold text-slate-700 mt-1 uppercase tracking-wide',
+    tagBadge: 'text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-cyan-100 text-cyan-800 border border-cyan-200',
   },
 
-  // Quote / Leadership Section
+  // Quote / Leadership Section (Medical Director Station)
   quote: {
-    sectionBg: 'bg-slate-950 text-white border-y border-cyan-900/60',
-    photoContainer: 'lg:col-span-4 bg-slate-900/90 backdrop-blur-xl border border-cyan-500/30 rounded-3xl p-6 sm:p-7 shadow-2xl space-y-4',
-    photoFrame: 'aspect-square rounded-2xl overflow-hidden border border-cyan-900/80 bg-slate-800',
-    quoteBox: 'lg:col-span-8 bg-slate-900/70 backdrop-blur-xl border border-cyan-500/30 rounded-3xl p-8 sm:p-10 shadow-2xl space-y-5',
-    quoteTextFont: 'font-sans font-semibold text-white text-lg sm:text-xl lg:text-2xl leading-relaxed',
-    authorNameFont: 'font-sans font-extrabold text-white text-lg',
-    authorTitleFont: 'font-sans text-xs font-medium text-cyan-300 mt-0.5',
-    subTextFont: 'font-sans text-[11px] text-cyan-100/70 mt-1',
-    badgeClass: 'text-xs uppercase font-bold text-cyan-200',
-    iconColor: 'text-cyan-500/40',
-  },
-
-  // Departments Section
-  departments: {
-    sectionBg: 'py-16 bg-slate-950 text-cyan-50 border-y border-cyan-950',
-    sectionHeaderBadge: 'bg-cyan-950/90 text-cyan-300 border border-cyan-400/40 text-xs font-sans font-bold uppercase',
-    headingFont: 'font-sans font-extrabold tracking-tight text-white text-3xl sm:text-4xl',
-    subtitleFont: 'font-sans text-cyan-100/70 text-sm',
-    cardBorder: 'border-cyan-500/30 hover:border-cyan-400/70',
-    cardBg: 'bg-slate-900/90 backdrop-blur-md rounded-2xl p-6 shadow-xl hover:shadow-2xl transition duration-300 border',
-    cardHover: 'hover:-translate-y-1',
-    iconBg: 'bg-cyan-500/15 text-cyan-300 border border-cyan-400/30',
-    accentText: 'text-cyan-300 hover:text-cyan-200 font-bold',
-    tagBadge: 'bg-cyan-950 text-cyan-300 border border-cyan-400/40 font-sans text-[10px] uppercase font-bold',
-  },
-
-  // Courses Section
-  courses: {
-    sectionBg: 'py-16 bg-slate-950 text-cyan-50 border-y border-cyan-950',
-    sectionHeaderBadge: 'bg-cyan-950/90 text-cyan-300 border border-cyan-400/40 text-xs font-sans font-bold uppercase',
-    headingFont: 'font-sans font-extrabold tracking-tight text-white text-3xl sm:text-4xl',
-    subtitleFont: 'font-sans text-cyan-100/70 text-sm',
-    cardBorder: 'border-cyan-500/30 hover:border-cyan-400/60',
-    cardBg: 'bg-slate-900/90 backdrop-blur-md rounded-2xl p-6 shadow-xl hover:shadow-2xl transition duration-300 border',
-    badge: 'bg-cyan-950/80 text-cyan-200 border border-cyan-400/40 font-sans text-[10px] uppercase font-bold',
-    accentText: 'text-cyan-300 hover:text-cyan-200 font-bold',
-    primaryBtn: 'bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs shadow-md shadow-cyan-900/40',
+    sectionBg: 'bg-white text-slate-900 border-y border-cyan-100',
+    photoContainer: 'lg:col-span-4 bg-slate-50 border border-cyan-200 rounded-3xl p-6 sm:p-7 shadow-lg space-y-4',
+    photoFrame: 'aspect-square rounded-2xl overflow-hidden border-2 border-cyan-200 bg-white',
+    quoteBox: 'lg:col-span-8 bg-cyan-50/50 border border-cyan-200/80 rounded-3xl p-8 sm:p-10 shadow-lg space-y-5',
+    quoteTextFont: 'font-sans font-semibold text-slate-900 text-lg sm:text-xl lg:text-2xl leading-relaxed',
+    authorNameFont: 'font-sans font-extrabold text-cyan-950 text-lg',
+    authorTitleFont: 'font-sans text-xs font-bold text-cyan-700 mt-0.5',
+    subTextFont: 'font-sans text-[11px] text-slate-500 mt-1',
+    badgeClass: 'text-xs uppercase font-bold text-cyan-800 bg-cyan-100 px-3 py-1 rounded-full border border-cyan-300',
     iconColor: 'text-cyan-400',
+  },
+
+  // Departments Section (Hospital Specialty Wings)
+  departments: {
+    sectionBg: 'py-16 bg-slate-50 text-slate-900 border-y border-cyan-100',
+    sectionHeaderBadge: 'bg-cyan-100 text-cyan-800 border border-cyan-300 text-xs font-sans font-bold uppercase',
+    headingFont: 'font-sans font-extrabold tracking-tight text-slate-900 text-3xl sm:text-4xl',
+    subtitleFont: 'font-sans text-slate-600 text-sm',
+    cardBorder: 'border border-cyan-200 hover:border-cyan-500',
+    cardBg: 'bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition duration-300 border text-slate-900',
+    cardHover: 'hover:-translate-y-1',
+    iconBg: 'bg-cyan-100 text-cyan-700 border border-cyan-200',
+    accentText: 'text-cyan-700 hover:text-cyan-900 font-bold',
+    tagBadge: 'bg-cyan-50 text-cyan-800 border border-cyan-200 font-sans text-[10px] uppercase font-bold',
+  },
+
+  // Courses Section (Clinical Degree Programs)
+  courses: {
+    sectionBg: 'py-16 bg-white text-slate-900 border-y border-cyan-100',
+    sectionHeaderBadge: 'bg-cyan-100 text-cyan-800 border border-cyan-300 text-xs font-sans font-bold uppercase',
+    headingFont: 'font-sans font-extrabold tracking-tight text-slate-900 text-3xl sm:text-4xl',
+    subtitleFont: 'font-sans text-slate-600 text-sm',
+    cardBorder: 'border border-cyan-200 hover:border-cyan-500',
+    cardBg: 'bg-slate-50/70 rounded-2xl p-6 shadow-md hover:shadow-xl transition duration-300 border text-slate-900',
+    badge: 'bg-cyan-100 text-cyan-800 border border-cyan-200 font-sans text-[10px] uppercase font-bold',
+    accentText: 'text-cyan-700 hover:text-cyan-900 font-bold',
+    primaryBtn: 'bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-xs shadow-md shadow-cyan-900/20',
+    iconColor: 'text-cyan-600',
   },
 
   // Call to Action (CTA)
   cta: {
-    sectionBg: 'py-16 sm:py-20 bg-slate-950 text-white relative overflow-hidden border-y border-cyan-900/60',
+    sectionBg: 'py-16 sm:py-20 bg-gradient-to-r from-cyan-900 via-cyan-950 to-slate-950 text-white relative overflow-hidden border-y border-cyan-800',
     badgeClass: 'bg-cyan-950/80 border-cyan-400/40 text-cyan-200 font-sans font-bold uppercase',
     headlineFont: 'font-sans font-extrabold tracking-tight leading-tight text-white text-3xl sm:text-4xl lg:text-5xl',
     subheadlineFont: 'font-sans text-cyan-100/90 text-sm sm:text-base',
-    primaryBtnClass: 'bg-cyan-600 hover:bg-cyan-500 text-white font-bold shadow-xl shadow-cyan-900/50',
+    primaryBtnClass: 'bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-bold shadow-xl shadow-cyan-900/50',
     secondaryBtnClass: 'bg-rose-600 hover:bg-rose-500 border border-rose-500/40 text-white font-bold shadow-xl shadow-rose-950/50',
   },
 
   // Cards Section
   cards: {
-    headingFont: 'font-sans font-extrabold text-white',
-    cardBorder: 'border-cyan-500/30 hover:border-cyan-400',
-    cardBg: 'bg-slate-900/90 backdrop-blur-md text-cyan-50',
-    badge: 'bg-cyan-950 text-cyan-300 border border-cyan-400/40 font-sans text-xs',
+    headingFont: 'font-sans font-extrabold text-slate-900',
+    cardBorder: 'border border-cyan-200 hover:border-cyan-400',
+    cardBg: 'bg-white text-slate-900 shadow-md',
+    badge: 'bg-cyan-100 text-cyan-800 border border-cyan-200 font-sans text-xs',
   },
 };
