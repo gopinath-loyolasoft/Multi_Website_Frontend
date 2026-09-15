@@ -53,7 +53,7 @@ export const MenusAdminPage: React.FC = () => {
   const [newsList, setNewsList] = useState<{ id: string; title: string; slug: string }[]>([]);
   const [noticesList, setNoticesList] = useState<{ id: string; title: string; slug: string }[]>([]);
   const [galleryList, setGalleryList] = useState<{ id: string; title: string; slug: string }[]>([]);
-  const [pickerCategory, setPickerCategory] = useState<'ALL' | 'CORE' | 'PAGES' | 'DEPARTMENTS' | 'NEWS' | 'NOTICES' | 'GALLERY'>('ALL');
+  const [pickerCategory, setPickerCategory] = useState<'ALL' | 'CORE' | 'ANCHORS' | 'PAGES' | 'DEPARTMENTS' | 'NEWS' | 'NOTICES' | 'GALLERY'>('ALL');
   const [pickerSearch, setPickerSearch] = useState('');
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
 
@@ -87,6 +87,25 @@ export const MenusAdminPage: React.FC = () => {
     { label: 'Notice Board', url: '/notices' },
     { label: 'Admissions & Apply', url: '/admissions' },
     { label: 'Contact Us', url: '/contact' },
+  ];
+
+  // Predefined Home In-Page Scroll Anchors
+  const predefinedScrollAnchors = [
+    { label: 'Home Top / Hero Banner', url: '/#hero' },
+    { label: 'About College Section', url: '/#about' },
+    { label: 'Leadership Quote / Vision', url: '/#quote' },
+    { label: 'Key Statistics & Facts', url: '/#stats' },
+    { label: 'Academic Departments Section', url: '/#departments' },
+    { label: 'Degree Programs & Courses', url: '/#courses' },
+    { label: 'Distinguished Faculty Section', url: '/#faculty' },
+    { label: 'Campus News Section', url: '/#news' },
+    { label: 'Events & Celebrations', url: '/#events' },
+    { label: 'Notice Board Section', url: '/#notices' },
+    { label: 'Campus Photo Gallery', url: '/#gallery' },
+    { label: 'Placements & Recruiters', url: '/#placements' },
+    { label: 'Student Testimonials', url: '/#testimonials' },
+    { label: 'FAQs Section', url: '/#faq' },
+    { label: 'Contact & Map Section', url: '/#contact' },
   ];
 
   const showNotification = (text: string, type: 'success' | 'error' = 'success') => {
@@ -344,6 +363,14 @@ export const MenusAdminPage: React.FC = () => {
       badge: 'Core Module',
       color: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800',
       icon: Globe
+    })),
+    ...predefinedScrollAnchors.map((a) => ({
+      category: 'ANCHORS' as const,
+      label: a.label,
+      url: a.url,
+      badge: 'Home Scroll',
+      color: 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/50 dark:text-indigo-300 dark:border-indigo-800',
+      icon: Link2
     })),
     ...customPages.map((p) => ({
       category: 'PAGES' as const,
@@ -1022,6 +1049,12 @@ export const MenusAdminPage: React.FC = () => {
                 setTargetType(newType);
                 if (newType === 'DYNAMIC_MODULE' && !url) {
                   setUrl('/about');
+                  setPickerCategory('CORE');
+                } else if (newType === 'SECTION_ANCHOR') {
+                  if (!url || !url.startsWith('/#')) setUrl('/#departments');
+                  setPickerCategory('ANCHORS');
+                } else if (newType === 'INTERNAL_PAGE') {
+                  setPickerCategory('PAGES');
                 } else if (newType === 'EXTERNAL_LINK' && (!url || url.startsWith('/'))) {
                   setUrl('https://');
                 }
@@ -1030,19 +1063,19 @@ export const MenusAdminPage: React.FC = () => {
             >
               <option value="DYNAMIC_MODULE">Dynamic College Module (Courses, Faculty, News, etc.)</option>
               <option value="INTERNAL_PAGE">Internal Dynamic Page (Slug Route)</option>
-              <option value="SECTION_ANCHOR">Section Anchor (Scrolls down, e.g. #departments)</option>
+              <option value="SECTION_ANCHOR">Section Anchor (In-Page Home Scroll, e.g. /#departments)</option>
               <option value="EXTERNAL_LINK">External Website Link</option>
               <option value="FILE_DOWNLOAD">Brochure or Document Download</option>
             </select>
           </div>
 
           {/* Categorized Route & Slug Directory Picker */}
-          {(targetType === 'DYNAMIC_MODULE' || targetType === 'INTERNAL_PAGE') && (
+          {(targetType === 'DYNAMIC_MODULE' || targetType === 'INTERNAL_PAGE' || targetType === 'SECTION_ANCHOR') && (
             <div className="space-y-2 p-3 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 text-primary" />
-                  <span>1-Click Route & Slug Picker</span>
+                  <span>1-Click Route & Anchor Picker</span>
                 </label>
                 <span className="text-[11px] text-slate-400 font-medium">
                   {filteredRoutes.length} available
@@ -1054,6 +1087,7 @@ export const MenusAdminPage: React.FC = () => {
                 {[
                   { key: 'ALL', label: 'All' },
                   { key: 'CORE', label: 'Core Modules' },
+                  { key: 'ANCHORS', label: 'Scroll Anchors' },
                   { key: 'PAGES', label: 'CMS Pages' },
                   { key: 'DEPARTMENTS', label: 'Departments' },
                   { key: 'NEWS', label: 'News' },
@@ -1081,7 +1115,7 @@ export const MenusAdminPage: React.FC = () => {
                   type="text"
                   value={pickerSearch}
                   onChange={(e) => setPickerSearch(e.target.value)}
-                  placeholder="Filter routes by title or slug..."
+                  placeholder="Filter routes or scroll anchors..."
                   className="w-full pl-8 pr-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-xs"
                 />
               </div>

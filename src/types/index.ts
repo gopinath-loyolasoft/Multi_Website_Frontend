@@ -101,6 +101,7 @@ export interface SectionSettings {
   spacing?: 'compact' | 'normal' | 'large';
   containerWidth?: 'narrow' | 'standard' | 'full';
   customCssClass?: string;
+  anchorId?: string;
 }
 
 export interface PageSection {

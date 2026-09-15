@@ -270,27 +270,8 @@ export const SuperAdminLayout: React.FC = () => {
             {/* 1-Click Theme Switcher Icon */}
             <ThemeToggle variant="superadmin" />
 
-            {/* Profile Avatar & Details Dropdown */}
-            <HeaderProfileDropdown
-              user={user}
-              roleTitle="SuperAdmin"
-              subInfo={branding.platformSubtitle || 'Control Plane'}
-              onLogout={handleLogout}
-              variant="superadmin"
-              quickLinks={[
-                {
-                  label: 'Platform Branding & Tab Settings',
-                  to: '/superadmin/settings',
-                  icon: Settings
-                },
-                {
-                  label: 'Open Public Gateway',
-                  to: '/',
-                  icon: Globe2,
-                  external: true
-                }
-              ]}
-            />
+
+
 
             {/* Direct Logout Button on Header */}
             <button

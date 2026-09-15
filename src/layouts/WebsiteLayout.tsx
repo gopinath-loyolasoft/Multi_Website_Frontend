@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   GraduationCap,
   Lock,
@@ -20,7 +20,8 @@ import {
   ShieldCheck,
   Landmark,
   PhoneCall,
-  FileText
+  FileText,
+  ArrowUp
 } from 'lucide-react';
 import { useTenant } from '../tenant/TenantContext';
 import { useTheme } from '../themes/ThemeContext';
@@ -36,9 +37,12 @@ interface SubMenuItem {
 export const WebsiteLayout: React.FC = () => {
   const { siteConfig, loading, error, tenantDomain } = useTenant();
   const location = useLocation();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<Record<string, boolean>>({});
+  const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
+  const [showBackToTop, setShowBackToTop] = useState(false);
   const dropdownTimeoutRef = useRef<any>(null);
 
   // Update browser document title dynamically
@@ -55,12 +59,120 @@ export const WebsiteLayout: React.FC = () => {
     }
   }, [siteConfig]);
 
-  // Close mobile drawer & scroll to top when route changes
+  // Handle cross-page hash navigation & scroll restoration
   useEffect(() => {
     setMobileMenuOpen(false);
     setActiveDropdown(null);
-    window.scrollTo(0, 0);
-  }, [location.pathname, location.search]);
+
+    if (location.hash) {
+      const targetId = location.hash.replace('#', '');
+      const scrollToTarget = () => {
+        const el = document.getElementById(targetId) || document.querySelector(`[data-section-type="${targetId.toUpperCase()}"]`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      };
+
+      scrollToTarget();
+      const timer = setTimeout(scrollToTarget, 300);
+      return () => clearTimeout(timer);
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [location.pathname, location.hash]);
+
+  // Back to Top listener
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 350) {
+        setShowBackToTop(true);
+      } else {
+        setShowBackToTop(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // ScrollSpy observer on Home Page
+  useEffect(() => {
+    if (location.pathname !== '/') {
+      setActiveSectionId(null);
+      return;
+    }
+
+    const handleScrollSpy = () => {
+      const sections = Array.from(document.querySelectorAll('section[id]'));
+      if (sections.length === 0) return;
+
+      const scrollPosition = window.scrollY + 120; // 120px offset for sticky header
+      let currentSectionId: string | null = null;
+
+      for (const sec of sections) {
+        const el = sec as HTMLElement;
+        const top = el.offsetTop;
+        const height = el.offsetHeight;
+        if (scrollPosition >= top && scrollPosition < top + height) {
+          currentSectionId = el.id;
+          break;
+        }
+      }
+
+      if (!currentSectionId && window.scrollY < 200) {
+        currentSectionId = 'hero';
+      }
+
+      if (currentSectionId) {
+        setActiveSectionId(currentSectionId);
+      }
+    };
+
+    window.addEventListener('scroll', handleScrollSpy, { passive: true });
+    handleScrollSpy();
+    return () => window.removeEventListener('scroll', handleScrollSpy);
+  }, [location.pathname]);
+
+  const handleAnchorClick = (targetUrl: string, e: React.MouseEvent) => {
+    if (!targetUrl) return;
+
+    // Check if it's an in-page anchor like "#departments" or "/#departments"
+    if (targetUrl.includes('#')) {
+      const [path, hash] = targetUrl.split('#');
+      const isCurrentPage = !path || path === '/' ? location.pathname === '/' : location.pathname === path;
+
+      if (isCurrentPage) {
+        e.preventDefault();
+        const el = document.getElementById(hash) || document.querySelector(`[data-section-type="${hash.toUpperCase()}"]`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          window.history.pushState(null, '', `/#${hash}`);
+          setMobileMenuOpen(false);
+          setActiveDropdown(null);
+          return;
+        }
+      } else {
+        // Navigate to the target page with hash
+        setMobileMenuOpen(false);
+        setActiveDropdown(null);
+      }
+    } else {
+      setMobileMenuOpen(false);
+      setActiveDropdown(null);
+    }
+  };
+
+  const isMenuItemActive = (itemUrl?: string) => {
+    if (!itemUrl) return false;
+    if (location.pathname === '/') {
+      if (itemUrl.includes('#')) {
+        const hash = itemUrl.split('#')[1];
+        return activeSectionId === hash;
+      }
+      if (itemUrl === '/') return !activeSectionId || activeSectionId === 'hero';
+      return false;
+    }
+    return location.pathname === itemUrl || location.pathname.startsWith(itemUrl + '/');
+  };
 
   if (loading) {
     return (
@@ -207,9 +319,10 @@ export const WebsiteLayout: React.FC = () => {
               const isOpen = activeDropdown === menuKey;
               const isExternal = item.openInNewTab || item.targetType === 'EXTERNAL_LINK';
 
+              const isActive = isMenuItemActive(item.url);
               const linkClass = isUniversity
-                ? (isOpen ? 'text-rose-400 bg-slate-900' : 'text-slate-200 hover:text-white hover:bg-slate-900')
-                : (isOpen ? 'text-primary bg-slate-50' : 'text-slate-700 hover:text-primary hover:bg-slate-50');
+                ? (isActive ? 'text-rose-400 bg-slate-900 font-bold shadow-xs' : isOpen ? 'text-rose-400 bg-slate-900' : 'text-slate-200 hover:text-white hover:bg-slate-900')
+                : (isActive ? 'text-primary bg-primary/10 font-bold shadow-xs' : isOpen ? 'text-primary bg-slate-50' : 'text-slate-700 hover:text-primary hover:bg-slate-50');
 
               return (
                 <div
@@ -235,6 +348,7 @@ export const WebsiteLayout: React.FC = () => {
                     ) : (
                       <Link
                         to={item.url || '/'}
+                        onClick={(e) => handleAnchorClick(item.url || '/', e)}
                         className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-semibold transition ${linkClass}`}
                       >
                         <span>{item.title}</span>
@@ -255,6 +369,7 @@ export const WebsiteLayout: React.FC = () => {
                         {subItems.map((sub, idx) => {
                           const SubIcon = sub.icon || FileText;
                           const isSubExternal = sub.openInNewTab || sub.targetType === 'EXTERNAL_LINK' || sub.url.startsWith('http');
+                          const isSubActive = isMenuItemActive(sub.url);
 
                           if (isSubExternal) {
                             return (
@@ -287,13 +402,14 @@ export const WebsiteLayout: React.FC = () => {
                             <Link
                               key={idx}
                               to={sub.url}
-                              className="group flex items-start gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition"
+                              onClick={(e) => handleAnchorClick(sub.url, e)}
+                              className={`group flex items-start gap-3 p-2.5 rounded-xl transition ${isSubActive ? 'bg-primary/10 text-primary font-bold' : 'hover:bg-slate-50 text-slate-700'}`}
                             >
-                              <div className="w-8 h-8 rounded-lg bg-slate-100 group-hover:bg-primary/10 flex items-center justify-center text-slate-500 group-hover:text-primary transition shrink-0 mt-0.5">
+                              <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition shrink-0 mt-0.5 ${isSubActive ? 'bg-primary text-white' : 'bg-slate-100 group-hover:bg-primary/10 text-slate-500 group-hover:text-primary'}`}>
                                 <SubIcon className="w-4 h-4" />
                               </div>
                               <div className="min-w-0 flex-1">
-                                <div className="text-xs font-bold text-slate-900 group-hover:text-primary transition flex items-center justify-between">
+                                <div className={`text-xs font-bold transition flex items-center justify-between ${isSubActive ? 'text-primary' : 'text-slate-900 group-hover:text-primary'}`}>
                                   <span>{sub.title}</span>
                                 </div>
                                 {sub.description && (
@@ -320,22 +436,11 @@ export const WebsiteLayout: React.FC = () => {
               </div>
             )}
 
-            {/* Quick Apply CTA in Header */}
-            {/* <Link
-              to={siteConfig.settings?.headerCtaUrl || "/admissions"}
-              className="ml-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold text-white bg-primary hover:opacity-90 shadow-md shadow-primary/20 transition hover:scale-105"
-            >
-              <span>{siteConfig.settings?.headerCtaText || (isMedical ? 'NEET Admissions' : isArtsAndScience ? 'Apply for Degree' : 'Apply Now')}</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link> */}
-
             {/* Admin Login Portal */}
             {(siteConfig.settings?.showAdminLink !== false) && (
               <Link
                 to="/admin/login"
                 className="ml-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold text-white bg-primary hover:opacity-90 shadow-md shadow-primary/20 transition hover:scale-105"
-
-                // className="ml-1 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition bg-primary hover:opacity-90 shadow-md shadow-primary/20 transition hover:scale-105"
                 title="Campus CMS Admin Login"
               >
                 <Lock className="w-3.5 h-3.5 text-slate-400" />
@@ -389,6 +494,7 @@ export const WebsiteLayout: React.FC = () => {
                   const hasDropdown = subItems.length > 0;
                   const isExpanded = !!mobileExpanded[menuKey];
                   const isExternal = item.openInNewTab || item.targetType === 'EXTERNAL_LINK';
+                  const isItemActive = isMenuItemActive(item.url);
 
                   return (
                     <div key={item.id} className="border-b border-slate-100 pb-2">
@@ -406,7 +512,8 @@ export const WebsiteLayout: React.FC = () => {
                         ) : (
                           <Link
                             to={item.url || '/'}
-                            className="text-sm font-bold text-slate-800 hover:text-primary py-1.5"
+                            onClick={(e) => handleAnchorClick(item.url || '/', e)}
+                            className={`text-sm font-bold py-1.5 ${isItemActive ? 'text-primary' : 'text-slate-800 hover:text-primary'}`}
                           >
                             {item.title}
                           </Link>
@@ -425,6 +532,8 @@ export const WebsiteLayout: React.FC = () => {
                         <div className="pl-3 mt-1.5 space-y-1.5 border-l-2 border-primary/20">
                           {subItems.map((sub, idx) => {
                             const isSubExternal = sub.openInNewTab || sub.targetType === 'EXTERNAL_LINK' || sub.url.startsWith('http');
+                            const isSubActive = isMenuItemActive(sub.url);
+
                             if (isSubExternal) {
                               return (
                                 <a
@@ -443,7 +552,8 @@ export const WebsiteLayout: React.FC = () => {
                               <Link
                                 key={idx}
                                 to={sub.url}
-                                className="block py-1 text-xs font-semibold text-slate-600 hover:text-primary"
+                                onClick={(e) => handleAnchorClick(sub.url, e)}
+                                className={`block py-1 text-xs font-semibold ${isSubActive ? 'text-primary font-bold' : 'text-slate-600 hover:text-primary'}`}
                               >
                                 {sub.title}
                               </Link>
@@ -589,6 +699,19 @@ export const WebsiteLayout: React.FC = () => {
           </div>
         </div>
       </footer>
+
+      {/* Floating Back to Top Button */}
+      {showBackToTop && (
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          aria-label="Back to Top"
+          className="fixed bottom-6 right-6 z-50 p-3 rounded-2xl bg-primary text-white shadow-xl shadow-primary/30 hover:scale-110 active:scale-95 transition-all duration-300 flex items-center justify-center cursor-pointer border border-white/20 group"
+          title="Back to Top"
+        >
+          <ArrowUp className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" />
+        </button>
+      )}
     </div>
   );
 };

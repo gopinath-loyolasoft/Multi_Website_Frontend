@@ -137,9 +137,63 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({ section }) => 
     }
   };
 
+  const getSectionAnchorId = (sec: PageSection): string => {
+    if (sec.settings?.anchorId) return sec.settings.anchorId;
+    const type = (sec.sectionType || '').toUpperCase();
+    switch (type) {
+      case 'HERO':
+      case 'HERO_SLIDER':
+      case 'BANNERS':
+        return 'hero';
+      case 'QUOTE':
+        return 'quote';
+      case 'STATISTICS':
+      case 'STATS':
+        return 'stats';
+      case 'DEPARTMENTS':
+        return 'departments';
+      case 'COURSES':
+        return 'courses';
+      case 'FACULTY':
+        return 'faculty';
+      case 'NEWS':
+        return 'news';
+      case 'EVENTS':
+        return 'events';
+      case 'NOTICES':
+        return 'notices';
+      case 'GALLERY':
+        return 'gallery';
+      case 'PLACEMENTS':
+      case 'RECRUITERS':
+        return 'placements';
+      case 'TESTIMONIALS':
+        return 'testimonials';
+      case 'FAQ':
+        return 'faq';
+      case 'CONTACT':
+      case 'MAP':
+        return 'contact';
+      case 'IMAGE_TEXT':
+      case 'TEXT':
+      case 'CARDS':
+        return sec.title?.toLowerCase().includes('about') ? 'about' : `section-${sec.id}`;
+      default:
+        return `section-${sec.id}`;
+    }
+  };
+
+  const anchorId = getSectionAnchorId(section);
+
   if (isHero) {
     return (
-      <section id={`section-${section.id}`} className="w-full">
+      <section
+        id={anchorId}
+        data-section-id={section.id}
+        data-section-type={section.sectionType}
+        className="w-full scroll-mt-24"
+        style={{ scrollMarginTop: '85px' }}
+      >
         {renderContent()}
       </section>
     );
@@ -147,11 +201,13 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({ section }) => 
 
   return (
     <section
-      id={`section-${section.id}`}
-      className={`w-full transition-colors duration-200 ${bgClass} ${spacingClass} ${settings.customCssClass || ''}`}
+      id={anchorId}
+      data-section-id={section.id}
       data-section-type={section.sectionType}
       data-columns={settings.columns || 3}
       data-card-variant={settings.cardVariant || 'standard'}
+      className={`w-full scroll-mt-24 transition-colors duration-200 ${bgClass} ${spacingClass} ${settings.customCssClass || ''}`}
+      style={{ scrollMarginTop: '85px' }}
     >
       <div className={`${widthClass} ${alignClass}`}>
         {(section.title || section.subtitle) && (
