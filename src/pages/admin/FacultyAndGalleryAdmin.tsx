@@ -927,55 +927,43 @@ export const GalleryManagementPage: React.FC = () => {
           </div>
 
           {/* Category / Type Field with Preset Chips + Custom input */}
-          <div className="space-y-2">
-            <label className="block text-xs font-bold uppercase text-slate-600 dark:text-slate-300">
+          {/* Category / Type Field Dropdown */}
+          <div>
+            <label className="block text-xs font-bold uppercase text-slate-600 dark:text-slate-300 mb-1">
               Album Category / Type *
             </label>
-            <div className="flex flex-wrap gap-1.5">
-              {GALLERY_CATEGORIES.map((catOption) => {
-                const isSelected = !isCustomCategory && category === catOption;
-                return (
-                  <button
-                    key={catOption}
-                    type="button"
-                    onClick={() => {
-                      setIsCustomCategory(false);
-                      setCategory(catOption);
-                    }}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
-                      isSelected
-                        ? 'bg-primary text-white shadow-sm'
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                    }`}
-                  >
-                    {catOption}
-                  </button>
-                );
-              })}
-              <button
-                type="button"
-                onClick={() => {
+            <select
+              value={isCustomCategory ? '__CUSTOM__' : category}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val === '__CUSTOM__') {
                   setIsCustomCategory(true);
-                }}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
-                  isCustomCategory
-                    ? 'bg-primary text-white shadow-sm'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                }`}
-              >
-                + Custom Type
-              </button>
-            </div>
+                } else {
+                  setIsCustomCategory(false);
+                  setCategory(val);
+                }
+              }}
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:outline-none cursor-pointer"
+              required
+            >
+              {GALLERY_CATEGORIES.map((catOption) => (
+                <option key={catOption} value={catOption}>
+                  {catOption}
+                </option>
+              ))}
+              <option value="__CUSTOM__">+ Custom / Other Type</option>
+            </select>
 
             {isCustomCategory && (
-              <div className="pt-1">
+              <div className="mt-2">
                 <input
                   type="text"
                   value={customCategory}
                   onChange={(e) => setCustomCategory(e.target.value)}
-                  placeholder="Enter custom category (e.g. NCC & NSS, Workshop, Robotics Expo)"
-                  className="w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white text-xs focus:ring-2 focus:ring-primary focus:outline-none"
+                  placeholder="Enter custom category name (e.g. NCC & NSS, Robotics Expo)"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:outline-none"
                   required={isCustomCategory}
+                  autoFocus
                 />
               </div>
             )}
