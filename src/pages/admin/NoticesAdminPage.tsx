@@ -649,7 +649,7 @@ export const NoticesAdminPage: React.FC = () => {
                       <Copy className="w-3 h-3" />
                       <span>/notices/{n.slug}</span>
                     </button>
-                  ) : <span />}
+                  ) : null}
 
                   <div className="flex items-center gap-1.5">
                     <button
@@ -706,7 +706,7 @@ export const NoticesAdminPage: React.FC = () => {
         loading={actionLoading}
         size="lg"
       >
-        {drawerMode === 'view' && selectedNotice ? (
+        {(drawerMode === 'view' && selectedNotice) ? (
           <div className="space-y-6">
             <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
               <div className="flex items-center justify-between">
@@ -922,7 +922,7 @@ export const NoticesAdminPage: React.FC = () => {
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
         title="Delete Notice"
-        message={`This permanently deletes "${deleteTarget?.title}". This action cannot be undone.`}
+        message={deleteTarget ? `This permanently deletes "${deleteTarget.title}". This action cannot be undone.` : ''}
         confirmText="Delete"
         loading={actionLoading}
       />

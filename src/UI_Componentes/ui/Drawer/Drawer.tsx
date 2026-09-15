@@ -64,11 +64,6 @@ export const Drawer: React.FC<DrawerProps> = ({
         data-drawer-backdrop="true"
         onClick={closeOnOutsideClick ? onClose : undefined}
         className="fixed inset-0 drawer-backdrop transition-opacity duration-300 cursor-pointer"
-        style={{
-          backgroundColor: 'rgba(15, 23, 42, 0.22)',
-          backdropFilter: 'none',
-          WebkitBackdropFilter: 'none'
-        }}
       />
 
       {/* Drawer Panel Sliding in from Right */}

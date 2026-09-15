@@ -66,11 +66,6 @@ export const Modal: React.FC<ModalProps> = ({
         data-modal-backdrop="true"
         onClick={closeOnOutsideClick ? onClose : undefined}
         className="fixed inset-0 modal-backdrop transition-opacity animate-in fade-in"
-        style={{
-          backgroundColor: 'rgba(15, 23, 42, 0.35)',
-          backdropFilter: 'none',
-          WebkitBackdropFilter: 'none'
-        }}
       />
 
       {/* Modal Container */}

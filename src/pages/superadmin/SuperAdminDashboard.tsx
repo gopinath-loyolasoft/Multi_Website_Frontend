@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Building2, 
-  CheckCircle2, 
-  XCircle, 
-  Globe2, 
-  Database, 
-  Users, 
-  ArrowRight, 
-  PlusCircle, 
-  Activity, 
+import {
+  Building2,
+  CheckCircle2,
+  XCircle,
+  Globe2,
+  Database,
+  Users,
+  ArrowRight,
+  PlusCircle,
+  Activity,
 
   RefreshCw
 } from 'lucide-react';
@@ -125,7 +125,7 @@ export const SuperAdminDashboard: React.FC = () => {
 
   return (
     <div className="space-y-6 font-sans antialiased text-slate-900">
-      {/* Top Banner with Quick Actions */}
+      {/* Top Banner with Quick Actions
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
         <div>
           <h1 className="text-xl font-bold text-slate-900 tracking-tight">SuperAdmin Control Plane</h1>
@@ -150,7 +150,7 @@ export const SuperAdminDashboard: React.FC = () => {
             <span>Provision College</span>
           </Link>
         </div>
-      </div>
+      </div> */}
 
       {/* 6 Real Database Aggregate Cards (Pure White, 12-16px radius, subtle border) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -214,11 +214,10 @@ export const SuperAdminDashboard: React.FC = () => {
                     <td className="py-3 font-mono text-slate-600">college_{col.tenantCode.toLowerCase()}</td>
                     <td className="py-3">
                       <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                          col.status === 'ACTIVE'
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${col.status === 'ACTIVE'
                             ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                             : 'bg-red-50 text-red-700 border border-red-200'
-                        }`}
+                          }`}
                       >
                         {col.status}
                       </span>
