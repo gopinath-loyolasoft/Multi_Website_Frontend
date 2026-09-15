@@ -31,23 +31,23 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const themeConfig = siteConfig?.theme?.configuration;
 
   // Resolve template code from siteConfig or theme code fallback
-  const rawCode = (siteConfig?.templateCode || siteConfig?.tenant?.templateCode || '').toUpperCase();
+  const rawCode = (siteConfig?.templateCode || siteConfig?.tenant?.templateCode || (siteConfig?.theme as any)?.templateCode || '').toUpperCase().trim();
   let templateCode: TemplateCode = 'ENGINEERING_MODERN';
-  if (['TEMPLATE1', 'TEMPLATE_1', 'ENGINEERING_MODERN', 'ENGINEERING'].includes(rawCode)) {
+  if (['TEMPLATE1', 'TEMPLATE_1', 'TEMPLATE 1', '1', 'ENGINEERING_MODERN', 'ENGINEERING', 'TECH'].includes(rawCode)) {
     templateCode = 'ENGINEERING_MODERN';
-  } else if (['TEMPLATE2', 'TEMPLATE_2', 'ARTS_SCIENCE_MODERN', 'ARTS_SCIENCE'].includes(rawCode)) {
+  } else if (['TEMPLATE2', 'TEMPLATE_2', 'TEMPLATE 2', '2', 'ARTS_SCIENCE_MODERN', 'ARTS_SCIENCE', 'ARTS'].includes(rawCode)) {
     templateCode = 'ARTS_SCIENCE_MODERN';
-  } else if (['TEMPLATE3', 'TEMPLATE_3', 'MEDICAL_MODERN', 'MEDICAL'].includes(rawCode)) {
+  } else if (['TEMPLATE3', 'TEMPLATE_3', 'TEMPLATE 3', '3', 'MEDICAL_MODERN', 'MEDICAL', 'NURSING', 'HEALTH', 'CLINICAL'].includes(rawCode)) {
     templateCode = 'MEDICAL_MODERN';
-  } else if (['TEMPLATE4', 'TEMPLATE_4', 'UNIVERSITY_MODERN', 'UNIVERSITY'].includes(rawCode)) {
+  } else if (['TEMPLATE4', 'TEMPLATE_4', 'TEMPLATE 4', '4', 'UNIVERSITY_MODERN', 'UNIVERSITY', 'CENTRAL'].includes(rawCode)) {
     templateCode = 'UNIVERSITY_MODERN';
   } else if (rawCode) {
     templateCode = rawCode as TemplateCode;
   } else if (siteConfig?.theme?.code === 'ARTS_GREEN' || siteConfig?.theme?.code === 'THEME_EMERALD') {
     templateCode = 'ARTS_SCIENCE_MODERN';
-  } else if (siteConfig?.theme?.code === 'NURSING_CARE' || siteConfig?.theme?.code === 'THEME_TEAL') {
+  } else if (siteConfig?.theme?.code === 'NURSING_CARE' || siteConfig?.theme?.code === 'THEME_TEAL' || siteConfig?.theme?.code === 'TEMPLATE3') {
     templateCode = 'MEDICAL_MODERN';
-  } else if (siteConfig?.theme?.code === 'UNIV_CRIMSON' || siteConfig?.theme?.code === 'THEME_CRIMSON') {
+  } else if (siteConfig?.theme?.code === 'UNIV_CRIMSON' || siteConfig?.theme?.code === 'THEME_CRIMSON' || siteConfig?.theme?.code === 'TEMPLATE4') {
     templateCode = 'UNIVERSITY_MODERN';
   }
 

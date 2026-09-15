@@ -20,7 +20,7 @@ interface GalleryProps {
 }
 
 export const GallerySection: React.FC<GalleryProps> = ({ content }) => {
-  const { isArtsAndScience, isMedical, isUniversity } = useTheme();
+  const { isArtsAndScience, isMedical, isUniversity, isEngineering } = useTheme();
   const isCenterAligned = isArtsAndScience || isUniversity;
 
   const [fetchedImages, setFetchedImages] = useState<GalleryImg[]>([]);
@@ -76,8 +76,24 @@ export const GallerySection: React.FC<GalleryProps> = ({ content }) => {
     ? 'text-cyan-700 hover:text-cyan-900' 
     : 'text-primary hover:underline';
 
+  const sectionBg = isEngineering
+    ? 'py-16 bg-slate-950 text-white border-y border-slate-900'
+    : isArtsAndScience
+    ? 'py-16 bg-[#fbf9f4] text-slate-900 border-y border-emerald-900/10'
+    : isMedical
+    ? 'py-16 bg-white text-slate-900 border-y border-cyan-100'
+    : 'py-16 bg-[#fcfaf7] text-slate-900 border-y border-stone-200';
+
+  const cardBorder = isEngineering
+    ? 'border border-slate-800 hover:border-amber-400/60 shadow-xl'
+    : isArtsAndScience
+    ? 'border-2 border-emerald-800/15 hover:border-emerald-600 shadow-sm'
+    : isMedical
+    ? 'border border-cyan-200 hover:border-cyan-500 shadow-sm'
+    : 'border-t-4 border-t-rose-900 border-x border-b border-stone-200 hover:border-rose-700 shadow-sm';
+
   return (
-    <section className="py-16 bg-slate-50 dark:bg-slate-950 transition-colors">
+    <section className={sectionBg}>
       <div className="max-w-screen-2xl mx-auto px-6 sm:px-10 lg:px-16">
         {isCenterAligned ? (
           <div className="text-center max-w-3xl mx-auto mb-12 space-y-3 flex flex-col items-center">
@@ -89,7 +105,7 @@ export const GallerySection: React.FC<GalleryProps> = ({ content }) => {
               {content.title || 'Campus Photo & Video Gallery'}
             </h2>
             {content.subtitle && (
-              <p className="text-sm text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+              <p className="text-sm opacity-80 max-w-2xl mx-auto">
                 {content.subtitle}
               </p>
             )}
@@ -112,7 +128,7 @@ export const GallerySection: React.FC<GalleryProps> = ({ content }) => {
                 {content.title || 'Campus Photo & Video Gallery'}
               </h2>
               {content.subtitle && (
-                <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                <p className="text-sm opacity-80 mt-1">
                   {content.subtitle}
                 </p>
               )}
@@ -132,7 +148,7 @@ export const GallerySection: React.FC<GalleryProps> = ({ content }) => {
             <div
               key={idx}
               onClick={() => setActiveModalImg(img.imageUrl)}
-              className="group relative h-64 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl cursor-pointer border border-slate-200/80 dark:border-slate-800 transition duration-300"
+              className={`group relative h-64 rounded-2xl overflow-hidden hover:shadow-xl cursor-pointer ${cardBorder} transition duration-300`}
             >
               <img
                 src={img.imageUrl}

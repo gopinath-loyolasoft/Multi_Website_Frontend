@@ -17,7 +17,7 @@ interface NewsSectionProps {
 }
 
 export const NewsSection: React.FC<NewsSectionProps> = ({ content }) => {
-  const { isArtsAndScience, isMedical, isUniversity } = useTheme();
+  const { isArtsAndScience, isMedical, isUniversity, isEngineering } = useTheme();
   const isCenterAligned = isArtsAndScience || isUniversity;
 
   const [news, setNews] = useState<NewsItem[]>([]);
@@ -68,13 +68,29 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ content }) => {
     ? 'text-cyan-700 hover:text-cyan-900' 
     : 'text-primary hover:underline';
 
+  const sectionBg = isEngineering
+    ? 'py-16 bg-slate-900 text-white border-y border-slate-800'
+    : isArtsAndScience
+    ? 'py-16 bg-[#f5f2eb] text-slate-900 border-y border-emerald-900/10'
+    : isMedical
+    ? 'py-16 bg-slate-50 text-slate-900 border-y border-cyan-100'
+    : 'py-16 bg-[#f7f4ee] text-slate-900 border-y border-stone-200';
+
+  const cardBg = isEngineering
+    ? 'group bg-slate-950 text-white rounded-2xl border border-slate-800 hover:border-amber-400/60 overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col'
+    : isArtsAndScience
+    ? 'group bg-white text-slate-900 rounded-2xl border-2 border-emerald-800/15 hover:border-emerald-600 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col'
+    : isMedical
+    ? 'group bg-white text-slate-900 rounded-2xl border border-cyan-200 hover:border-cyan-500 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col'
+    : 'group bg-white text-slate-900 rounded-2xl border-t-4 border-t-rose-900 border-x border-b border-stone-200 hover:border-rose-700 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col';
+
   return (
-    <section className="py-16 bg-white border-b border-slate-100">
+    <section className={sectionBg}>
       <div className="max-w-6xl mx-auto px-6">
         {isCenterAligned ? (
           <div className="text-center max-w-3xl mx-auto mb-10 space-y-2 flex flex-col items-center">
             <h2 className={headingFont}>{title}</h2>
-            <p className="text-slate-500 text-sm max-w-2xl mx-auto">{subtitle}</p>
+            <p className="opacity-80 text-sm max-w-2xl mx-auto">{subtitle}</p>
             <Link
               to="/news"
               className={`inline-flex items-center gap-1.5 text-sm font-semibold pt-1 ${linkColor}`}
@@ -87,7 +103,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ content }) => {
           <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
             <div>
               <h2 className={headingFont}>{title}</h2>
-              <p className="text-slate-500 text-sm mt-1">{subtitle}</p>
+              <p className="opacity-80 text-sm mt-1">{subtitle}</p>
             </div>
             <Link
               to="/news"
@@ -102,7 +118,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ content }) => {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-pulse">
             {[1, 2, 3].map((n) => (
-              <div key={n} className="h-72 bg-slate-100 rounded-2xl" />
+              <div key={n} className="h-72 bg-slate-800/20 rounded-2xl" />
             ))}
           </div>
         ) : (
@@ -110,10 +126,10 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ content }) => {
             {news.map((item) => (
               <article
                 key={item.id}
-                className="group bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col"
+                className={cardBg}
               >
                 {item.imageUrl && (
-                  <div className="aspect-[16/9] overflow-hidden bg-slate-100">
+                  <div className="aspect-[16/9] overflow-hidden bg-slate-200/50">
                     <img
                       src={item.imageUrl}
                       alt={item.title}
@@ -123,19 +139,19 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ content }) => {
                 )}
                 <div className="p-6 flex-1 flex flex-col justify-between">
                   <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-xs font-medium text-slate-400">
+                    <div className="flex items-center gap-2 text-xs font-medium opacity-60">
                       <Calendar className="w-3.5 h-3.5" />
                       <span>{new Date(item.publishedDate).toLocaleDateString()}</span>
                     </div>
-                    <h3 className="font-bold text-slate-900 group-hover:text-primary transition line-clamp-2">
+                    <h3 className={`font-bold line-clamp-2 ${isArtsAndScience || isUniversity ? 'font-serif' : 'font-sans'}`}>
                       {item.title}
                     </h3>
-                    <p className="text-slate-600 text-sm line-clamp-3 leading-relaxed">
+                    <p className="text-sm line-clamp-3 leading-relaxed opacity-80">
                       {item.summary}
                     </p>
                   </div>
 
-                  <div className="pt-4 mt-4 border-t border-slate-100">
+                  <div className="pt-4 mt-4 border-t border-current/10">
                     <Link
                       to={`/news/${item.slug}`}
                       className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary group-hover:gap-2.5 transition-all"

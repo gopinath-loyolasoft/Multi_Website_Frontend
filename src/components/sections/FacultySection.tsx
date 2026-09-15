@@ -24,7 +24,7 @@ interface FacultyProps {
 }
 
 export const FacultySection: React.FC<FacultyProps> = ({ content }) => {
-  const { isArtsAndScience, isMedical, isUniversity } = useTheme();
+  const { isArtsAndScience, isMedical, isUniversity, isEngineering } = useTheme();
   const isCenterAligned = isArtsAndScience || isUniversity;
 
   const [fetchedFaculty, setFetchedFaculty] = React.useState<FacultyItem[]>([]);
@@ -82,8 +82,56 @@ export const FacultySection: React.FC<FacultyProps> = ({ content }) => {
     ? 'text-cyan-700 hover:text-cyan-900' 
     : 'text-primary hover:underline';
 
+  const sectionBg = isEngineering
+    ? 'py-16 bg-slate-950 text-white border-y border-slate-900'
+    : isArtsAndScience
+    ? 'py-16 bg-[#fbf9f4] text-slate-900 border-y border-emerald-900/10'
+    : isMedical
+    ? 'py-16 bg-white text-slate-900 border-y border-cyan-100'
+    : 'py-16 bg-[#fcfaf7] text-slate-900 border-y border-stone-200';
+
+  const cardBg = isEngineering
+    ? 'bg-slate-900/90 rounded-2xl overflow-hidden border border-slate-800 hover:border-amber-400/60 shadow-xl transition duration-300 text-white'
+    : isArtsAndScience
+    ? 'bg-white rounded-2xl overflow-hidden border-2 border-emerald-800/15 hover:border-emerald-600 shadow-md transition duration-300 text-slate-900'
+    : isMedical
+    ? 'bg-slate-50 rounded-2xl overflow-hidden border border-cyan-200 hover:border-cyan-500 shadow-md transition duration-300 text-slate-900'
+    : 'bg-white rounded-2xl overflow-hidden border-t-4 border-t-rose-900 border-x border-b border-stone-200 hover:border-rose-700 shadow-md transition duration-300 text-slate-900';
+
+  const cardImgBg = isEngineering
+    ? 'bg-slate-800'
+    : isArtsAndScience
+    ? 'bg-emerald-50'
+    : isMedical
+    ? 'bg-cyan-50'
+    : 'bg-rose-50';
+
+  const cardName = isEngineering
+    ? 'text-sm font-bold text-white font-sans'
+    : isArtsAndScience
+    ? 'text-sm font-bold text-emerald-950 font-serif'
+    : isMedical
+    ? 'text-sm font-bold text-slate-900 font-sans'
+    : 'text-sm font-bold text-rose-950 font-serif';
+
+  const cardRole = isEngineering
+    ? 'text-xs font-mono font-bold text-amber-400'
+    : isArtsAndScience
+    ? 'text-xs font-serif italic text-emerald-700'
+    : isMedical
+    ? 'text-xs font-sans font-bold text-cyan-700'
+    : 'text-xs font-serif font-bold text-rose-900';
+
+  const cardSpecialization = isEngineering
+    ? 'text-[11px] font-sans text-slate-400 line-clamp-2 pt-1'
+    : isArtsAndScience
+    ? 'text-[11px] font-serif text-slate-600 line-clamp-2 pt-1'
+    : isMedical
+    ? 'text-[11px] font-sans text-slate-600 line-clamp-2 pt-1'
+    : 'text-[11px] font-serif text-slate-600 line-clamp-2 pt-1';
+
   return (
-    <section className="py-16 bg-white dark:bg-slate-900 transition-colors">
+    <section className={sectionBg}>
       <div className="max-w-screen-2xl mx-auto px-6 sm:px-10 lg:px-16">
         {isCenterAligned ? (
           <div className="text-center max-w-3xl mx-auto mb-12 space-y-3 flex flex-col items-center">
@@ -95,7 +143,7 @@ export const FacultySection: React.FC<FacultyProps> = ({ content }) => {
               {content.title || 'Faculty & Academic Leadership'}
             </h2>
             {content.subtitle && (
-              <p className="text-sm text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+              <p className="text-sm opacity-80 max-w-2xl mx-auto">
                 {content.subtitle}
               </p>
             )}
@@ -118,7 +166,7 @@ export const FacultySection: React.FC<FacultyProps> = ({ content }) => {
                 {content.title || 'Faculty & Leadership'}
               </h2>
               {content.subtitle && (
-                <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                <p className="text-sm opacity-80 mt-1">
                   {content.subtitle}
                 </p>
               )}
@@ -137,9 +185,9 @@ export const FacultySection: React.FC<FacultyProps> = ({ content }) => {
           {facultyList.map((f, idx) => (
             <div
               key={idx}
-              className="bg-slate-50 dark:bg-slate-950 rounded-2xl overflow-hidden border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-lg transition duration-300"
+              className={cardBg}
             >
-              <div className="h-52 overflow-hidden bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
+              <div className={`h-52 overflow-hidden ${cardImgBg} flex items-center justify-center`}>
                 {f.imageUrl ? (
                   <img
                     src={f.imageUrl}
@@ -147,25 +195,25 @@ export const FacultySection: React.FC<FacultyProps> = ({ content }) => {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-20 h-20 rounded-full bg-primary/10 text-primary font-black text-2xl flex items-center justify-center">
+                  <div className="w-20 h-20 rounded-full bg-slate-300/30 text-current font-black text-2xl flex items-center justify-center">
                     {f.name ? f.name.charAt(0).toUpperCase() : 'F'}
                   </div>
                 )}
               </div>
               <div className="p-5 space-y-1.5">
-                <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                <h4 className={cardName}>
                   {f.name}
                 </h4>
-                <p className="text-xs font-semibold text-primary">
+                <p className={cardRole}>
                   {f.designation}
                 </p>
                 {f.qualification && (
-                  <p className="text-[11px] text-slate-500">
+                  <p className="text-[11px] opacity-70">
                     {f.qualification}
                   </p>
                 )}
                 {f.specialization && (
-                  <p className="text-[11px] text-slate-600 dark:text-slate-400 line-clamp-2 pt-1">
+                  <p className={cardSpecialization}>
                     {f.specialization}
                   </p>
                 )}
