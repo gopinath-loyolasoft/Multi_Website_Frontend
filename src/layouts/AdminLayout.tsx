@@ -102,12 +102,6 @@ const AdminLayoutContent: React.FC = () => {
     if (path.startsWith('/admin/quote')) {
       return { url: '/preview/module/quote', title: `${collegeName} - Welcome Quote Module` };
     }
-    if (path.startsWith('/admin/placements')) {
-      return { url: '/preview/module/placements', title: `${collegeName} - Placements Module` };
-    }
-    if (path.startsWith('/admin/recruiters')) {
-      return { url: '/preview/module/recruiters', title: `${collegeName} - Recruiters Module` };
-    }
     if (path.startsWith('/admin/departments')) {
       return { url: '/preview/module/departments', title: `${collegeName} - Departments Module` };
     }
@@ -160,8 +154,6 @@ const AdminLayoutContent: React.FC = () => {
     { label: 'Hero Slider & Highlights', path: '/admin/banners', icon: Sliders, featureCode: 'BANNERS' },
     { label: 'Stats Counter Bar', path: '/admin/stats', icon: BarChart3, featureCode: 'STATS' },
     { label: 'Quote Management', path: '/admin/quote', icon: Quote, featureCode: 'QUOTES' },
-    { label: 'Placements Records', path: '/admin/placements', icon: Award, featureCode: 'PLACEMENTS' },
-    { label: 'Partner Recruiters', path: '/admin/recruiters', icon: Briefcase, featureCode: 'RECRUITERS' },
   ].filter((item) => isFeatureActive(item.featureCode));
 
   const isHomeSubActive = homeSubItems.some((item) => location.pathname.startsWith(item.path));

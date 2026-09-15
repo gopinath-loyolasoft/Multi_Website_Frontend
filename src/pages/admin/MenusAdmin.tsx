@@ -102,7 +102,6 @@ export const MenusAdminPage: React.FC = () => {
     { label: 'Events & Celebrations', url: '/#events' },
     { label: 'Notice Board Section', url: '/#notices' },
     { label: 'Campus Photo Gallery', url: '/#gallery' },
-    { label: 'Placements & Recruiters', url: '/#placements' },
     { label: 'Student Testimonials', url: '/#testimonials' },
     { label: 'FAQs Section', url: '/#faq' },
     { label: 'Contact & Map Section', url: '/#contact' },

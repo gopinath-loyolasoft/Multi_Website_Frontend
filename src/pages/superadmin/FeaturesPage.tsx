@@ -63,8 +63,6 @@ const FEATURE_ROUTES: Record<string, { path: string; label: string }> = {
   STATISTICS: { path: '/', label: 'Counters Bar' },
   QUOTES: { path: '/', label: 'Welcome Quote' },
   QUOTE: { path: '/', label: 'Welcome Quote' },
-  PLACEMENTS: { path: '/', label: 'Placements' },
-  RECRUITERS: { path: '/', label: 'Recruiters' },
   TESTIMONIALS: { path: '/', label: 'Testimonials' },
   CONTACT: { path: '/contact', label: '/contact' },
   NOTICES: { path: '/notices', label: '/notices' },

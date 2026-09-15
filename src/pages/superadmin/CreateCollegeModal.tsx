@@ -34,7 +34,7 @@ export const CreateCollegeModal: React.FC<Props> = ({ isOpen, onClose, onSuccess
   const [loginTemplate, setLoginTemplate] = useState<string>('template2');
   const [defaultThemeId, setDefaultThemeId] = useState<string | number>(themes[0]?.id || 1);
   const [enabledFeatures, setEnabledFeatures] = useState<string[]>([
-    'PAGES', 'MENUS', 'BANNERS', 'NEWS', 'EVENTS', 'NOTICES', 'DEPARTMENTS', 'COURSES', 'FACULTY', 'GALLERY', 'MEDIA', 'CONTACT', 'PLACEMENTS', 'STATS', 'MARQUEE'
+    'PAGES', 'MENUS', 'BANNERS', 'NEWS', 'EVENTS', 'NOTICES', 'DEPARTMENTS', 'COURSES', 'FACULTY', 'GALLERY', 'MEDIA', 'CONTACT', 'STATS', 'MARQUEE'
   ]);
 
   const templatesList = [
@@ -45,7 +45,7 @@ export const CreateCollegeModal: React.FC<Props> = ({ isOpen, onClose, onSuccess
       themeCode: 'THEME_BLUE',
       defaultLoginTemplate: 'template4',
       recommended: [
-        'PAGES', 'MENUS', 'BANNERS', 'NEWS', 'EVENTS', 'NOTICES', 'DEPARTMENTS', 'COURSES', 'FACULTY', 'GALLERY', 'MEDIA', 'CONTACT', 'PLACEMENTS', 'STATS', 'MARQUEE'
+        'PAGES', 'MENUS', 'BANNERS', 'NEWS', 'EVENTS', 'NOTICES', 'DEPARTMENTS', 'COURSES', 'FACULTY', 'GALLERY', 'MEDIA', 'CONTACT', 'STATS', 'MARQUEE'
       ]
     },
     {
@@ -75,7 +75,7 @@ export const CreateCollegeModal: React.FC<Props> = ({ isOpen, onClose, onSuccess
       themeCode: 'THEME_CRIMSON',
       defaultLoginTemplate: 'template1',
       recommended: [
-        'PAGES', 'MENUS', 'MEDIA', 'CONTACT', 'NEWS', 'EVENTS', 'NOTICES', 'DEPARTMENTS', 'COURSES', 'FACULTY', 'ADMISSIONS', 'BANNERS', 'MARQUEE', 'STATS', 'TESTIMONIALS', 'PLACEMENTS'
+        'PAGES', 'MENUS', 'MEDIA', 'CONTACT', 'NEWS', 'EVENTS', 'NOTICES', 'DEPARTMENTS', 'COURSES', 'FACULTY', 'ADMISSIONS', 'BANNERS', 'MARQUEE', 'STATS', 'TESTIMONIALS'
       ]
     }
   ];

@@ -43,7 +43,7 @@ export const CreateCollegeDrawer: React.FC<Props> = ({
   const [loginTemplate, setLoginTemplate] = useState<string>('template2');
   const [defaultThemeId, setDefaultThemeId] = useState<string | number>(themes[0]?.id || 1);
   const [enabledFeatures, setEnabledFeatures] = useState<string[]>([
-    'PAGES', 'MENUS', 'THEMES', 'BANNERS', 'MARQUEE', 'STATS', 'NEWS', 'EVENTS', 'GALLERY', 'DEPARTMENTS', 'COURSES', 'FACULTY', 'ADMISSIONS', 'PLACEMENTS', 'RECRUITERS'
+    'PAGES', 'MENUS', 'THEMES', 'BANNERS', 'MARQUEE', 'STATS', 'NEWS', 'EVENTS', 'GALLERY', 'DEPARTMENTS', 'COURSES', 'FACULTY', 'ADMISSIONS'
   ]);
   const [adminUsername, setAdminUsername] = useState('');
   const [adminEmail, setAdminEmail] = useState('');
@@ -67,11 +67,11 @@ export const CreateCollegeDrawer: React.FC<Props> = ({
       code: 'ENGINEERING_MODERN',
       tag: 'Engineering / Poly',
       defaultLoginTemplate: 'template4',
-      description: 'Bold high-tech design, split stats counter (patents, placements), dynamic tech departments, recruiter marquee.',
+      description: 'Bold high-tech design, split stats counter, dynamic tech departments, and research highlights.',
       accent: 'border-blue-500 text-blue-600 bg-blue-50/40 dark:bg-blue-950/20',
       recommended: [
         'PAGES', 'MENUS', 'THEMES', 'BANNERS', 'MARQUEE', 'STATS', 'NEWS', 'EVENTS', 'GALLERY',
-        'DEPARTMENTS', 'COURSES', 'FACULTY', 'ADMISSIONS', 'PLACEMENTS', 'RECRUITERS'
+        'DEPARTMENTS', 'COURSES', 'FACULTY', 'ADMISSIONS'
       ]
     },
     {
@@ -100,10 +100,10 @@ export const CreateCollegeDrawer: React.FC<Props> = ({
       code: 'UNIVERSITY_MODERN',
       tag: 'University / Multi-Faculty',
       defaultLoginTemplate: 'template1',
-      description: 'Prestigious collegiate aesthetic with rich crimson header, research departments, admissions gateway, placement marquee.',
+      description: 'Prestigious collegiate aesthetic with rich crimson header, research departments, and admissions gateway.',
       accent: 'border-rose-500 text-rose-600 bg-rose-50/40 dark:bg-rose-950/20',
       recommended: [
-        'PAGES', 'MENUS', 'MEDIA', 'CONTACT', 'NEWS', 'EVENTS', 'NOTICES', 'DEPARTMENTS', 'COURSES', 'FACULTY', 'ADMISSIONS', 'BANNERS', 'MARQUEE', 'STATS', 'TESTIMONIALS', 'PLACEMENTS'
+        'PAGES', 'MENUS', 'MEDIA', 'CONTACT', 'NEWS', 'EVENTS', 'NOTICES', 'DEPARTMENTS', 'COURSES', 'FACULTY', 'ADMISSIONS', 'BANNERS', 'MARQUEE', 'STATS', 'TESTIMONIALS'
       ]
     }
   ];
@@ -248,11 +248,9 @@ export const CreateCollegeDrawer: React.FC<Props> = ({
       ]
     },
     {
-      name: 'Campus Life & Career',
+      name: 'Campus Life & Events',
       features: [
         { code: 'ADMISSIONS', label: 'Online Admission Portal' },
-        { code: 'PLACEMENTS', label: 'Placements Records' },
-        { code: 'RECRUITERS', label: 'Top Recruiters' },
         { code: 'NEWS', label: 'Campus News & Press' },
         { code: 'EVENTS', label: 'Campus Events Calendar' },
         { code: 'GALLERY', label: 'Media & Photo Gallery' },

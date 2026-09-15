@@ -553,7 +553,7 @@ export const PagesAdminPage: React.FC = () => {
         { type: 'EVENTS', title: 'Upcoming Campus Events', subtitle: 'Academic conferences, symposiums, student fests, and cultural celebrations' },
         { type: 'NOTICES', title: 'Official Notice Board', subtitle: 'Important administrative updates, examination schedules, and circulars' },
         { type: 'GALLERY', title: 'Campus Photo Gallery', subtitle: 'A visual journey across our world-class laboratories, library, and campus architecture' },
-        { type: 'TESTIMONIALS', title: 'Placement Records & Testimonials', subtitle: 'Top corporate recruiters and success stories from our graduates' },
+        { type: 'TESTIMONIALS', title: 'Student Testimonials & Stories', subtitle: 'Inspiring experiences and success stories from our graduates' },
         { type: 'CONTACT', title: 'Campus Helpdesk & Location', subtitle: 'Reach our admissions desk, administrative offices, and visit our campus' },
       ];
 
@@ -990,7 +990,7 @@ export const PagesAdminPage: React.FC = () => {
               onClick={handleSeedDefaultSections}
               disabled={isSeedingSections || sectionsLoading}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-900 transition cursor-pointer shadow-xs disabled:opacity-50"
-              title="Populate missing standard college module sections (Hero, Stats, Quote, Departments, Courses, Faculty, News, Events, Notices, Gallery, Placements, Contact)"
+              title="Populate missing standard college module sections (Hero, Stats, Quote, Departments, Courses, Faculty, News, Events, Notices, Gallery, Testimonials, Contact)"
             >
               <Sparkles className={`w-4 h-4 ${isSeedingSections ? 'animate-spin' : 'text-indigo-600'}`} />
               <span>{isSeedingSections ? 'Syncing Sections...' : '⚡ Auto-Generate All Sections'}</span>
@@ -1073,7 +1073,7 @@ export const PagesAdminPage: React.FC = () => {
                       Home Page Quick-Setup Available
                     </p>
                     <p className="text-[11px] text-indigo-700/80 dark:text-indigo-300/80 leading-relaxed">
-                      Your home page currently has {sections.length} section(s). Click to sync all 12 default modules (Hero, Stats, Quote, Departments, Courses, Faculty, News, Events, Notices, Gallery, Placements, Contact).
+                      Your home page currently has {sections.length} section(s). Click to sync all 12 default modules (Hero, Stats, Quote, Departments, Courses, Faculty, News, Events, Notices, Gallery, Testimonials, Contact).
                     </p>
                   </div>
                 </div>
@@ -1110,7 +1110,7 @@ export const PagesAdminPage: React.FC = () => {
               const isModule = [
                 'HERO', 'HERO_SLIDER', 'BANNERS', 'STATISTICS', 'STATS', 'QUOTE',
                 'DEPARTMENTS', 'COURSES', 'FACULTY', 'NEWS', 'EVENTS', 'NOTICES',
-                'GALLERY', 'TESTIMONIALS', 'PLACEMENTS', 'CONTACT', 'MAP'
+                'GALLERY', 'TESTIMONIALS', 'CONTACT', 'MAP'
               ].includes(section.sectionType?.toUpperCase());
 
               return (

@@ -29,7 +29,6 @@ import { SettingsAdminPage } from '../pages/admin/SettingsAdmin';
 import { PagesAdminPage } from '../pages/admin/PagesAdmin';
 import { StatsAdminPage } from '../pages/admin/StatsAdminPage';
 import { QuoteAdminPage } from '../pages/admin/QuoteAdminPage';
-import { PlacementsAdminPage } from '../pages/admin/PlacementsAdminPage';
 import { ContactSubmissionsAdminPage } from '../pages/admin/ContactSubmissionsAdmin';
 import { ContactInfoAdminPage } from '../pages/admin/ContactInfoAdmin';
 import { NoticesAdminPage } from '../pages/admin/NoticesAdminPage';
@@ -110,8 +109,6 @@ export const AppRoutes: React.FC = () => {
           <Route path="banners" element={<BannersManagementPage />} />
           <Route path="stats" element={<StatsAdminPage />} />
           <Route path="quote" element={<QuoteAdminPage />} />
-          <Route path="placements" element={<PlacementsAdminPage />} />
-          <Route path="recruiters" element={<PlacementsAdminPage />} />
           <Route path="pages" element={<PagesAdminPage />} />
           <Route path="admissions" element={<AdmissionsManagementPage />} />
           <Route path="contact-submissions" element={<ContactSubmissionsAdminPage />} />
