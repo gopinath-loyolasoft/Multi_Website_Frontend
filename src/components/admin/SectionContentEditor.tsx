@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import { Code2, LayoutList, Plus, Trash2, ChevronUp, ChevronDown, AlertCircle } from 'lucide-react';
+import { Code2, LayoutList, Plus, Trash2, ChevronUp, ChevronDown, AlertCircle, Image as ImageIcon } from 'lucide-react';
+import { FileUploadInput } from '../../UI_Componentes/ui/Form/FileUploadInput';
 
 export interface ContentField {
   key: string;
   label: string;
-  type: 'text' | 'textarea' | 'number' | 'switch';
+  type: 'text' | 'textarea' | 'number' | 'switch' | 'image';
   help?: string;
 }
 
@@ -38,7 +39,7 @@ export const getFieldsForType = (sectionType: string): SectionField[] | null => 
         { key: 'ctaLink', label: 'Primary Button Link', type: 'text' },
         { key: 'secondaryCtaText', label: 'Secondary Button Text', type: 'text' },
         { key: 'secondaryCtaLink', label: 'Secondary Button Link', type: 'text' },
-        { key: 'backgroundImage', label: 'Background Image URL', type: 'text' },
+        { key: 'backgroundImage', label: 'Background Image', type: 'image' },
         { key: 'showRightCard', label: 'Show Right Info Card', type: 'switch' },
         { key: 'cardBadge', label: 'Card Badge', type: 'text' },
         { key: 'cardTitle', label: 'Card Title', type: 'text' },
@@ -49,12 +50,12 @@ export const getFieldsForType = (sectionType: string): SectionField[] | null => 
         { key: 'cardSecondaryButtonUrl', label: 'Card Secondary Button URL', type: 'text' },
         {
           key: 'cardItems',
-          label: 'Card Items',
+          label: 'Card Bullet Items',
           type: 'object-list',
-          itemLabel: 'item',
+          itemLabel: 'bullet item',
           fields: [
-            { key: 'title', label: 'Title', type: 'text' },
-            { key: 'desc', label: 'Description', type: 'text' },
+            { key: 'title', label: 'Item Title', type: 'text' },
+            { key: 'desc', label: 'Item Description', type: 'text' },
           ],
         },
         { key: 'pillars', label: 'Quick Pillars (badges below heading)', type: 'string-list' },
@@ -64,11 +65,11 @@ export const getFieldsForType = (sectionType: string): SectionField[] | null => 
       return [
         {
           key: 'slides',
-          label: 'Slides',
+          label: 'Hero Slides',
           type: 'object-list',
           itemLabel: 'slide',
           fields: [
-            { key: 'imageUrl', label: 'Image URL', type: 'text' },
+            { key: 'imageUrl', label: 'Slide Image', type: 'image' },
             { key: 'headline', label: 'Headline', type: 'text' },
             { key: 'caption', label: 'Caption', type: 'text' },
             { key: 'badge', label: 'Badge', type: 'text' },
@@ -82,94 +83,85 @@ export const getFieldsForType = (sectionType: string): SectionField[] | null => 
       ];
     case 'QUOTE':
       return [
-        { key: 'title', label: 'Section Header (optional)', type: 'text' },
-        { key: 'quoteText', label: 'Quote Text', type: 'textarea' },
-        { key: 'authorName', label: 'Author / Leader Name', type: 'text' },
-        { key: 'designation', label: 'Designation / Title', type: 'text' },
-        { key: 'authorImageUrl', label: 'Author Photo URL', type: 'text', help: 'Path to portrait, e.g. /assets/templates/common/leader_portrait.svg' },
-        { key: 'subText', label: 'Sub Text / Department (optional)', type: 'text' },
+        { key: 'quoteText', label: 'Inspiring Quote Message', type: 'textarea' },
+        { key: 'authorName', label: 'Leader / Author Name', type: 'text' },
+        { key: 'designation', label: 'Designation / Title (e.g. Principal & Dean)', type: 'text' },
+        { key: 'authorImageUrl', label: 'Leader Portrait Photo', type: 'image' },
+        { key: 'subText', label: 'Department / Governance Sub-line', type: 'text' },
       ];
     case 'TEXT':
       return [
-        { key: 'title', label: 'Title', type: 'text' },
-        { key: 'leadText', label: 'Lead Text (Quote)', type: 'textarea' },
-        { key: 'bodyHtml', label: 'Body HTML', type: 'textarea', help: 'Supports basic HTML markup' },
-        { key: 'authorName', label: 'Author Name', type: 'text' },
-        { key: 'authorRole', label: 'Author Role', type: 'text' },
+        { key: 'leadText', label: 'Lead Highlight Quote', type: 'textarea' },
+        { key: 'bodyHtml', label: 'Body Content (Paragraphs)', type: 'textarea', help: 'Supports text & HTML markup' },
       ];
     case 'IMAGE':
       return [
-        { key: 'imageUrl', label: 'Image URL', type: 'text' },
+        { key: 'imageUrl', label: 'Image', type: 'image' },
         { key: 'caption', label: 'Caption', type: 'text' },
         { key: 'altText', label: 'Alt Text', type: 'text' },
         { key: 'fullWidth', label: 'Full Width', type: 'switch' },
-        { key: 'aspectRatio', label: 'Aspect Ratio (e.g. 16/9)', type: 'text' },
       ];
     case 'IMAGE_TEXT':
       return [
         { key: 'badge', label: 'Badge', type: 'text' },
         { key: 'heading', label: 'Heading', type: 'text' },
-        { key: 'description', label: 'Description', type: 'textarea' },
-        { key: 'imageUrl', label: 'Image URL', type: 'text' },
+        { key: 'description', label: 'Narrative Description', type: 'textarea' },
+        { key: 'imageUrl', label: 'Story Image', type: 'image' },
         { key: 'ctaText', label: 'Button Text', type: 'text' },
         { key: 'ctaLink', label: 'Button Link', type: 'text' },
-        { key: 'points', label: 'Checklist Points', type: 'string-list' },
+        { key: 'points', label: 'Bullet Checklist Points', type: 'string-list' },
       ];
     case 'CARDS':
       return [
-        { key: 'title', label: 'Title', type: 'text' },
-        { key: 'subtitle', label: 'Subtitle', type: 'text' },
         {
-          key: 'cards',
-          label: 'Cards',
+          key: 'items',
+          label: 'Feature Cards',
           type: 'object-list',
           itemLabel: 'card',
           fields: [
-            { key: 'title', label: 'Title', type: 'text' },
-            { key: 'description', label: 'Description', type: 'textarea' },
-            { key: 'imageUrl', label: 'Image URL', type: 'text' },
-            { key: 'badge', label: 'Badge', type: 'text' },
+            { key: 'title', label: 'Card Title', type: 'text' },
+            { key: 'desc', label: 'Card Description', type: 'textarea' },
+            { key: 'icon', label: 'Icon Name (e.g. Award, Sparkles, BookOpen)', type: 'text' },
           ],
         },
       ];
     case 'STATISTICS':
     case 'STATS':
       return [
-        { key: 'title', label: 'Title', type: 'text' },
-        { key: 'subtitle', label: 'Subtitle', type: 'text' },
         {
-          key: 'stats',
-          label: 'Statistics',
+          key: 'items',
+          label: 'Milestone Counters',
           type: 'object-list',
-          itemLabel: 'statistic',
+          itemLabel: 'counter',
           fields: [
-            { key: 'value', label: 'Value', type: 'text' },
-            { key: 'label', label: 'Label', type: 'text' },
+            { key: 'label', label: 'Metric Label (e.g. Active Students)', type: 'text' },
+            { key: 'value', label: 'Counter Value (e.g. 8,500)', type: 'text' },
+            { key: 'prefix', label: 'Prefix (e.g. $)', type: 'text' },
+            { key: 'suffix', label: 'Suffix (e.g. + or %)', type: 'text' },
+            { key: 'iconName', label: 'Icon (e.g. Users, Award, BookOpen)', type: 'text' },
           ],
         },
       ];
     case 'ICON_CARDS':
       return [
-        { key: 'title', label: 'Title', type: 'text' },
-        { key: 'subtitle', label: 'Subtitle', type: 'text' },
         {
           key: 'items',
-          label: 'Cards',
+          label: 'Icon Feature Cards',
           type: 'object-list',
           itemLabel: 'card',
           fields: [
             { key: 'title', label: 'Title', type: 'text' },
             { key: 'description', label: 'Description', type: 'textarea' },
-            { key: 'icon', label: 'Icon Name', type: 'text', help: 'Example: GraduationCap' },
+            { key: 'icon', label: 'Icon Name', type: 'text' },
           ],
         },
       ];
     case 'CTA':
     case 'CALL_TO_ACTION':
       return [
-        { key: 'badge', label: 'Badge', type: 'text' },
+        { key: 'badge', label: 'Badge Tag', type: 'text' },
         { key: 'headline', label: 'Headline', type: 'text' },
-        { key: 'subheadline', label: 'Subheadline', type: 'textarea' },
+        { key: 'subheadline', label: 'Supporting Description', type: 'textarea' },
         { key: 'buttonText', label: 'Primary Button Text', type: 'text' },
         { key: 'buttonUrl', label: 'Primary Button URL', type: 'text' },
         { key: 'secondaryButtonText', label: 'Secondary Button Text', type: 'text' },
@@ -177,105 +169,68 @@ export const getFieldsForType = (sectionType: string): SectionField[] | null => 
       ];
     case 'VIDEO':
       return [
-        { key: 'title', label: 'Title', type: 'text' },
-        { key: 'subtitle', label: 'Subtitle', type: 'text' },
-        { key: 'videoUrl', label: 'Video URL', type: 'text' },
-        { key: 'thumbnailUrl', label: 'Thumbnail URL', type: 'text' },
+        { key: 'videoUrl', label: 'Video URL (YouTube or MP4)', type: 'text' },
+        { key: 'coverImageUrl', label: 'Video Poster Cover Image', type: 'image' },
+        { key: 'caption', label: 'Video Caption / Subtitle', type: 'text' },
       ];
-    case 'LOGO_GRID':
+    case 'TESTIMONIALS':
       return [
-        { key: 'title', label: 'Title', type: 'text' },
-        { key: 'subtitle', label: 'Subtitle', type: 'text' },
         {
-          key: 'logos',
-          label: 'Logos',
+          key: 'items',
+          label: 'Student Testimonials',
           type: 'object-list',
-          itemLabel: 'logo',
+          itemLabel: 'testimonial',
           fields: [
-            { key: 'name', label: 'Name', type: 'text' },
-            { key: 'logoUrl', label: 'Logo URL', type: 'text' },
-            { key: 'url', label: 'Link URL', type: 'text' },
+            { key: 'name', label: 'Student / Alumni Name', type: 'text' },
+            { key: 'role', label: 'Department / Degree Batch', type: 'text' },
+            { key: 'quote', label: 'Experience Quote', type: 'textarea' },
+            { key: 'avatarUrl', label: 'Student Photo', type: 'image' },
           ],
         },
       ];
     case 'FAQ':
       return [
-        { key: 'title', label: 'Title', type: 'text' },
-        { key: 'subtitle', label: 'Subtitle', type: 'text' },
         {
-          key: 'faqs',
-          label: 'FAQ Items',
+          key: 'items',
+          label: 'Questions & Answers',
           type: 'object-list',
-          itemLabel: 'question',
+          itemLabel: 'FAQ Item',
           fields: [
             { key: 'question', label: 'Question', type: 'text' },
             { key: 'answer', label: 'Answer', type: 'textarea' },
           ],
         },
       ];
-    case 'NOTICES':
-      return [
-        { key: 'title', label: 'Title', type: 'text' },
-        { key: 'subtitle', label: 'Subtitle', type: 'text' },
-        {
-          key: 'items',
-          label: 'Notices',
-          type: 'object-list',
-          itemLabel: 'notice',
-          fields: [
-            { key: 'title', label: 'Title', type: 'text' },
-            { key: 'description', label: 'Description', type: 'textarea' },
-          ],
-        },
-      ];
+    case 'DEPARTMENTS':
+    case 'COURSES':
+    case 'FACULTY':
     case 'NEWS':
     case 'EVENTS':
-      return [
-        { key: 'heading', label: 'Heading', type: 'text' },
-        { key: 'subheading', label: 'Subheading', type: 'text' },
-      ];
-    case 'COURSES':
-    case 'DEPARTMENTS':
-    case 'FACULTY':
+    case 'NOTICES':
     case 'GALLERY':
-    case 'TESTIMONIALS':
       return [
-        { key: 'title', label: 'Title', type: 'text' },
-        { key: 'subtitle', label: 'Subtitle', type: 'text' },
-      ];
-    case 'MAP':
-      return [
-        { key: 'title', label: 'Title', type: 'text' },
-        { key: 'subtitle', label: 'Subtitle', type: 'text' },
-        { key: 'embedUrl', label: 'Google Maps Embed URL', type: 'text', help: 'Paste the share embed src (iframe src) from Google Maps' },
-        { key: 'address', label: 'Address', type: 'textarea' },
-        { key: 'height', label: 'Map Height (px)', type: 'number' },
+        { key: 'limit', label: 'Number of items to display', type: 'number', help: 'Leave blank to use default count' },
+        { key: 'showExploreButton', label: 'Show "View All" button at bottom', type: 'switch' },
       ];
     case 'CONTACT':
       return [
-        { key: 'title', label: 'Title', type: 'text' },
-        { key: 'subtitle', label: 'Subtitle', type: 'text' },
-        { key: 'phone', label: 'Phone', type: 'text' },
-        { key: 'email', label: 'Email', type: 'text' },
-        { key: 'address', label: 'Address', type: 'textarea' },
+        { key: 'showInquiryForm', label: 'Show Admissions Inquiry Form', type: 'switch' },
+        { key: 'showMap', label: 'Show Interactive Campus Map', type: 'switch' },
       ];
     default:
       return null;
   }
 };
 
+const TEXT_INPUT =
+  'w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none transition shadow-2xs placeholder:text-slate-400';
+
 interface SectionContentEditorProps {
   sectionType: string;
-  content: Record<string, any>;
+  content: Record<string, any> | null | undefined;
   onChange: (content: Record<string, any>) => void;
   onJsonError?: (hasError: boolean) => void;
 }
-
-const TEXT_INPUT =
-  'w-full py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 transition focus:outline-none focus:ring-2 focus:ring-blue-500 px-3';
-
-const THIN_INPUT =
-  'w-full py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 transition focus:outline-none focus:ring-2 focus:ring-blue-500 px-2.5';
 
 export const SectionContentEditor: React.FC<SectionContentEditorProps> = ({
   sectionType,
@@ -283,19 +238,21 @@ export const SectionContentEditor: React.FC<SectionContentEditorProps> = ({
   onChange,
   onJsonError,
 }) => {
-  const fields = useMemo(() => getFieldsForType(sectionType), [sectionType]);
-  const [mode, setMode] = useState<'form' | 'json'>(fields ? 'form' : 'json');
-  const [jsonDraft, setJsonDraft] = useState(() => JSON.stringify(content || {}, null, 2));
+  const [activeTab, setActiveTab] = useState<'form' | 'json'>('form');
+  const [jsonDraft, setJsonDraft] = useState<string>(() => JSON.stringify(content || {}, null, 2));
   const [jsonError, setJsonError] = useState<string | null>(null);
 
-  const set = (key: string, value: any) => {
-    const next = { ...(content || {}) };
-    if (value === '' || value === null || value === undefined) {
-      delete next[key];
+  const fields = useMemo(() => getFieldsForType(sectionType), [sectionType]);
+
+  const set = (key: string, val: any) => {
+    const updated = { ...(content || {}) };
+    if (val === undefined || val === '' || val === null) {
+      delete updated[key];
     } else {
-      next[key] = value;
+      updated[key] = val;
     }
-    onChange(next);
+    onChange(updated);
+    syncJsonDraft(updated);
   };
 
   const syncJsonDraft = (c: Record<string, any>) => {
@@ -319,7 +276,33 @@ export const SectionContentEditor: React.FC<SectionContentEditorProps> = ({
     }
   };
 
+  const isImageField = (key: string, label: string) => {
+    const k = key.toLowerCase();
+    const l = label.toLowerCase();
+    return (
+      k.includes('image') ||
+      k.includes('photo') ||
+      k.includes('avatar') ||
+      k.includes('poster') ||
+      l.includes('image') ||
+      l.includes('photo') ||
+      l.includes('avatar')
+    );
+  };
+
   const renderScalar = (field: ContentField, value: any, onChangeValue: (v: any) => void) => {
+    if (field.type === 'image' || isImageField(field.key, field.label)) {
+      return (
+        <FileUploadInput
+          label={field.label}
+          value={typeof value === 'string' ? value : ''}
+          onChange={(val) => onChangeValue(val)}
+          placeholder="Upload image or enter image URL"
+          helpText={field.help}
+        />
+      );
+    }
+
     switch (field.type) {
       case 'text':
         return (
@@ -344,7 +327,7 @@ export const SectionContentEditor: React.FC<SectionContentEditorProps> = ({
       case 'textarea':
         return (
           <textarea
-            rows={4}
+            rows={3}
             value={typeof value === 'string' ? value : ''}
             placeholder={field.label}
             className={TEXT_INPUT}
@@ -397,28 +380,30 @@ export const SectionContentEditor: React.FC<SectionContentEditorProps> = ({
       set(field.key, next);
     };
     return (
-      <div className="space-y-3">
+      <div className="space-y-3 pt-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-bold text-slate-700 dark:text-slate-300">{field.label}</span>
+          <span className="text-xs font-bold text-slate-800 dark:text-slate-200">{field.label} ({list.length})</span>
           <button
             type="button"
             onClick={() => set(field.key, [...list, {}])}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition cursor-pointer"
+            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             Add {field.itemLabel}
           </button>
         </div>
         {list.length === 0 && (
-          <p className="text-[11px] text-slate-400 italic">No {field.label.toLowerCase()} added yet.</p>
+          <div className="p-4 rounded-xl border border-dashed border-slate-200 dark:border-slate-800 text-center text-xs text-slate-400">
+            No {field.label.toLowerCase()} added yet. Click "+ Add {field.itemLabel}" above to create one.
+          </div>
         )}
         {list.map((item, index) => (
           <div
             key={index}
-            className="p-3 rounded-xl border border-slate-200 dark:border-slate-700/70 bg-slate-50 dark:bg-slate-900/50 space-y-2.5"
+            className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60 space-y-3 shadow-2xs"
           >
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">
+            <div className="flex items-center justify-between pb-1 border-b border-slate-200/60 dark:border-slate-800">
+              <span className="text-[11px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-400">
                 {field.itemLabel} #{index + 1}
               </span>
               <div className="flex items-center gap-1">
@@ -450,35 +435,18 @@ export const SectionContentEditor: React.FC<SectionContentEditorProps> = ({
                 </button>
               </div>
             </div>
-            {field.fields.map((sub) => {
-              const subValue = item?.[sub.key];
-              if (sub.type === 'switch') {
-                return (
-                  <div key={sub.key}>{renderScalar(sub, subValue, (v) => updateItem(index, sub.key, v))}</div>
-                );
-              }
-              return (
-                <div key={sub.key} className="space-y-1">
-                  <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-                    {sub.label}
-                  </label>
-                  {sub.type === 'textarea'
-                    ? renderScalar(sub, subValue, (v) => updateItem(index, sub.key, v))
-                    : sub.type === 'text'
-                      ? renderScalar(sub, subValue, (v) => updateItem(index, sub.key, v))
-                      : (
-                          <input
-                            type="text"
-                            value={typeof subValue === 'string' ? subValue : ''}
-                            placeholder={sub.label}
-                            className={THIN_INPUT}
-                            onChange={(e) => updateItem(index, sub.key, e.target.value)}
-                          />
-                        )}
-                  {sub.help && <p className="text-[10px] text-slate-400 mt-0.5">{sub.help}</p>}
+            <div className="space-y-2.5">
+              {field.fields.map((f) => (
+                <div key={f.key}>
+                  {f.type !== 'image' && !isImageField(f.key, f.label) && (
+                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
+                      {f.label}
+                    </label>
+                  )}
+                  {renderScalar(f, item[f.key], (v) => updateItem(index, f.key, v))}
                 </div>
-              );
-            })}
+              ))}
+            </div>
           </div>
         ))}
       </div>
@@ -487,144 +455,131 @@ export const SectionContentEditor: React.FC<SectionContentEditorProps> = ({
 
   const renderStringList = (field: StringListField) => {
     const list: string[] = Array.isArray(content?.[field.key]) ? content[field.key] : [];
+    const updateItem = (index: number, value: string) => {
+      const next = [...list];
+      next[index] = value;
+      set(field.key, next.filter((s) => s.trim().length > 0));
+    };
     return (
-      <div className="space-y-3">
+      <div className="space-y-2.5 pt-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-bold text-slate-700 dark:text-slate-300">{field.label}</span>
+          <span className="text-xs font-bold text-slate-800 dark:text-slate-200">{field.label}</span>
           <button
             type="button"
             onClick={() => set(field.key, [...list, ''])}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition cursor-pointer"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
-            Add item
+            Add Item
           </button>
         </div>
-        {list.length === 0 && (
-          <p className="text-[11px] text-slate-400 italic">No items added yet.</p>
-        )}
-        <div className="space-y-2">
-          {list.map((item, index) => (
-            <div key={index} className="flex items-center gap-2">
-              <input
-                type="text"
-                value={item || ''}
-                placeholder="Enter value"
-                className={TEXT_INPUT}
-                onChange={(e) => {
-                  const next = [...list];
-                  next[index] = e.target.value;
-                  set(field.key, next);
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => set(field.key, list.filter((_, i) => i !== index))}
-                className="p-2 rounded-md text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition cursor-pointer"
-                title="Remove"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          ))}
-        </div>
+        {list.map((item, index) => (
+          <div key={index} className="flex items-center gap-2">
+            <input
+              type="text"
+              value={item}
+              placeholder="Enter item text..."
+              className={TEXT_INPUT}
+              onChange={(e) => updateItem(index, e.target.value)}
+            />
+            <button
+              type="button"
+              onClick={() => set(field.key, list.filter((_, i) => i !== index))}
+              className="p-2 rounded-xl text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition cursor-pointer"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        ))}
       </div>
     );
   };
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <div className="flex rounded-lg bg-slate-100 dark:bg-slate-800 p-0.5 text-[11px] font-bold">
+      {/* Mode Switcher */}
+      <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+        <div className="inline-flex p-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
           <button
             type="button"
             onClick={() => {
-              setMode('form');
-              syncJsonDraft(content || {});
+              setActiveTab('form');
+              setJsonError(null);
             }}
-            disabled={!fields}
-            className={`px-3 py-1.5 rounded-md transition flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
-              mode === 'form'
-                ? 'bg-white dark:bg-slate-900 text-blue-600 shadow-xs'
-                : 'text-slate-500 dark:text-slate-400'
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
+              activeTab === 'form'
+                ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
             }`}
           >
             <LayoutList className="w-3.5 h-3.5" />
-            Visual Editor
+            <span>Visual Editor</span>
           </button>
           <button
             type="button"
-            onClick={() => setMode('json')}
-            className={`px-3 py-1.5 rounded-md transition flex items-center gap-1.5 cursor-pointer ${
-              mode === 'json'
-                ? 'bg-white dark:bg-slate-900 text-blue-600 shadow-xs'
-                : 'text-slate-500 dark:text-slate-400'
+            onClick={() => {
+              syncJsonDraft(content || {});
+              setActiveTab('json');
+            }}
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
+              activeTab === 'json'
+                ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
             }`}
           >
             <Code2 className="w-3.5 h-3.5" />
-            JSON
+            <span>Raw JSON</span>
           </button>
         </div>
-        {fields && (
-          <span className="text-[10px] font-semibold text-slate-400">
-            {mode === 'form' ? 'Fields map to the live section renderer' : 'Press "Validate JSON" before saving'}
-          </span>
-        )}
       </div>
 
-      {mode === 'json' ? (
+      {activeTab === 'json' ? (
         <div className="space-y-2">
-          <textarea
-            rows={14}
-            value={jsonDraft}
-            onChange={(e) => setJsonDraft(e.target.value)}
-            className="w-full p-3 rounded-lg bg-slate-950 text-slate-100 dark:bg-slate-950 border border-slate-700 text-xs font-mono leading-relaxed focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
-            spellCheck={false}
-          />
           {jsonError && (
-            <div className="flex items-center gap-2 text-[11px] font-semibold text-red-600 dark:text-red-400">
-              <AlertCircle className="w-3.5 h-3.5" />
-              {jsonError}
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-red-600 bg-red-50 border border-red-200">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{jsonError}</span>
             </div>
           )}
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={applyJson}
-              className="px-3 py-1.5 rounded-lg text-[11px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-900 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition cursor-pointer"
-            >
-              Validate JSON
-            </button>
-          </div>
+          <textarea
+            rows={12}
+            value={jsonDraft}
+            onChange={(e) => {
+              setJsonDraft(e.target.value);
+              setJsonError(null);
+            }}
+            onBlur={applyJson}
+            className="w-full font-mono text-xs p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-900 text-emerald-400 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          />
         </div>
       ) : (
         <div className="space-y-4">
-          {fields?.map((field) => {
-            if (field.type === 'object-list') {
-              return <div key={field.key}>{renderObjectList(field)}</div>;
-            }
-            if (field.type === 'string-list') {
-              return <div key={field.key}>{renderStringList(field)}</div>;
-            }
-            const value = content?.[field.key];
-            if (field.type === 'switch') {
-              return <div key={field.key}>{renderScalar(field, value, (v) => set(field.key, v))}</div>;
-            }
-            return (
-              <div key={field.key} className="space-y-1">
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
-                  {field.label}
-                </label>
-                {renderScalar(field, value, (v) => set(field.key, v))}
-                {field.help && <p className="text-[10px] text-slate-400">{field.help}</p>}
-              </div>
-            );
-          })}
-          {!fields && (
-            <p className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 rounded-lg p-3">
-              No visual editor defined for this section type. Switch to the JSON tab to configure content.
+          {(!fields || fields.length === 0) && (
+            <p className="text-xs text-slate-400 italic py-2">
+              This section type uses automatic dynamic feeds or template settings.
             </p>
           )}
+
+          {fields &&
+            fields.map((field) => {
+              if (field.type === 'object-list') {
+                return <div key={field.key}>{renderObjectList(field)}</div>;
+              }
+              if (field.type === 'string-list') {
+                return <div key={field.key}>{renderStringList(field)}</div>;
+              }
+              return (
+                <div key={field.key} className="space-y-1">
+                  {field.type !== 'image' && !isImageField(field.key, field.label) && (
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                      {field.label}
+                    </label>
+                  )}
+                  {renderScalar(field, content?.[field.key], (v) => set(field.key, v))}
+                  {field.help && <p className="text-[10px] text-slate-400">{field.help}</p>}
+                </div>
+              );
+            })}
         </div>
       )}
     </div>

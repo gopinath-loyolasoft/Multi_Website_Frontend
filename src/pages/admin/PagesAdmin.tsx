@@ -29,6 +29,7 @@ import { useTenant } from '../../tenant/TenantContext';
 import { PageSection, SectionSettings } from '../../types';
 import { FormDrawer, Drawer, Input, Select, Switch, LivePreviewModal, ConfirmDialog } from '../../UI_Componentes/ui';
 import { SectionContentEditor } from '../../components/admin/SectionContentEditor';
+import { VisualSectionPickerModal, SectionBlockPreset } from '../../components/admin/VisualSectionPickerModal';
 import { slugify, copyToClipboard } from '../../utils/helpers';
 
 interface AdminPageItem {
