@@ -680,11 +680,10 @@ export const PagesAdminPage: React.FC = () => {
       {/* Notices */}
       {notice && (
         <div
-          className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-semibold border ${
-            notice.type === 'success'
-              ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900 text-emerald-700 dark:text-emerald-300'
-              : 'bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-900 text-red-700 dark:text-red-300'
-          }`}
+          className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-semibold border ${notice.type === 'success'
+            ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900 text-emerald-700 dark:text-emerald-300'
+            : 'bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-900 text-red-700 dark:text-red-300'
+            }`}
         >
           {notice.type === 'success' ? (
             <CheckCircle2 className="w-4 h-4 shrink-0" />
@@ -813,16 +812,14 @@ export const PagesAdminPage: React.FC = () => {
                     </td>
                     <td className="px-4 py-3.5">
                       <span
-                        className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-wider ${
-                          page.isPublished
-                            ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
-                            : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
-                        }`}
+                        className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-wider ${page.isPublished
+                          ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+                          : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
+                          }`}
                       >
                         <span
-                          className={`w-1.5 h-1.5 rounded-full ${
-                            page.isPublished ? 'bg-emerald-500' : 'bg-slate-400'
-                          }`}
+                          className={`w-1.5 h-1.5 rounded-full ${page.isPublished ? 'bg-emerald-500' : 'bg-slate-400'
+                            }`}
                         />
                         {page.isPublished ? 'Published' : 'Draft'}
                       </span>
@@ -924,11 +921,10 @@ export const PagesAdminPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setAutoSlug(!autoSlug)}
-                className={`text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 transition cursor-pointer ${
-                  autoSlug
-                    ? 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-300'
-                    : 'bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-400'
-                }`}
+                className={`text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 transition cursor-pointer ${autoSlug
+                  ? 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-300'
+                  : 'bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-400'
+                  }`}
                 title={autoSlug ? 'Auto-Sync is ON: typing title updates slug' : 'Auto-Sync is OFF: custom edit'}
               >
                 {autoSlug ? <Lock className="w-2.5 h-2.5" /> : <Unlock className="w-2.5 h-2.5" />}
@@ -1043,13 +1039,18 @@ export const PagesAdminPage: React.FC = () => {
               </p>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-              <button
+              <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
                 onClick={handleSeedDefaultSections}
                 disabled={isSeedingSections}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition shadow-md shadow-indigo-200 dark:shadow-none cursor-pointer"
               >
-                <Sparkles className={`w-4 h-4 ${isSeedingSections ? 'animate-spin' : ''}`} />
-                <span>{isSeedingSections ? 'Populating...' : '⚡ Auto-Generate All College Module Sections'}</span>
+                <Sparkles
+                  className={`w-4 h-4 ${isSeedingSections ? 'animate-spin' : ''}`}
+                />
+                <span>
+                  {isSeedingSections
+                    ? 'Populating...'
+                    : '⚡ Auto-Generate All College Module Sections'}
+                </span>
               </button>
               <button
                 onClick={openCreateSection}
@@ -1107,19 +1108,18 @@ export const PagesAdminPage: React.FC = () => {
 
             {sections.map((section, index) => {
               const isModule = [
-                'HERO', 'HERO_SLIDER', 'BANNERS', 'STATISTICS', 'STATS', 'QUOTE', 
-                'DEPARTMENTS', 'COURSES', 'FACULTY', 'NEWS', 'EVENTS', 'NOTICES', 
+                'HERO', 'HERO_SLIDER', 'BANNERS', 'STATISTICS', 'STATS', 'QUOTE',
+                'DEPARTMENTS', 'COURSES', 'FACULTY', 'NEWS', 'EVENTS', 'NOTICES',
                 'GALLERY', 'TESTIMONIALS', 'PLACEMENTS', 'CONTACT', 'MAP'
               ].includes(section.sectionType?.toUpperCase());
 
               return (
                 <div
                   key={section.id}
-                  className={`p-3.5 rounded-2xl border transition shadow-2xs ${
-                    !section.isVisible
-                      ? 'border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-950/40 opacity-70'
-                      : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900'
-                  }`}
+                  className={`p-3.5 rounded-2xl border transition shadow-2xs ${!section.isVisible
+                    ? 'border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-950/40 opacity-70'
+                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900'
+                    }`}
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
@@ -1146,11 +1146,10 @@ export const PagesAdminPage: React.FC = () => {
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
                       <span
-                        className={`hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                          section.isVisible
-                            ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900'
-                            : 'bg-slate-100 dark:bg-slate-800 text-slate-400 border border-slate-200 dark:border-slate-700'
-                        }`}
+                        className={`hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${section.isVisible
+                          ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-400 border border-slate-200 dark:border-slate-700'
+                          }`}
                       >
                         {section.isVisible ? 'Visible' : 'Hidden'}
                       </span>
