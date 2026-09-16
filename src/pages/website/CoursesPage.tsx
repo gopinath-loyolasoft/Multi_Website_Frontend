@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, Search, Clock, CheckCircle2, ArrowRight, Building2, AlertCircle } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
-import { useTheme } from '../../themes/ThemeContext';
+import { useActiveTemplate } from '../../templates/templateRegistry';
 
 interface Course {
   id: string;
@@ -20,7 +20,7 @@ interface Course {
 }
 
 export const CoursesPage: React.FC = () => {
-  const { isArtsAndScience, isMedical, isUniversity, isEngineering } = useTheme();
+  const Template = useActiveTemplate();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -63,28 +63,26 @@ export const CoursesPage: React.FC = () => {
   }, [courses]);
 
   const filtered = courses.filter((c) => {
-    const matchesSearch =
-      c.name.toLowerCase().includes(search.toLowerCase()) ||
-      c.code.toLowerCase().includes(search.toLowerCase()) ||
-      c.departmentName?.toLowerCase().includes(search.toLowerCase());
     const matchesLevel =
       selectedLevel === 'All Programs' ||
-      c.degreeLevel.toLowerCase() === selectedLevel.toLowerCase() ||
-      (selectedLevel === 'Undergraduate' && c.degreeLevel.toLowerCase().includes('undergrad')) ||
-      (selectedLevel === 'Postgraduate' && c.degreeLevel.toLowerCase().includes('postgrad')) ||
-      (selectedLevel === 'Doctoral' && c.degreeLevel.toLowerCase().includes('doctor'));
-    return matchesSearch && matchesLevel;
+      c.degreeLevel?.toLowerCase() === selectedLevel.toLowerCase();
+    const matchesSearch =
+      !search.trim() ||
+      c.name.toLowerCase().includes(search.toLowerCase()) ||
+      c.code.toLowerCase().includes(search.toLowerCase()) ||
+      (c.departmentName && c.departmentName.toLowerCase().includes(search.toLowerCase()));
+    return matchesLevel && matchesSearch;
   });
 
   const getDegreeBadgeColor = (level: string) => {
     const lower = level.toLowerCase();
-    if (isArtsAndScience) {
+    if (Template.config.code === 'ARTS_SCIENCE_MODERN') {
       return 'bg-amber-100/80 text-amber-900 border-amber-300 font-serif';
     }
-    if (isMedical) {
+    if (Template.config.code === 'MEDICAL_MODERN') {
       return 'bg-teal-100/80 text-teal-900 border-teal-300';
     }
-    if (isUniversity) {
+    if (Template.config.code === 'UNIVERSITY_MODERN') {
       return 'bg-rose-100/80 text-rose-900 border-rose-300 font-serif';
     }
     if (lower.includes('undergrad')) return 'bg-blue-50 text-blue-700 border-blue-200';
@@ -93,34 +91,15 @@ export const CoursesPage: React.FC = () => {
     return 'bg-emerald-50 text-emerald-700 border-emerald-200';
   };
 
-  const heroBg = isArtsAndScience
-    ? 'bg-gradient-to-r from-emerald-950 via-emerald-900 to-slate-950'
-    : isMedical
-    ? 'bg-gradient-to-r from-teal-950 via-teal-900 to-slate-950'
-    : isUniversity
-    ? 'bg-gradient-to-r from-rose-950 via-slate-950 to-slate-900'
-    : 'bg-gradient-to-r from-slate-950 via-blue-950 to-slate-900';
-
-  const titleFont = isArtsAndScience || isUniversity ? 'font-serif' : 'font-sans';
-
   return (
-    <div className={`min-h-screen ${isArtsAndScience ? 'bg-amber-50/30' : isMedical ? 'bg-teal-50/20' : 'bg-slate-50'}`}>
-      {/* Header Banner */}
-      <section className={`relative ${heroBg} text-white py-16 md:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden`}>
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
-        <div className="max-w-7xl mx-auto relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold uppercase tracking-wider text-white mb-4">
-            <BookOpen className="w-4 h-4 text-emerald-300" />
-            <span>{isArtsAndScience ? 'Scholarly Curriculum & Degrees' : isMedical ? 'Clinical & Medical Degrees' : isUniversity ? 'Multi-Disciplinary Curricula' : 'Academic Degree Programs'}</span>
-          </div>
-          <h1 className={`text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white mb-4 ${titleFont}`}>
-            Degrees & Programs of Study
-          </h1>
-          <p className={`text-slate-200 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed ${isArtsAndScience ? 'font-serif' : ''}`}>
-            Gain recognized degrees accredited by national and international bodies, empowered by experiential learning, cutting-edge labs, and high-placement corporate ecosystems.
-          </p>
-        </div>
-      </section>
+    <div className={`min-h-screen ${Template.config.bodyBgClass}`}>
+      {/* Dynamic Modular Template Page Hero */}
+      <Template.PageHero
+        badge={Template.config.code === 'ARTS_SCIENCE_MODERN' ? 'Scholarly Curriculum & Degrees' : Template.config.code === 'MEDICAL_MODERN' ? 'Clinical & Medical Degrees' : Template.config.code === 'UNIVERSITY_MODERN' ? 'Multi-Disciplinary Curricula' : 'Academic Degree Programs'}
+        title="Degrees & Programs of Study"
+        subtitle="Gain recognized degrees accredited by national and international bodies, empowered by experiential learning, cutting-edge labs, and corporate ecosystems."
+        icon={<BookOpen className="w-4 h-4 text-emerald-300" />}
+      />
 
       {/* Filter & Search Bar */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8 relative z-20">

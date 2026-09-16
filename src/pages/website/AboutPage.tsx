@@ -5,11 +5,11 @@ import { PageData } from '../../types';
 import { apiClient } from '../../services/apiClient';
 import { PageRenderer } from '../../components/dynamic/SectionRenderer';
 import { useTenant } from '../../tenant/TenantContext';
-import { useTheme } from '../../themes/ThemeContext';
+import { useActiveTemplate } from '../../templates/templateRegistry';
 
 export const AboutPage: React.FC = () => {
   const { tenantDomain, siteConfig } = useTenant();
-  const { isArtsAndScience, isMedical, isUniversity } = useTheme();
+  const Template = useActiveTemplate();
   const [pageData, setPageData] = useState<PageData | null>(null);
   const [loading, setLoading] = useState(true);
   const [found, setFound] = useState(false);
@@ -60,43 +60,15 @@ export const AboutPage: React.FC = () => {
   const stats = siteConfig?.stats && Array.isArray(siteConfig.stats) && siteConfig.stats.length > 0 ? siteConfig.stats : null;
   const quote = siteConfig?.quote;
 
-  const heroBg = isArtsAndScience
-    ? 'bg-gradient-to-r from-emerald-950 via-emerald-900 to-slate-950'
-    : isMedical
-    ? 'bg-gradient-to-r from-teal-950 via-teal-900 to-slate-950'
-    : isUniversity
-    ? 'bg-gradient-to-r from-rose-950 via-slate-950 to-slate-900'
-    : 'bg-gradient-to-r from-slate-950 via-blue-950 to-slate-900';
-
-  const titleFont = isArtsAndScience || isUniversity ? 'font-serif' : 'font-sans';
-  const statValColor = isArtsAndScience
-    ? 'text-emerald-700 font-serif'
-    : isMedical
-    ? 'text-teal-700 font-sans'
-    : isUniversity
-    ? 'text-rose-900 font-serif'
-    : 'text-blue-700 font-sans';
-
   return (
-    <div className={`min-h-screen ${isArtsAndScience ? 'bg-amber-50/30 font-serif' : isMedical ? 'bg-teal-50/20' : 'bg-slate-50'}`}>
-      {/* Hero Banner */}
-      <section className={`relative ${heroBg} text-white py-16 md:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden`}>
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
-        <div className="max-w-4xl mx-auto relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold uppercase tracking-wider text-white mb-4">
-            <Building2 className="w-4 h-4 text-amber-300" />
-            <span>Institutional Profile</span>
-          </div>
-          <h1 className={`text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white mb-4 ${titleFont}`}>
-            About {institutionName}
-          </h1>
-          {tagline && (
-            <p className={`text-slate-200 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed ${isArtsAndScience ? 'font-serif' : ''}`}>
-              {tagline}
-            </p>
-          )}
-        </div>
-      </section>
+    <div className={`min-h-screen ${Template.config.bodyBgClass}`}>
+      {/* Dynamic Modular Template Page Hero */}
+      <Template.PageHero
+        badge="Institutional Profile"
+        title={`About ${institutionName}`}
+        subtitle={tagline}
+        icon={<Building2 className="w-4 h-4 text-amber-300" />}
+      />
 
       {/* Dynamic Stats Ribbon (Rendered only when real stats are configured) */}
       {stats && (
@@ -104,7 +76,7 @@ export const AboutPage: React.FC = () => {
           <div className={`grid grid-cols-2 sm:grid-cols-${Math.min(stats.length, 4)} gap-4 sm:gap-6 bg-white rounded-3xl p-6 sm:p-8 shadow-lg border border-slate-200/80`}>
             {stats.map((stat, idx) => (
               <div key={idx} className="text-center">
-                <span className={`block text-2xl sm:text-3xl font-black ${statValColor}`}>{stat.value}</span>
+                <span className={`block text-2xl sm:text-3xl font-black ${Template.config.statValColor}`}>{stat.value}</span>
                 <span className="block text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">{stat.label}</span>
               </div>
             ))}

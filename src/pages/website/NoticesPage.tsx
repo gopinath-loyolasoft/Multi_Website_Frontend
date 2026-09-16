@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Bell, Calendar, Download, AlertCircle } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
-import { useTheme } from '../../themes/ThemeContext';
+import { useActiveTemplate } from '../../templates/templateRegistry';
 
 interface NoticeItem {
   title: string;
@@ -12,7 +12,7 @@ interface NoticeItem {
 }
 
 export const NoticesPage: React.FC = () => {
-  const { isArtsAndScience, isMedical, isUniversity, isEngineering } = useTheme();
+  const Template = useActiveTemplate();
   const [notices, setNotices] = useState<NoticeItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,34 +40,15 @@ export const NoticesPage: React.FC = () => {
     fetchNotices();
   }, []);
 
-  const heroBg = isArtsAndScience
-    ? 'bg-gradient-to-r from-emerald-950 via-emerald-900 to-slate-950'
-    : isMedical
-    ? 'bg-gradient-to-r from-teal-950 via-teal-900 to-slate-950'
-    : isUniversity
-    ? 'bg-gradient-to-r from-rose-950 via-slate-950 to-slate-900'
-    : 'bg-gradient-to-r from-slate-950 via-blue-950 to-slate-900';
-
-  const titleFont = isArtsAndScience || isUniversity ? 'font-serif' : 'font-sans';
-
   return (
-    <div className={`min-h-screen ${isArtsAndScience ? 'bg-amber-50/30' : isMedical ? 'bg-teal-50/20' : 'bg-slate-50'}`}>
-      {/* Header Banner */}
-      <section className={`relative ${heroBg} text-white py-16 md:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden`}>
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
-        <div className="max-w-7xl mx-auto relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold uppercase tracking-wider text-white mb-4">
-            <Bell className="w-4 h-4 text-amber-300" />
-            <span>{isArtsAndScience ? 'Scholarly Circulars & Directives' : isMedical ? 'Clinical Bulletins & Directives' : isUniversity ? 'Official Gazette & Circulars' : 'Official Circulars'}</span>
-          </div>
-          <h1 className={`text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white mb-4 ${titleFont}`}>
-            Notices & Official Announcements
-          </h1>
-          <p className={`text-slate-200 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed ${isArtsAndScience ? 'font-serif' : ''}`}>
-            Circulars, examination schedules, admission updates, and institutional announcements.
-          </p>
-        </div>
-      </section>
+    <div className={`min-h-screen ${Template.config.bodyBgClass}`}>
+      {/* Dynamic Modular Template Page Hero */}
+      <Template.PageHero
+        badge={Template.config.code === 'ARTS_SCIENCE_MODERN' ? 'Scholarly Circulars & Directives' : Template.config.code === 'MEDICAL_MODERN' ? 'Clinical Bulletins & Directives' : Template.config.code === 'UNIVERSITY_MODERN' ? 'Official Gazette & Circulars' : 'Official Circulars'}
+        title="Notices & Official Announcements"
+        subtitle="Circulars, examination schedules, admission updates, and institutional announcements."
+        icon={<Bell className="w-4 h-4 text-amber-300" />}
+      />
 
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
         {loading ? (

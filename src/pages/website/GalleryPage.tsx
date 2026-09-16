@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Image as ImageIcon, Maximize2, X, ChevronRight, AlertCircle } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
-import { useTheme } from '../../themes/ThemeContext';
+import { useActiveTemplate } from '../../templates/templateRegistry';
 
 interface GalleryItem {
   id: string;
@@ -14,7 +14,7 @@ interface GalleryItem {
 }
 
 export const GalleryPage: React.FC = () => {
-  const { isArtsAndScience, isMedical, isUniversity, isEngineering } = useTheme();
+  const Template = useActiveTemplate();
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -63,34 +63,15 @@ export const GalleryPage: React.FC = () => {
       item.category.toLowerCase() === selectedCategory.toLowerCase()
   );
 
-  const heroBg = isArtsAndScience
-    ? 'bg-gradient-to-r from-emerald-950 via-emerald-900 to-slate-950'
-    : isMedical
-    ? 'bg-gradient-to-r from-teal-950 via-teal-900 to-slate-950'
-    : isUniversity
-    ? 'bg-gradient-to-r from-rose-950 via-slate-950 to-slate-900'
-    : 'bg-gradient-to-r from-slate-950 via-blue-950 to-slate-900';
-
-  const titleFont = isArtsAndScience || isUniversity ? 'font-serif' : 'font-sans';
-
   return (
-    <div className={`min-h-screen ${isArtsAndScience ? 'bg-amber-50/30' : isMedical ? 'bg-teal-50/20' : 'bg-slate-50'}`}>
-      {/* Header Banner */}
-      <section className={`relative ${heroBg} text-white py-16 md:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden`}>
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
-        <div className="max-w-7xl mx-auto relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold uppercase tracking-wider text-white mb-4">
-            <ImageIcon className="w-4 h-4 text-emerald-300" />
-            <span>{isArtsAndScience ? 'Heritage & Photo Archives' : isMedical ? 'Clinical Facilities & Labs Photo Tour' : isUniversity ? 'Campus Panorama & Archives' : 'Campus Panorama & Labs'}</span>
-          </div>
-          <h1 className={`text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white mb-4 ${titleFont}`}>
-            Campus Life & Multimedia Gallery
-          </h1>
-          <p className={`text-slate-200 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed ${isArtsAndScience ? 'font-serif' : ''}`}>
-            Take a visual tour through our world-class laboratories, verdant university grounds, vibrant student societies, and athletic championships.
-          </p>
-        </div>
-      </section>
+    <div className={`min-h-screen ${Template.config.bodyBgClass}`}>
+      {/* Dynamic Modular Template Page Hero */}
+      <Template.PageHero
+        badge={Template.config.code === 'ARTS_SCIENCE_MODERN' ? 'Heritage & Photo Archives' : Template.config.code === 'MEDICAL_MODERN' ? 'Clinical Facilities & Labs Photo Tour' : Template.config.code === 'UNIVERSITY_MODERN' ? 'Campus Panorama & Archives' : 'Campus Panorama & Labs'}
+        title="Campus Life & Multimedia Gallery"
+        subtitle="Take a visual tour through our world-class laboratories, verdant university grounds, vibrant student societies, and athletic championships."
+        icon={<ImageIcon className="w-4 h-4 text-emerald-300" />}
+      />
 
       {/* Category Filter Bar (rendered if more than 1 category exists) */}
       {availableCategories.length > 1 && (

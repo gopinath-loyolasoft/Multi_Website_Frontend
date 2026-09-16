@@ -173,21 +173,7 @@ export const getFieldsForType = (sectionType: string): SectionField[] | null => 
         { key: 'coverImageUrl', label: 'Video Poster Cover Image', type: 'image' },
         { key: 'caption', label: 'Video Caption / Subtitle', type: 'text' },
       ];
-    case 'TESTIMONIALS':
-      return [
-        {
-          key: 'items',
-          label: 'Student Testimonials',
-          type: 'object-list',
-          itemLabel: 'testimonial',
-          fields: [
-            { key: 'name', label: 'Student / Alumni Name', type: 'text' },
-            { key: 'role', label: 'Department / Degree Batch', type: 'text' },
-            { key: 'quote', label: 'Experience Quote', type: 'textarea' },
-            { key: 'avatarUrl', label: 'Student Photo', type: 'image' },
-          ],
-        },
-      ];
+
     case 'FAQ':
       return [
         {

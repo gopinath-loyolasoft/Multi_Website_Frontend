@@ -30,7 +30,6 @@ import {
   Calendar,
   GraduationCap,
   Briefcase,
-  MessageSquare,
   Mail,
   Award,
   HelpCircle
@@ -63,7 +62,7 @@ const FEATURE_ROUTES: Record<string, { path: string; label: string }> = {
   STATISTICS: { path: '/', label: 'Counters Bar' },
   QUOTES: { path: '/', label: 'Welcome Quote' },
   QUOTE: { path: '/', label: 'Welcome Quote' },
-  TESTIMONIALS: { path: '/', label: 'Testimonials' },
+
   CONTACT: { path: '/contact', label: '/contact' },
   NOTICES: { path: '/notices', label: '/notices' },
   MEDIA: { path: '/gallery', label: 'Media' },
@@ -117,9 +116,7 @@ const getIconComponent = (iconName: string) => {
       return Briefcase;
     case 'quote':
     case 'quotes':
-    case 'testimonial':
-    case 'testimonials':
-      return MessageSquare;
+
     case 'contact':
     case 'mail':
     case 'inquiry':

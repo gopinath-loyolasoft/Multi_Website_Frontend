@@ -15,7 +15,6 @@ import { CoursesSection } from '../sections/CoursesSection';
 import { DepartmentsSection } from '../sections/DepartmentsSection';
 import { FacultySection } from '../sections/FacultySection';
 import { GallerySection } from '../sections/GallerySection';
-import { TestimonialsSection } from '../sections/TestimonialsSection';
 import { CtaSection } from '../sections/CtaSection';
 import { VideoSection } from '../sections/VideoSection';
 import { LogoGridSection } from '../sections/LogoGridSection';
@@ -50,7 +49,7 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({ section }) => 
     'EVENTS',
     'NOTICES',
     'GALLERY',
-    'TESTIMONIALS',
+
     'CALL_TO_ACTION',
     'CTA',
     'CONTACT',
@@ -104,8 +103,6 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({ section }) => 
         return <FacultySection content={effectiveContent} />;
       case 'GALLERY':
         return <GallerySection content={effectiveContent} />;
-      case 'TESTIMONIALS':
-        return <TestimonialsSection content={effectiveContent} />;
       case 'CALL_TO_ACTION':
       case 'CTA':
         return <CtaSection content={effectiveContent} />;
@@ -158,8 +155,6 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({ section }) => 
       case 'PLACEMENTS':
       case 'RECRUITERS':
         return 'placements';
-      case 'TESTIMONIALS':
-        return 'testimonials';
       case 'FAQ':
         return 'faq';
       case 'CONTACT':
