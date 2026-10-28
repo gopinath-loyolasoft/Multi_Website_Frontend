@@ -1,15 +1,36 @@
 import axios from 'axios';
 
-export const API_BASE_URL = 'http://localhost:5000/api/v1';
+// Read API Base URL from the active environment configuration (.env.development / .env.production)
+export const getApiBaseUrl = (): string => {
+  if (typeof window !== 'undefined') {
+    // Optional developer override in browser localStorage (for testing)
+    const override = localStorage.getItem('API_URL_OVERRIDE');
+    if (override) return override;
+  }
+
+  // Pure environment-driven configuration from .env file
+  return import.meta.env.VITE_API_BASE_URL || '/api/v1';
+};
+
+export const API_BASE_URL = getApiBaseUrl();
 
 // Check if current hostname is the root platform host (SuperAdmin control plane)
 export const isPlatformRootHost = (): boolean => {
+  if (typeof window === 'undefined') return true;
   const hostname = window.location.hostname.toLowerCase();
-  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === 'admin.localhost';
+  const configuredRoot = (import.meta.env.VITE_PLATFORM_ROOT_HOST || '').toLowerCase();
+  return (
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === 'admin.localhost' ||
+    hostname === 'schoolsite.loyolasoft.com' ||
+    (configuredRoot !== '' && hostname === configuredRoot)
+  );
 };
 
-// Determine active tenant domain: Hostname if on college domain (e.g. kts.localhost, kts.localhost.com), or localStorage override, or default 'rnc.localhost'
+// Determine active tenant domain: Hostname if on college domain (e.g. kts.localhost, kts.loyolasoft.com, testwebsitecollege.com), or localStorage override, or default 'rnc.localhost'
 export const getActiveTenantDomain = (): string => {
+  if (typeof window === 'undefined') return 'rnc.localhost';
   const hostname = window.location.hostname.toLowerCase();
   if (hostname && !isPlatformRootHost()) {
     return hostname;
@@ -22,6 +43,7 @@ export const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use((config) => {
+  config.baseURL = getApiBaseUrl();
   const tenantDomain = getActiveTenantDomain();
   config.headers['X-Tenant-Domain'] = tenantDomain;
 

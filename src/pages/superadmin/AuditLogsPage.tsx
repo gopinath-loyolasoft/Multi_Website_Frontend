@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FileClock, RefreshCw, Search, Filter, ChevronLeft, ChevronRight, Building2 } from 'lucide-react';
+import { FileClock, RefreshCw, Search, Filter, ChevronLeft, ChevronRight, Building2, CalendarDays, X } from 'lucide-react';
 import { AuditLogItem, Tenant } from '../../types';
 import { apiClient } from '../../services/apiClient';
 
@@ -13,6 +13,10 @@ export const AuditLogsPage: React.FC = () => {
   const [page, setPage] = useState<number>(1);
   const [pageSize] = useState<number>(25);
   const [totalCount, setTotalCount] = useState<number>(0);
+  const [searchInput, setSearchInput] = useState<string>('');
+  const [appliedSearch, setAppliedSearch] = useState<string>('');
+  const [fromDate, setFromDate] = useState<string>('');
+  const [toDate, setToDate] = useState<string>('');
 
   const fetchColleges = async () => {
     try {
@@ -34,6 +38,9 @@ export const AuditLogsPage: React.FC = () => {
       };
       if (selectedTenantId) params.tenantId = selectedTenantId;
       if (selectedAction) params.action = selectedAction;
+      if (appliedSearch) params.search = appliedSearch;
+      if (fromDate) params.fromDate = new Date(`${fromDate}T00:00:00`).toISOString();
+      if (toDate) params.toDate = new Date(`${toDate}T23:59:59`).toISOString();
 
       const res = await apiClient.get('/superadmin/audit-logs', { params });
       if (res.data.success) {
@@ -65,14 +72,26 @@ export const AuditLogsPage: React.FC = () => {
 
   useEffect(() => {
     fetchAuditLogs();
-  }, [page, selectedTenantId, selectedAction]);
+  }, [page, selectedTenantId, selectedAction, appliedSearch, fromDate, toDate]);
 
-  const filtered = logs.filter((l) =>
-    l.action.toLowerCase().includes(search.toLowerCase()) ||
-    (l.details && l.details.toLowerCase().includes(search.toLowerCase())) ||
-    l.username.toLowerCase().includes(search.toLowerCase()) ||
-    (l.tenantCode && l.tenantCode.toLowerCase().includes(search.toLowerCase()))
-  );
+  const applySearch = () => {
+    setPage(1);
+    setAppliedSearch(searchInput.trim());
+  };
+
+  const clearAllFilters = () => {
+    setPage(1);
+    setSearchInput('');
+    setAppliedSearch('');
+    setFromDate('');
+    setToDate('');
+    setSelectedTenantId('');
+    setSelectedAction('');
+  };
+
+  const hasActiveFilters = Boolean(appliedSearch || fromDate || toDate || selectedTenantId || selectedAction);
+
+  const filtered = logs;
 
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
@@ -102,17 +121,68 @@ export const AuditLogsPage: React.FC = () => {
         </button>
       </div>
 
-      {/* Filter Toolbar */}
-      <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+      {/* Filter Toolbar */}        <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between flex-wrap">
         <div className="relative flex-1 max-w-md">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search within page by action, details, user..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-2xs"
+            placeholder="Search all logs by action, details, user... (Enter to apply)"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') applySearch();
+            }}
+            className="w-full pl-9 pr-20 py-2 rounded-lg bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-2xs"
           />
+          <button
+            type="button"
+            onClick={applySearch}
+            className="absolute right-2 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold transition"
+          >
+            SEARCH
+          </button>
+        </div>
+
+        {/* Date Range Filters (server-side) */}
+        <div className="flex flex-wrap items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs shadow-2xs">
+          <CalendarDays className="w-4 h-4 text-blue-600 shrink-0" />
+          <span className="text-slate-500 font-medium">From</span>
+          <input
+            type="date"
+            value={fromDate}
+            max={toDate || undefined}
+            onChange={(e) => {
+              setFromDate(e.target.value);
+              setPage(1);
+            }}
+            className="bg-transparent text-slate-700 text-xs focus:outline-none cursor-pointer font-medium"
+          />
+          <span className="text-slate-300">|</span>
+          <span className="text-slate-500 font-medium">To</span>
+          <input
+            type="date"
+            value={toDate}
+            min={fromDate || undefined}
+            onChange={(e) => {
+              setToDate(e.target.value);
+              setPage(1);
+            }}
+            className="bg-transparent text-slate-700 text-xs focus:outline-none cursor-pointer font-medium"
+          />
+          {(fromDate || toDate) && (
+            <button
+              type="button"
+              onClick={() => {
+                setFromDate('');
+                setToDate('');
+                setPage(1);
+              }}
+              className="p-0.5 text-slate-400 hover:text-red-600 transition"
+              title="Clear date range"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
@@ -152,6 +222,11 @@ export const AuditLogsPage: React.FC = () => {
               <option value="UPDATE_COLLEGE" className="text-slate-900">UPDATE_COLLEGE</option>
               <option value="ACTIVATE_COLLEGE" className="text-slate-900">ACTIVATE_COLLEGE</option>
               <option value="SUSPEND_COLLEGE" className="text-slate-900">SUSPEND_COLLEGE</option>
+              <option value="LOGIN_BLOCKED_TENANT" className="text-slate-900">LOGIN_BLOCKED_TENANT</option>
+              <option value="DELETE_USER" className="text-slate-900">DELETE_USER</option>
+              <option value="RESET_USER_PASSWORD" className="text-slate-900">RESET_USER_PASSWORD</option>
+              <option value="UPDATE_PLATFORM_BRANDING" className="text-slate-900">UPDATE_PLATFORM_BRANDING</option>
+              <option value="RUN_MIGRATION" className="text-slate-900">RUN_MIGRATION</option>
               <option value="ASSIGN_THEME" className="text-slate-900">ASSIGN_THEME</option>
               <option value="UPDATE_FEATURES" className="text-slate-900">UPDATE_FEATURES</option>
               <option value="CREATE_ROLE" className="text-slate-900">CREATE_ROLE</option>
@@ -160,6 +235,18 @@ export const AuditLogsPage: React.FC = () => {
               <option value="CREATE_DOMAIN" className="text-slate-900">CREATE_DOMAIN</option>
             </select>
           </div>
+
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={clearAllFilters}
+              className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold transition flex items-center gap-1"
+              title="Clear all filters"
+            >
+              <X className="w-3.5 h-3.5" />
+              <span>Clear</span>
+            </button>
+          )}
         </div>
       </div>
 

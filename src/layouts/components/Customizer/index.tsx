@@ -1,6 +1,5 @@
-import Icon from '@/components/wrappers/Icon'
-import { SimpleBar } from '@/components/wrappers/SimpleBar'
-import { useLayoutContext } from '@/context/useLayoutContext'
+import { X, RotateCcw } from 'lucide-react'
+import { useLayoutContext } from '@/contexts/useLayoutContext'
 import Dir from './components/Dir'
 import Orientation from './components/Orientation'
 import Position from './components/Position'
@@ -23,8 +22,6 @@ export const Customizer = () => {
   return (
     <>
       {/* Slide-in Customizer Drawer (No dark/blur backdrop so left content remains clearly visible) */}
-
-      {/* Slide-in Customizer Drawer */}
       <div
         id="theme-customization"
         className={`fixed inset-y-0 end-0 bottom-0 z-50 w-full max-w-[400px] flex flex-col overflow-hidden bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-2xl border-l border-slate-200 dark:border-slate-800 transition-transform duration-300 ease-in-out ${
@@ -39,13 +36,13 @@ export const Customizer = () => {
           <button 
             type="button" 
             onClick={toggleCustomizer} 
-            className="p-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white transition shrink-0"
+            className="p-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white transition shrink-0 cursor-pointer"
             title="Close Customizer"
           >
-            <Icon icon="x" className="w-5 h-5" />
+            <X className="w-5 h-5" />
           </button>
         </div>
-        <SimpleBar className="h-full grow overflow-y-auto">
+        <div className="h-full grow overflow-y-auto">
           <div className="divide-default-300 divide-y divide-dashed">
             <Skin />
 
@@ -67,14 +64,14 @@ export const Customizer = () => {
 
             <SidenavUser />
           </div>
-        </SimpleBar>
+        </div>
         <div className="border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-4 shrink-0">
           <button 
             type="button" 
-            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-sm transition" 
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-sm transition cursor-pointer" 
             onClick={reset}
           >
-            <Icon icon="refresh" className="w-4 h-4" /> Reset Settings
+            <RotateCcw className="w-4 h-4" /> Reset Settings
           </button>
         </div>
       </div>

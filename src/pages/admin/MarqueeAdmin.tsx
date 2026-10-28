@@ -312,23 +312,23 @@ export const MarqueeAdminPage: React.FC = () => {
         </div>
       )}
 
-      {/* LIVE PREVIEW BOX (LIGHT MODE) */}
-      <div className="rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden">
-        <div className="p-4 flex items-center justify-between border-b border-slate-100 bg-slate-50/75">
+      {/* LIVE PREVIEW BOX (DARK & LIGHT MODE) */}
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden">
+        <div className="p-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-800 bg-slate-50/75 dark:bg-slate-800/60">
           <div className="flex items-center gap-2">
             <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
-            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 font-mono">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 font-mono">
               Live Preview Monitor ({currentlyLiveItems.length} Active Bulletins)
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-500 font-medium hidden sm:inline">
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium hidden sm:inline">
               Status: {settings.isActive ? '🟢 Active & Ticking' : '🔴 Inactive (Bar hidden)'}
             </span>
             <button
               type="button"
               onClick={() => setShowPreview(!showPreview)}
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 shadow-2xs transition cursor-pointer"
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-2xs transition cursor-pointer"
             >
               {showPreview ? 'Hide Preview' : 'Show Preview'}
             </button>
@@ -336,13 +336,13 @@ export const MarqueeAdminPage: React.FC = () => {
         </div>
 
         {showPreview && (
-          <div className="p-5 bg-slate-50/50 space-y-3">
+          <div className="p-5 bg-slate-100/90 dark:bg-slate-950/60 space-y-3">
             {/* Embedded Marquee Component running live */}
-            <div className="rounded-lg overflow-hidden border border-slate-200 shadow-2xs bg-white">
+            <div className="rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 shadow-2xs bg-white dark:bg-slate-900">
               <MarqueeBar marquee={livePreviewData} isPreview={true} />
             </div>
 
-            <p className="text-[11px] text-slate-400 italic">
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">
               * This live preview renders dynamically as you configure speed, colors, and announcements below.
             </p>
           </div>

@@ -47,25 +47,46 @@ import { apiClient } from '../../services/apiClient';
 import { FormDrawer, Drawer, LivePreviewModal, Input, Select, Switch } from '../../UI_Componentes/ui';
 
 const FEATURE_ROUTES: Record<string, { path: string; label: string }> = {
+  PAGES: { path: '/admin/pages', label: 'Pages Builder' },
+  SECTIONS: { path: '/admin/pages', label: 'Section Builder' },
+  MENUS: { path: '/admin/menus', label: 'Header & Footer Menus' },
+  THEMES: { path: '/admin/settings', label: 'Theme & Colors' },
+  ABOUT: { path: '/admin/about', label: 'About College Page' },
+  BANNERS: { path: '/admin/banners', label: 'Home Slider' },
+  MARQUEE: { path: '/admin/marquee', label: 'Top Ticker' },
+  STATS: { path: '/admin/stats', label: 'Counters Bar' },
+  STATISTICS: { path: '/admin/stats', label: 'Counters Bar' },
+  QUOTE: { path: '/admin/quote', label: 'Leadership Quote' },
+  QUOTES: { path: '/admin/quote', label: 'Leadership Quote' },
+  DEPARTMENTS: { path: '/departments', label: '/departments' },
+  COURSES: { path: '/courses', label: '/courses' },
+  FACULTY: { path: '/faculty', label: '/faculty' },
   NEWS: { path: '/news', label: '/news' },
   EVENTS: { path: '/events', label: '/events' },
   GALLERY: { path: '/gallery', label: '/gallery' },
-  COURSES: { path: '/courses', label: '/courses' },
-  DEPARTMENTS: { path: '/departments', label: '/departments' },
-  FACULTY: { path: '/faculty', label: '/faculty' },
+  MEDIA: { path: '/gallery', label: 'Media Library' },
   ADMISSIONS: { path: '/admissions', label: '/admissions' },
-  BANNERS: { path: '/', label: 'Home Slider' },
-  MARQUEE: { path: '/', label: 'Top Ticker' },
-  MENUS: { path: '/', label: 'Header Menu' },
-  PAGES: { path: '/admin/pages', label: 'Pages CMS' },
-  STATS: { path: '/', label: 'Counters Bar' },
-  STATISTICS: { path: '/', label: 'Counters Bar' },
-  QUOTES: { path: '/', label: 'Welcome Quote' },
-  QUOTE: { path: '/', label: 'Welcome Quote' },
-
-  CONTACT: { path: '/contact', label: '/contact' },
   NOTICES: { path: '/notices', label: '/notices' },
-  MEDIA: { path: '/gallery', label: 'Media' },
+  CONTACT: { path: '/contact', label: '/contact' },
+  PLACEMENTS: { path: '/placements', label: '/placements' },
+  COMPLIANCE: { path: '/compliance', label: '/compliance' },
+  TRANSPORT: { path: '/transport', label: '/transport' },
+  HOSTELS: { path: '/hostels', label: '/hostels' },
+  LIBRARY: { path: '/library', label: '/library' },
+  ALUMNI: { path: '/alumni', label: '/alumni' },
+  POPUPS: { path: '/admin/popups', label: 'Lightbox & Popups' },
+  POPUP: { path: '/admin/popups', label: 'Lightbox & Popups' },
+};
+
+export const normalizeCategory = (cat: string): string => {
+  const c = (cat || '').toUpperCase().trim();
+  if (c === 'CMS' || c === 'CORE CMS & LAYOUT' || c === 'CORE PAGES & LAYOUT' || c === 'CORE SYSTEM') return 'Core CMS & Layout';
+  if (c === 'DYNAMIC HOME SECTIONS' || c === 'DYNAMIC HOME PAGE MODULES' || c === 'NAVIGATION & ANNOUNCEMENTS' || c === 'CONTENT') return 'Dynamic Home Sections';
+  if (c === 'ACADEMIC' || c === 'ACADEMICS' || c === 'ACADEMICS & FACULTY') return 'Academics & Faculty';
+  if (c === 'MEDIA' || c === 'CAMPUS LIFE & MEDIA' || c === 'CAMPUS LIFE & EVENTS' || c === 'CAMPUS LIFE & LOGISTICS' || c === 'LOGISTICS') return 'Campus Life & Logistics';
+  if (c === 'STATUTORY' || c === 'STATUTORY & CORPORATE' || c === 'CORPORATE' || c === 'COMPLIANCE') return 'Statutory & Corporate';
+  if (c === 'COMMUNICATION' || c === 'ADMISSIONS & COMMUNICATION' || c === 'STUDENT CONVERSION') return 'Admissions & Communication';
+  return 'Core CMS & Layout';
 };
 
 const getIconComponent = (iconName: string) => {
@@ -110,13 +131,15 @@ const getIconComponent = (iconName: string) => {
     case 'courses':
     case 'academic':
     case 'academics':
+    case 'bookopen':
       return GraduationCap;
     case 'faculty':
     case 'staff':
+    case 'users':
       return Briefcase;
     case 'quote':
     case 'quotes':
-
+      return Sparkles;
     case 'contact':
     case 'mail':
     case 'inquiry':
@@ -125,7 +148,24 @@ const getIconComponent = (iconName: string) => {
     case 'stats':
     case 'statistics':
     case 'counter':
+    case 'barchart2':
       return Award;
+    case 'bell':
+    case 'notices':
+    case 'notice':
+      return Megaphone;
+    case 'camera':
+    case 'gallery':
+      return ImageIcon;
+    case 'palette':
+    case 'theme':
+    case 'themes':
+      return Sliders;
+    case 'layers':
+    case 'popup':
+    case 'popups':
+    case 'modal':
+      return Layers;
     default:
       return Sparkles;
   }
@@ -140,6 +180,7 @@ const renderFeatureIconBadge = (iconName: string) => {
   );
 };
 
+
 export const FeaturesPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'catalog' | 'assignments'>('catalog');
   const [features, setFeatures] = useState<FeatureItem[]>([]);
@@ -152,7 +193,7 @@ export const FeaturesPage: React.FC = () => {
   const [tenantLoading, setTenantLoading] = useState(false);
   const [savingFeature, setSavingFeature] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('ALL');
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'INACTIVE'>('ALL');
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   
@@ -172,7 +213,7 @@ export const FeaturesPage: React.FC = () => {
     code: '',
     name: '',
     description: '',
-    category: 'CORE PAGES & LAYOUT',
+    category: 'Core CMS & Layout',
     icon: 'box',
     sortOrder: 1,
     isActive: true
@@ -180,10 +221,12 @@ export const FeaturesPage: React.FC = () => {
   const [formSaving, setFormSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
-  // Feature College Usage Modal
-  const [usageModalOpen, setUsageModalOpen] = useState(false);
+  // Feature College Usage Drawer (Right-side slideout)
+  const [usageDrawerOpen, setUsageDrawerOpen] = useState(false);
   const [usageData, setUsageData] = useState<FeatureCollegeUsage | null>(null);
   const [usageLoading, setUsageLoading] = useState(false);
+  const [togglingUsageTenantId, setTogglingUsageTenantId] = useState<string | null>(null);
+  const [usageSearchQuery, setUsageSearchQuery] = useState('');
 
   const showNotification = (msg: string) => {
     setSuccessMsg(msg);
@@ -325,7 +368,7 @@ export const FeaturesPage: React.FC = () => {
       code: '',
       name: '',
       description: '',
-      category: 'CORE PAGES & LAYOUT',
+      category: 'Core CMS & Layout',
       icon: 'box',
       sortOrder: (features.length || 0) + 1,
       isActive: true
@@ -341,7 +384,7 @@ export const FeaturesPage: React.FC = () => {
       code: feat.code,
       name: feat.name,
       description: feat.description || '',
-      category: feat.category || 'CORE PAGES & LAYOUT',
+      category: normalizeCategory(feat.category || 'Core CMS & Layout'),
       icon: feat.icon || 'box',
       sortOrder: feat.sortOrder || 1,
       isActive: feat.isActive
@@ -409,11 +452,12 @@ export const FeaturesPage: React.FC = () => {
     }
   };
 
-  const openUsageModal = async (feat: FeatureItem) => {
+  const openUsageDrawer = async (feat: FeatureItem) => {
     try {
       setUsageLoading(true);
-      setUsageModalOpen(true);
-      const res = await apiClient.get(`/superadmin/features/${feat.id}/colleges`);
+      setUsageDrawerOpen(true);
+      setUsageSearchQuery('');
+      const res = await apiClient.get(`/superadmin/features/${feat.code}/colleges`);
       if (res.data?.success) {
         setUsageData(res.data.data);
       }
@@ -424,32 +468,58 @@ export const FeaturesPage: React.FC = () => {
     }
   };
 
+  const handleToggleCollegeFeatureInDrawer = async (tenantId: string | number, currentEnabled: boolean) => {
+    if (!usageData) return;
+    try {
+      setTogglingUsageTenantId(String(tenantId));
+      const updatedFeatures = { [usageData.featureCode]: !currentEnabled };
+      const res = await apiClient.put(`/superadmin/colleges/${tenantId}/features`, updatedFeatures);
+      if (res.data?.success) {
+        setUsageData((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            colleges: prev.colleges.map((c) =>
+              String(c.tenantId) === String(tenantId) ? { ...c, isEnabled: !currentEnabled } : c
+            ),
+          };
+        });
+        showNotification(`Updated ${usageData.featureCode} access.`);
+        fetchCatalogAndColleges();
+      }
+    } catch (err: any) {
+      console.error(err);
+      setError(err.response?.data?.message || 'Failed to update feature access for college');
+    } finally {
+      setTogglingUsageTenantId(null);
+    }
+  };
+
   const selectedCollege = colleges.find((c) => String(c.id) === String(selectedTenantId));
 
   const categories = [
-    'ALL',
-    'NAVIGATION & ANNOUNCEMENTS',
-    'CORE PAGES & LAYOUT',
-    'ACADEMICS & FACULTY',
-    'CAMPUS LIFE & MEDIA',
-    'STUDENT CONVERSION'
+    'All',
+    'Core CMS & Layout',
+    'Dynamic Home Sections',
+    'Academics & Faculty',
+    'Campus Life & Logistics',
+    'Statutory & Corporate',
+    'Admissions & Communication'
   ];
 
   const CATEGORY_ORDER: Record<string, number> = {
-    'CMS': 1,
-    'CORE PAGES & LAYOUT': 1,
-    'NAVIGATION & ANNOUNCEMENTS': 2,
-    'CONTENT': 3,
-    'CAMPUS LIFE & MEDIA': 4,
-    'ACADEMIC': 5,
-    'ACADEMICS & FACULTY': 5,
-    'STUDENT CONVERSION': 6,
+    'Core CMS & Layout': 1,
+    'Dynamic Home Sections': 2,
+    'Academics & Faculty': 3,
+    'Campus Life & Logistics': 4,
+    'Statutory & Corporate': 5,
+    'Admissions & Communication': 6,
   };
 
   const sortedFeatures = useMemo(() => {
     return [...features].sort((a, b) => {
-      const catA = (a.category || 'CMS').toUpperCase();
-      const catB = (b.category || 'CMS').toUpperCase();
+      const catA = normalizeCategory(a.category || '');
+      const catB = normalizeCategory(b.category || '');
       const rankA = CATEGORY_ORDER[catA] ?? 50;
       const rankB = CATEGORY_ORDER[catB] ?? 50;
       if (rankA !== rankB) return rankA - rankB;
@@ -459,8 +529,8 @@ export const FeaturesPage: React.FC = () => {
 
   const filteredFeatures = useMemo(() => {
     return sortedFeatures.filter((f) => {
-      const featCategory = f.category || 'CORE PAGES & LAYOUT';
-      const matchesCategory = selectedCategory === 'ALL' || featCategory === selectedCategory;
+      const featCategory = normalizeCategory(f.category || '');
+      const matchesCategory = selectedCategory === 'All' || featCategory === selectedCategory;
       const matchesSearch = 
         f.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         f.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -514,7 +584,7 @@ export const FeaturesPage: React.FC = () => {
       {/* 4 Summary Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-4.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Features</span>
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block">Total Features</span>
           <div className="flex items-baseline justify-between mt-2">
             <span className="text-2xl font-black text-slate-900 dark:text-white">{summary?.totalFeatures ?? features.length}</span>
             <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-900">
@@ -524,7 +594,7 @@ export const FeaturesPage: React.FC = () => {
         </div>
 
         <div className="p-4.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">College Assignments</span>
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block">College Assignments</span>
           <div className="flex items-baseline justify-between mt-2">
             <span className="text-2xl font-black text-blue-600 dark:text-blue-400">{summary?.totalAssignments ?? 0}</span>
             <span className="text-xs font-bold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-full border border-blue-200 dark:border-blue-900">
@@ -534,7 +604,7 @@ export const FeaturesPage: React.FC = () => {
         </div>
 
         <div className="p-4.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Categories</span>
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block">Categories</span>
           <div className="flex items-baseline justify-between mt-2">
             <span className="text-2xl font-black text-slate-900 dark:text-white">{summary?.categoriesCount ?? 5}</span>
             <span className="text-xs font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2 py-0.5 rounded-full border border-purple-200 dark:border-purple-900">
@@ -544,7 +614,7 @@ export const FeaturesPage: React.FC = () => {
         </div>
 
         <div className="p-4.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Managed Colleges</span>
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block">Managed Colleges</span>
           <div className="flex items-baseline justify-between mt-2">
             <span className="text-2xl font-black text-slate-900 dark:text-white">{colleges.length}</span>
             <span className="text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-900">
@@ -693,7 +763,7 @@ export const FeaturesPage: React.FC = () => {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/40 text-slate-400 font-black uppercase tracking-wider text-[10px]">
+                    <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/40 text-slate-500 dark:text-slate-400 font-bold text-xs">
                       <th className="py-3.5 px-5">Feature Code & Name</th>
                       <th className="py-3.5 px-4">Category</th>
                       <th className="py-3.5 px-4">Colleges Using</th>
@@ -720,19 +790,19 @@ export const FeaturesPage: React.FC = () => {
                         </td>
 
                         <td className="py-3.5 px-4">
-                          <span className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60 whitespace-nowrap">
-                            {feat.category || 'CORE PAGES & LAYOUT'}
+                          <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60 whitespace-nowrap">
+                            {normalizeCategory(feat.category || '')}
                           </span>
                         </td>
 
                         <td className="py-3.5 px-4">
                           <button
-                            onClick={() => openUsageModal(feat)}
+                            onClick={() => openUsageDrawer(feat)}
                             className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 dark:hover:bg-blue-900/40 border border-blue-200/70 dark:border-blue-900 transition cursor-pointer whitespace-nowrap"
                             title="View which colleges have this feature enabled"
                           >
                             <Users className="w-3.5 h-3.5" />
-                            <span>{feat.collegesUsingCount ?? 0} Colleges</span>
+                            <span>{feat.collegesUsingCount ?? 0} {colleges.length > 0 ? `/ ${colleges.length}` : ''} Colleges</span>
                           </button>
                         </td>
 
@@ -800,8 +870,8 @@ export const FeaturesPage: React.FC = () => {
 
                     <div>
                       <h3 className="text-sm font-bold text-slate-900 dark:text-white">{feat.name}</h3>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mt-0.5">
-                        {feat.category || 'CORE PAGES & LAYOUT'}
+                      <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block mt-0.5">
+                        {normalizeCategory(feat.category || '')}
                       </span>
                       <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-1.5 line-clamp-2">{feat.description}</p>
                     </div>
@@ -809,11 +879,11 @@ export const FeaturesPage: React.FC = () => {
 
                   <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
                     <button
-                      onClick={() => openUsageModal(feat)}
+                      onClick={() => openUsageDrawer(feat)}
                       className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 dark:hover:bg-blue-900/40 border border-blue-200/70 dark:border-blue-900 transition cursor-pointer"
                     >
                       <Users className="w-3.5 h-3.5" />
-                      <span>{feat.collegesUsingCount ?? 0} Colleges</span>
+                      <span>{feat.collegesUsingCount ?? 0} {colleges.length > 0 ? `/ ${colleges.length}` : ''} Colleges</span>
                     </button>
 
                     <button
@@ -841,7 +911,7 @@ export const FeaturesPage: React.FC = () => {
                 <Building2 className="w-6 h-6" />
               </div>
               <div className="min-w-0">
-                <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block">
                   Active College Tenant
                 </span>
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white truncate">
@@ -906,7 +976,7 @@ export const FeaturesPage: React.FC = () => {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/40 text-slate-400 font-black uppercase tracking-wider text-[10px]">
+                    <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/40 text-slate-500 dark:text-slate-400 font-bold text-xs">
                       <th className="py-3.5 px-5">Feature Code & Name</th>
                       <th className="py-3.5 px-4">Category</th>
                       <th className="py-3.5 px-4">Tenant Entitlement Status</th>
@@ -936,8 +1006,8 @@ export const FeaturesPage: React.FC = () => {
                           </td>
 
                           <td className="py-3.5 px-4">
-                            <span className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60 whitespace-nowrap">
-                              {feat.category || 'CORE PAGES & LAYOUT'}
+                            <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60 whitespace-nowrap">
+                              {normalizeCategory(feat.category || '')}
                             </span>
                           </td>
 
@@ -948,7 +1018,7 @@ export const FeaturesPage: React.FC = () => {
                                 : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200/60 dark:border-slate-700/60'
                             }`}>
                               <span className={`w-1.5 h-1.5 rounded-full ${isEnabled ? 'bg-emerald-500' : 'bg-slate-400'}`} />
-                              <span>{isEnabled ? '✓ ENABLED' : '✗ DISABLED'}</span>
+                              <span>{isEnabled ? '✓ Enabled' : '✗ Disabled'}</span>
                             </span>
                           </td>
 
@@ -1022,8 +1092,8 @@ export const FeaturesPage: React.FC = () => {
 
                       <div>
                         <h3 className="text-base font-bold text-slate-900 dark:text-white">{feat.name}</h3>
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mt-0.5">
-                          {feat.category || 'CORE PAGES & LAYOUT'}
+                        <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block mt-0.5">
+                          {normalizeCategory(feat.category || '')}
                         </span>
                         <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-1.5">{feat.description}</p>
                       </div>
@@ -1032,7 +1102,7 @@ export const FeaturesPage: React.FC = () => {
                     <div className="pt-3 border-t border-slate-100 dark:border-slate-800 text-xs flex items-center justify-between">
                       <span className="text-slate-400 font-medium">Tenant Access:</span>
                       <span className={`font-bold font-mono text-xs ${isEnabled ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}`}>
-                        {isEnabled ? '✓ ENABLED' : '✗ DISABLED'}
+                        {isEnabled ? '✓ Enabled' : '✗ Disabled'}
                       </span>
                     </div>
                   </div>
@@ -1087,12 +1157,11 @@ export const FeaturesPage: React.FC = () => {
             value={formData.category}
             onChange={(e) => setFormData({ ...formData, category: e.target.value })}
             options={[
-              { value: 'CORE PAGES & LAYOUT', label: 'CORE PAGES & LAYOUT' },
-              { value: 'NAVIGATION & ANNOUNCEMENTS', label: 'NAVIGATION & ANNOUNCEMENTS' },
-              { value: 'ACADEMICS & FACULTY', label: 'ACADEMICS & FACULTY' },
-              { value: 'CAMPUS LIFE & MEDIA', label: 'CAMPUS LIFE & MEDIA' },
-              { value: 'STUDENT CONVERSION', label: 'STUDENT CONVERSION' },
-              { value: 'GENERAL', label: 'GENERAL' },
+              { value: 'Core CMS & Layout', label: 'Core CMS & Layout' },
+              { value: 'Dynamic Home Sections', label: 'Dynamic Home Sections' },
+              { value: 'Academics & Faculty', label: 'Academics & Faculty' },
+              { value: 'Campus Life & Media', label: 'Campus Life & Media' },
+              { value: 'Admissions & Communication', label: 'Admissions & Communication' },
             ]}
           />
 
@@ -1129,67 +1198,147 @@ export const FeaturesPage: React.FC = () => {
         </div>
       </FormDrawer>
 
-      {/* Feature College Usage Modal */}
-      {usageModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 max-w-md w-full shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4 max-h-[85vh] flex flex-col">
-            <div className="flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-2">
-                <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                <h2 className="text-base font-bold text-slate-900 dark:text-white">
-                  College Usage: {usageData?.featureCode || 'Feature'}
-                </h2>
+      {/* Feature College Usage Right-Side Drawer */}
+      <Drawer
+        isOpen={usageDrawerOpen}
+        onClose={() => setUsageDrawerOpen(false)}
+        title={usageData ? `College Entitlements: ${usageData.featureName || usageData.featureCode}` : 'Feature College Usage'}
+        subtitle={usageData ? `Module Key: ${usageData.featureCode}` : 'Managing active tenant entitlements'}
+        size="md"
+        icon={<Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />}
+        footer={
+          <div className="flex items-center justify-between w-full">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+              {usageData?.colleges?.filter((c) => c.isEnabled).length || 0} of {usageData?.colleges?.length || 0} Colleges Active
+            </span>
+            <button
+              type="button"
+              onClick={() => setUsageDrawerOpen(false)}
+              className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-white dark:text-slate-900 rounded-xl text-xs font-bold transition cursor-pointer shadow-xs"
+            >
+              Done
+            </button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          {/* Summary Box */}
+          {usageData && (
+            <div className="p-4 rounded-2xl bg-blue-50/60 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="px-2.5 py-1 rounded-md font-mono text-xs font-black bg-blue-600 text-white shadow-xs">
+                  {usageData.featureCode}
+                </span>
+                <div>
+                  <h4 className="text-xs font-bold text-slate-900 dark:text-white">{usageData.featureName || usageData.featureCode}</h4>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400">Centrally toggle capability per college tenant</span>
+                </div>
               </div>
-              <button onClick={() => setUsageModalOpen(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer">
-                <X className="w-5 h-5" />
-              </button>
+              <div className="text-right">
+                <span className="text-sm font-black text-blue-600 dark:text-blue-400">
+                  {usageData.colleges.filter(c => c.isEnabled).length} / {usageData.colleges.length}
+                </span>
+                <span className="text-[10px] block font-semibold text-slate-400">Using</span>
+              </div>
             </div>
+          )}
 
-            <p className="text-xs text-slate-500 dark:text-slate-400 shrink-0">
-              Colleges that currently have the <strong>{usageData?.featureName || usageData?.featureCode}</strong> module enabled or disabled:
-            </p>
+          {/* Search Filter for Colleges in Drawer */}
+          <div className="relative">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={usageSearchQuery}
+              onChange={(e) => setUsageSearchQuery(e.target.value)}
+              placeholder="Search colleges in this list..."
+              className="w-full pl-8.5 pr-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs"
+            />
+          </div>
 
-            {usageLoading ? (
-              <div className="py-12 flex items-center justify-center">
-                <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-              </div>
-            ) : (
-              <div className="space-y-2 overflow-y-auto flex-1 pr-1">
-                {(usageData?.colleges || []).map((col) => (
-                  <div
-                    key={col.tenantId}
-                    className="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 flex items-center justify-between text-xs"
-                  >
-                    <div>
-                      <span className="font-bold text-slate-900 dark:text-white block">{col.collegeName}</span>
-                      <span className="font-mono text-[10px] text-slate-400">{col.tenantCode} • {col.primaryDomain || 'tenant.localhost'}</span>
-                    </div>
-
-                    <span
-                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+          {/* Loading or List */}
+          {usageLoading ? (
+            <div className="py-16 flex flex-col items-center justify-center gap-2">
+              <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+              <span className="text-xs text-slate-400 font-medium">Loading college assignments...</span>
+            </div>
+          ) : (
+            <div className="space-y-2.5 max-h-[calc(100vh-280px)] overflow-y-auto pr-1">
+              {(usageData?.colleges || [])
+                .filter((col: any) => {
+                  if (!usageSearchQuery.trim()) return true;
+                  const q = usageSearchQuery.toLowerCase();
+                  const name = (col.collegeName || col.tenantName || '').toLowerCase();
+                  const code = (col.tenantCode || '').toLowerCase();
+                  const dom = (col.primaryDomain || '').toLowerCase();
+                  return name.includes(q) || code.includes(q) || dom.includes(q);
+                })
+                .map((col: any) => {
+                  const isToggling = togglingUsageTenantId === String(col.tenantId);
+                  const displayName = col.collegeName || col.tenantName || col.tenantCode;
+                  const domain = col.primaryDomain || `${col.tenantCode.toLowerCase()}.localhost`;
+                  return (
+                    <div
+                      key={col.tenantId}
+                      className={`p-3.5 rounded-2xl border transition flex items-center justify-between gap-3 ${
                         col.isEnabled
-                          ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900'
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                          ? 'border-blue-200/80 dark:border-blue-900/60 bg-blue-50/30 dark:bg-blue-950/20'
+                          : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60'
                       }`}
                     >
-                      {col.isEnabled ? 'Enabled' : 'Disabled'}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-slate-900 dark:text-white text-xs truncate">
+                            {displayName}
+                          </span>
+                          <span className="px-1.5 py-0.2 rounded font-mono text-[10px] font-extrabold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                            {col.tenantCode}
+                          </span>
+                        </div>
+                        <a
+                          href={`http://${domain}:${window.location.port || '3000'}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 text-[11px] text-blue-600 dark:text-blue-400 hover:underline mt-0.5"
+                        >
+                          <span>{domain}</span>
+                          <ExternalLink className="w-2.5 h-2.5" />
+                        </a>
+                      </div>
 
-            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end shrink-0">
-              <button
-                onClick={() => setUsageModalOpen(false)}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-              >
-                Close
-              </button>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          disabled={isToggling}
+                          onClick={() => handleToggleCollegeFeatureInDrawer(col.tenantId, col.isEnabled)}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                            col.isEnabled
+                              ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs shadow-emerald-600/20'
+                              : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300'
+                          } ${isToggling ? 'opacity-60 cursor-not-allowed' : ''}`}
+                        >
+                          {isToggling ? (
+                            <RefreshCw className="w-3 h-3 animate-spin" />
+                          ) : col.isEnabled ? (
+                            <Check className="w-3 h-3" />
+                          ) : (
+                            <X className="w-3 h-3" />
+                          )}
+                          <span>{col.isEnabled ? 'Enabled' : 'Disabled'}</span>
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+
+              {(usageData?.colleges || []).length === 0 && (
+                <div className="p-8 text-center rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 text-slate-400 text-xs">
+                  No colleges currently registered.
+                </div>
+              )}
             </div>
-          </div>
+          )}
         </div>
-      )}
+      </Drawer>
 
       {/* Live Preview Modal */}
       <LivePreviewModal

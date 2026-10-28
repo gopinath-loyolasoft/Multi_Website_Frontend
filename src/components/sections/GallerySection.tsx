@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Camera, X, ArrowRight } from 'lucide-react';
+import { Camera, X, ArrowRight, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import { apiClient } from '../../services/apiClient';
 import { SectionError } from './SectionError';
-import { useTheme } from '../../themes/ThemeContext';
+import { useTemplateTheme } from '../../themes/ThemeContext';
 
 interface GalleryImg {
   title?: string;
@@ -20,8 +20,9 @@ interface GalleryProps {
 }
 
 export const GallerySection: React.FC<GalleryProps> = ({ content }) => {
-  const { isArtsAndScience, isMedical, isUniversity } = useTheme();
-  const isCenterAligned = isArtsAndScience || isUniversity;
+  const { styles } = useTemplateTheme();
+  const galleryStyles = styles.gallery;
+  const isCenterAligned = galleryStyles.isCentered ?? false;
 
   const [fetchedImages, setFetchedImages] = useState<GalleryImg[]>([]);
   const [loading, setLoading] = useState(false);
@@ -52,50 +53,28 @@ export const GallerySection: React.FC<GalleryProps> = ({ content }) => {
   }
   if (!loading && images.length === 0) return null;
 
-  const badgeClass = isArtsAndScience 
-    ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 font-serif' 
-    : isUniversity 
-    ? 'bg-rose-100 text-rose-900 border border-rose-200 font-serif' 
-    : isMedical 
-    ? 'bg-teal-100 text-teal-800 border border-teal-200 font-sans' 
-    : 'bg-primary/10 text-primary font-sans';
-
-  const headingFont = isArtsAndScience 
-    ? 'font-serif font-bold text-emerald-950 dark:text-emerald-50 text-3xl sm:text-4xl' 
-    : isUniversity 
-    ? 'font-serif font-bold text-rose-950 dark:text-amber-50 text-3xl sm:text-4xl' 
-    : isMedical 
-    ? 'font-sans font-extrabold text-slate-900 dark:text-white text-3xl sm:text-4xl' 
-    : 'font-sans font-black text-slate-900 dark:text-white text-3xl sm:text-4xl';
-
-  const linkColor = isArtsAndScience 
-    ? 'text-emerald-700 hover:text-emerald-900 font-serif' 
-    : isUniversity 
-    ? 'text-rose-900 hover:text-amber-700 font-serif' 
-    : isMedical 
-    ? 'text-cyan-700 hover:text-cyan-900' 
-    : 'text-primary hover:underline';
-
   return (
-    <section className="py-16 bg-slate-50 dark:bg-slate-950 transition-colors">
+    <section className={`py-16 ${galleryStyles.sectionBg} transition-colors`}>
       <div className="max-w-screen-2xl mx-auto px-6 sm:px-10 lg:px-16">
         {isCenterAligned ? (
           <div className="text-center max-w-3xl mx-auto mb-12 space-y-3 flex flex-col items-center">
-            <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${badgeClass}`}>
-              <Camera className="w-3.5 h-3.5" />
-              <span>Campus Visual Tour</span>
-            </div>
-            <h2 className={headingFont}>
-              {content.title || 'Campus Photo & Video Gallery'}
+            {galleryStyles.sectionHeaderBadge && (
+              <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${galleryStyles.sectionHeaderBadge}`}>
+                <Camera className="w-3.5 h-3.5" />
+                <span>{galleryStyles.defaultBadgeText || 'Campus Visual Tour'}</span>
+              </div>
+            )}
+            <h2 className={galleryStyles.headingFont}>
+              {content.title || galleryStyles.defaultTitle || 'Campus Photo & Video Gallery'}
             </h2>
             {content.subtitle && (
-              <p className="text-sm text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+              <p className={`${galleryStyles.subtitleFont} max-w-2xl mx-auto`}>
                 {content.subtitle}
               </p>
             )}
             <Link
               to="/gallery"
-              className={`inline-flex items-center gap-1 text-xs font-bold pt-1 ${linkColor}`}
+              className={`inline-flex items-center gap-1 text-xs font-bold pt-1 ${galleryStyles.accentText}`}
             >
               <span>Explore All Albums</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -104,22 +83,24 @@ export const GallerySection: React.FC<GalleryProps> = ({ content }) => {
         ) : (
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
             <div>
-              <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold mb-2 ${badgeClass}`}>
-                <Camera className="w-3.5 h-3.5" />
-                <span>Campus Visual Tour</span>
-              </div>
-              <h2 className={headingFont}>
-                {content.title || 'Campus Photo & Video Gallery'}
+              {galleryStyles.sectionHeaderBadge && (
+                <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold mb-2 ${galleryStyles.sectionHeaderBadge}`}>
+                  <Camera className="w-3.5 h-3.5" />
+                  <span>{galleryStyles.defaultBadgeText || 'Campus Visual Tour'}</span>
+                </div>
+              )}
+              <h2 className={galleryStyles.headingFont}>
+                {content.title || galleryStyles.defaultTitle || 'Campus Photo & Video Gallery'}
               </h2>
               {content.subtitle && (
-                <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                <p className={`${galleryStyles.subtitleFont} mt-1`}>
                   {content.subtitle}
                 </p>
               )}
             </div>
             <Link
               to="/gallery"
-              className={`inline-flex items-center gap-1 text-xs font-bold self-start md:self-auto ${linkColor}`}
+              className={`inline-flex items-center gap-1 text-xs font-bold self-start md:self-auto ${galleryStyles.accentText}`}
             >
               <span>Explore All Albums</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -132,14 +113,14 @@ export const GallerySection: React.FC<GalleryProps> = ({ content }) => {
             <div
               key={idx}
               onClick={() => setActiveModalImg(img.imageUrl)}
-              className="group relative h-64 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl cursor-pointer border border-slate-200/80 dark:border-slate-800 transition duration-300"
+              className={`group relative h-64 ${galleryStyles.imageBorder} shadow-sm hover:shadow-xl cursor-pointer transition duration-300`}
             >
               <img
                 src={img.imageUrl}
                 alt={img.title || 'Campus'}
                 className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-300 p-4 flex flex-col justify-end">
+              <div className={`absolute inset-0 ${galleryStyles.overlayGradient} opacity-0 group-hover:opacity-100 transition duration-300 p-4 flex flex-col justify-end`}>
                 <p className="text-xs font-bold text-white leading-snug">
                   {img.title}
                 </p>
@@ -157,7 +138,7 @@ export const GallerySection: React.FC<GalleryProps> = ({ content }) => {
         >
           <button
             onClick={() => setActiveModalImg(null)}
-            className="absolute top-6 right-6 text-white hover:text-red-400 p-2"
+            className="absolute top-6 right-6 text-white hover:text-red-400 p-2 cursor-pointer"
           >
             <X className="w-8 h-8" />
           </button>

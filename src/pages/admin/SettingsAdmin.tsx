@@ -23,11 +23,26 @@ import {
   Cpu,
   Landmark,
   Clock,
-  Compass
+  Compass,
+  HeartPulse,
+  Bell,
+  AlertCircle,
+  Megaphone,
+  ExternalLink,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  Layers,
+  Power,
+  Palette
 } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 import { FileUploadInput } from '../../UI_Componentes/ui/Form/FileUploadInput';
+import { useToast } from '../../UI_Componentes/ui';
 import { useTenant } from '../../tenant/TenantContext';
+import { IconPicker, getLucideIcon } from '../../components/common/IconPicker';
+
+// (rest of component)
 import { useTheme } from '../../themes/ThemeContext';
 import { 
   SkyBlueSlantedTemplate,
@@ -51,13 +66,43 @@ export const SettingsAdminPage: React.FC = () => {
   const [loginBgImageUrl, setLoginBgImageUrl] = useState('');
   const [previewTheme, setPreviewTheme] = useState<'light' | 'dark'>('light');
 
+  // Topbar Announcement & Helpline Card State
+  const [topbarActive, setTopbarActive] = useState(false);
+  const [topbarPosition, setTopbarPosition] = useState<'split' | 'center' | 'left' | 'right'>('split');
+  const [topbarIcon, setTopbarIcon] = useState('HeartPulse');
+  const [topbarHeadline, setTopbarHeadline] = useState('');
+  const [topbarBadgeText, setTopbarBadgeText] = useState('');
+  const [topbarLink1Text, setTopbarLink1Text] = useState('');
+  const [topbarLink1Url, setTopbarLink1Url] = useState('');
+  const [topbarLink2Text, setTopbarLink2Text] = useState('');
+  const [topbarLink2Url, setTopbarLink2Url] = useState('');
+  const [topbarLink2Highlight, setTopbarLink2Highlight] = useState(true);
+  const [topbarBgColor, setTopbarBgColor] = useState('#042f2e');
+  const [topbarTextColor, setTopbarTextColor] = useState('#ffffff');
+
+  const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
   const showNotification = (text: string, type: 'success' | 'error' = 'success') => {
-    setMessage({ text, type });
-    setTimeout(() => setMessage(null), 4000);
+    if (type === 'success') {
+      toast.success(text);
+    } else {
+      toast.error(text);
+    }
+  };
+
+  const getLegacyHex = (scheme?: string) => {
+    switch (scheme) {
+      case 'blue': return '#0f172a';
+      case 'indigo': return '#1e1b4b';
+      case 'emerald': return '#064e3b';
+      case 'crimson': return '#881337';
+      case 'amber': return '#78350f';
+      case 'dark': return '#020617';
+      case 'teal':
+      default: return '#042f2e';
+    }
   };
 
   const fetchSettings = async () => {
@@ -75,6 +120,36 @@ export const SettingsAdminPage: React.FC = () => {
         setOfficeHours(d.officeHours || d.socialLinks?.officeHours || 'Monday - Saturday: 9:00 AM - 5:00 PM');
         setGoogleMapsUrl(d.googleMapsUrl || d.socialLinks?.googleMapsUrl || '');
         setLoginBgImageUrl(d.loginBgImageUrl || '');
+
+        const topbar = d.socialLinks?.topbar;
+        const defaultHex = isMedical ? '#042f2e' : isArtsAndScience ? '#78350f' : isUniversity ? '#881337' : '#0f172a';
+        if (topbar) {
+          setTopbarActive(Boolean(topbar.isActive));
+          setTopbarPosition(topbar.position || 'split');
+          setTopbarIcon(topbar.icon || 'HeartPulse');
+          setTopbarHeadline(topbar.headline || '');
+          setTopbarBadgeText(topbar.badgeText || '');
+          setTopbarLink1Text(topbar.link1Text || '');
+          setTopbarLink1Url(topbar.link1Url || '');
+          setTopbarLink2Text(topbar.link2Text || '');
+          setTopbarLink2Url(topbar.link2Url || '');
+          setTopbarLink2Highlight(topbar.link2Highlight !== false);
+          setTopbarBgColor(topbar.bgColor || getLegacyHex(topbar.colorScheme) || defaultHex);
+          setTopbarTextColor(topbar.textColor || '#ffffff');
+        } else {
+          setTopbarActive(false);
+          setTopbarPosition('split');
+          setTopbarIcon(isMedical ? 'HeartPulse' : 'Phone');
+          setTopbarHeadline('');
+          setTopbarBadgeText('');
+          setTopbarLink1Text('');
+          setTopbarLink1Url('');
+          setTopbarLink2Text('');
+          setTopbarLink2Url('');
+          setTopbarLink2Highlight(true);
+          setTopbarBgColor(defaultHex);
+          setTopbarTextColor('#ffffff');
+        }
       }
     } catch (err) {
       console.error('Failed to load settings', err);
@@ -105,20 +180,34 @@ export const SettingsAdminPage: React.FC = () => {
         socialLinks: {
           ...(siteConfig?.settings?.socialLinks || {}),
           officeHours: officeHours.trim(),
-          googleMapsUrl: googleMapsUrl.trim()
+          googleMapsUrl: googleMapsUrl.trim(),
+          topbar: {
+            isActive: topbarActive,
+            position: topbarPosition,
+            icon: topbarIcon,
+            headline: topbarHeadline.trim(),
+            badgeText: topbarBadgeText.trim(),
+            link1Text: topbarLink1Text.trim(),
+            link1Url: topbarLink1Url.trim(),
+            link2Text: topbarLink2Text.trim(),
+            link2Url: topbarLink2Url.trim(),
+            link2Highlight: topbarLink2Highlight,
+            bgColor: topbarBgColor,
+            textColor: topbarTextColor,
+          }
         }
       };
 
       const res = await apiClient.put('/admin/profile/settings', payload);
       if (res.data.success) {
-        showNotification('College branding & header presentation successfully updated!');
+        showNotification('College branding, topbar & header settings successfully updated!');
         await refreshConfig();
       } else {
         showNotification(res.data.message || 'Failed to update settings', 'error');
       }
     } catch (err: any) {
       console.error(err);
-      showNotification('Error updating college branding', 'error');
+      showNotification('Error updating college settings', 'error');
     } finally {
       setSaving(false);
     }
@@ -211,24 +300,6 @@ export const SettingsAdminPage: React.FC = () => {
           <span>{saving ? 'Saving...' : 'Save All Changes'}</span>
         </button>
       </div>
-
-      {/* Notification banner */}
-      {message && (
-        <div
-          className={`p-3.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-all ${message.type === 'success'
-              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-              : 'bg-red-50 text-red-800 border border-red-200'
-            }`}
-        >
-          <div className="flex items-center gap-2">
-            {message.type === 'success' ? <Check className="w-4 h-4 text-emerald-600" /> : <X className="w-4 h-4 text-red-600" />}
-            <span>{message.text}</span>
-          </div>
-          <button onClick={() => setMessage(null)} className="text-slate-400 hover:text-slate-600">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      )}
 
       {loading ? (
         <div className="p-12 text-center text-slate-500 font-semibold bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
@@ -380,13 +451,323 @@ export const SettingsAdminPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Card 4: Website Header Live Preview & Interactive Controls (EDITABLE) */}
+          {/* Card 4: Topbar Announcement & Helpline Bar (DYNAMIC & EDITABLE) */}
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-xs space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Megaphone className="w-4 h-4 text-blue-600" />
+                  <span>4. Topbar Announcement &amp; Helpline Card</span>
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Configure topbar emergency helplines, urgent notices, accreditation highlights, and action links.
+                </p>
+              </div>
+
+              {/* Active / Inactive Switch */}
+              <button
+                type="button"
+                onClick={() => setTopbarActive(!topbarActive)}
+                className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer shadow-2xs ${
+                  topbarActive
+                    ? 'bg-emerald-500 text-white hover:bg-emerald-600'
+                    : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300'
+                }`}
+              >
+                <Power className="w-3.5 h-3.5" />
+                <span>{topbarActive ? 'ACTIVE (Visible on Site)' : 'INACTIVE (Hidden)'}</span>
+              </button>
+            </div>
+
+            {/* Live Interactive Preview */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-[11px] font-bold uppercase text-slate-600 dark:text-slate-400">
+                  Topbar Live Preview
+                </label>
+                <span className={`text-[10px] font-mono px-2 py-0.5 rounded-md ${
+                  topbarActive ? 'bg-emerald-100 text-emerald-800 font-bold' : 'bg-slate-100 text-slate-500'
+                }`}>
+                  {topbarActive ? '● Currently Enabled' : '○ Disabled (Hidden from visitors)'}
+                </span>
+              </div>
+
+              <div
+                style={topbarActive ? { backgroundColor: topbarBgColor, color: topbarTextColor, borderColor: 'rgba(255,255,255,0.15)' } : undefined}
+                className={`p-3 rounded-xl border overflow-hidden transition ${
+                  topbarActive 
+                    ? 'shadow-sm' 
+                    : 'bg-slate-100/80 dark:bg-slate-800/40 border-dashed border-slate-300 dark:border-slate-700 text-slate-400'
+                }`}
+              >
+                {topbarActive ? (
+                  <div className={`flex flex-wrap items-center gap-2 text-xs font-medium ${
+                    topbarPosition === 'center' ? 'justify-center text-center' :
+                    topbarPosition === 'left' ? 'justify-start text-left' :
+                    topbarPosition === 'right' ? 'justify-end text-right' :
+                    'justify-between'
+                  }`}>
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                      <span className="flex items-center gap-1.5 font-bold">
+                        {topbarIcon && topbarIcon !== 'None' && topbarIcon !== 'none' && (() => {
+                          const LiveIcon = getLucideIcon(topbarIcon);
+                          const isPulse = topbarIcon === 'HeartPulse' || topbarIcon === 'Activity';
+                          return <LiveIcon className={`w-3.5 h-3.5 shrink-0 ${isPulse ? 'animate-pulse text-rose-400' : ''}`} />;
+                        })()}
+                        <span>{topbarHeadline || 'Enter headline / emergency helpline text below...'}</span>
+                      </span>
+                      {topbarBadgeText && (
+                        <>
+                          <span className="opacity-40">|</span>
+                          <span className="opacity-80 text-[11px] font-normal">{topbarBadgeText}</span>
+                        </>
+                      )}
+                    </div>
+                    {(topbarLink1Text || topbarLink2Text) && (
+                      <div className="flex items-center gap-2 text-[11px]">
+                        {topbarLink1Text && <span className="underline opacity-90">{topbarLink1Text}</span>}
+                        {topbarLink1Text && topbarLink2Text && <span className="opacity-40">•</span>}
+                        {topbarLink2Text && (
+                          <span className={topbarLink2Highlight ? 'bg-amber-400 text-slate-950 font-bold px-1.5 py-0.5 rounded text-[10px]' : 'underline'}>
+                            {topbarLink2Text}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="py-2 text-center text-xs space-y-1">
+                    <p className="font-semibold text-slate-500">Topbar is currently turned OFF.</p>
+                    <p className="text-[11px]">Toggle the switch above to activate and display it on your public website.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Topbar Layout & Content Configuration */}
+            <div className="space-y-4 pt-2">
+              {/* Row 1: Position Alignment & Icon */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                <div>
+                  <label className="block text-[11px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1.5">
+                    Layout Alignment / Position
+                  </label>
+                  <div className="grid grid-cols-4 gap-1.5 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
+                    {[
+                      { key: 'split', label: 'Split', icon: <Layers className="w-3 h-3" /> },
+                      { key: 'center', label: 'Center', icon: <AlignCenter className="w-3 h-3" /> },
+                      { key: 'left', label: 'Left', icon: <AlignLeft className="w-3 h-3" /> },
+                      { key: 'right', label: 'Right', icon: <AlignRight className="w-3 h-3" /> },
+                    ].map((p) => (
+                      <button
+                        key={p.key}
+                        type="button"
+                        onClick={() => setTopbarPosition(p.key as any)}
+                        className={`py-1.5 rounded-lg text-xs font-semibold flex flex-col items-center gap-1 transition cursor-pointer ${
+                          topbarPosition === p.key
+                            ? 'bg-white dark:bg-slate-900 text-blue-600 shadow-xs'
+                            : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                        }`}
+                      >
+                        {p.icon}
+                        <span className="text-[10px]">{p.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1.5 flex items-center justify-between">
+                    <span>Helpline / Alert Icon</span>
+                    {topbarIcon && <span className="font-mono text-[10px] text-blue-600 dark:text-blue-400 font-bold">{topbarIcon}</span>}
+                  </label>
+                  <IconPicker
+                    value={topbarIcon}
+                    onChange={(newIcon) => setTopbarIcon(newIcon)}
+                    placeholder="Search & choose any icon..."
+                  />
+                </div>
+              </div>
+
+              {/* Color Customizer */}
+              <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                    <Palette className="w-3.5 h-3.5 text-blue-600" />
+                    Topbar Color Customizer
+                  </span>
+                  <span className="text-[10px] text-slate-400">Custom background and text colors</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1 flex items-center justify-between">
+                      <span>Background Color</span>
+                      <span className="font-mono text-blue-600">{topbarBgColor}</span>
+                    </label>
+                    <div className="flex items-center gap-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-1.5 shadow-2xs">
+                      <input
+                        type="color"
+                        value={topbarBgColor}
+                        onChange={(e) => setTopbarBgColor(e.target.value)}
+                        className="w-7 h-7 rounded border-0 cursor-pointer p-0 bg-transparent shrink-0"
+                      />
+                      <input
+                        type="text"
+                        value={topbarBgColor}
+                        onChange={(e) => setTopbarBgColor(e.target.value)}
+                        placeholder="#042f2e"
+                        className="w-full bg-transparent text-xs font-mono font-bold uppercase text-slate-800 dark:text-slate-100 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1 flex items-center justify-between">
+                      <span>Text &amp; Link Color</span>
+                      <span className="font-mono text-blue-600">{topbarTextColor}</span>
+                    </label>
+                    <div className="flex items-center gap-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-1.5 shadow-2xs">
+                      <input
+                        type="color"
+                        value={topbarTextColor}
+                        onChange={(e) => setTopbarTextColor(e.target.value)}
+                        className="w-7 h-7 rounded border-0 cursor-pointer p-0 bg-transparent shrink-0"
+                      />
+                      <input
+                        type="text"
+                        value={topbarTextColor}
+                        onChange={(e) => setTopbarTextColor(e.target.value)}
+                        placeholder="#ffffff"
+                        className="w-full bg-transparent text-xs font-mono font-bold uppercase text-slate-800 dark:text-slate-100 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-1.5 border-t border-slate-200 dark:border-slate-700 flex items-center gap-1.5 flex-wrap">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase">Presets:</span>
+                  {[
+                    { label: 'Dark Teal', bg: '#042f2e', text: '#ffffff' },
+                    { label: 'Deep Blue', bg: '#0f172a', text: '#ffffff' },
+                    { label: 'Royal Indigo', bg: '#1e1b4b', text: '#ffffff' },
+                    { label: 'Emerald', bg: '#064e3b', text: '#ffffff' },
+                    { label: 'Crimson', bg: '#881337', text: '#ffffff' },
+                    { label: 'Warm Amber', bg: '#78350f', text: '#ffffff' },
+                    { label: 'Slate Dark', bg: '#020617', text: '#ffffff' },
+                  ].map((s) => (
+                    <button
+                      key={s.bg}
+                      type="button"
+                      onClick={() => {
+                        setTopbarBgColor(s.bg);
+                        setTopbarTextColor(s.text);
+                      }}
+                      className="px-2 py-0.5 rounded text-[10px] font-semibold border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-blue-500 cursor-pointer transition flex items-center gap-1"
+                    >
+                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: s.bg }} />
+                      <span>{s.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Row 2: Headline & Secondary Badge Text */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                <div>
+                  <label className="block text-[11px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">
+                    Primary Headline / Emergency Helpline Text
+                  </label>
+                  <input
+                    type="text"
+                    value={topbarHeadline}
+                    onChange={(e) => setTopbarHeadline(e.target.value)}
+                    placeholder="e.g. 24/7 Casualty & Hospital Helpline: +91 98765 43210"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-xs text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-600 focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">
+                    Secondary Accreditation / Highlight Text
+                  </label>
+                  <input
+                    type="text"
+                    value={topbarBadgeText}
+                    onChange={(e) => setTopbarBadgeText(e.target.value)}
+                    placeholder="e.g. NMC Recognized · 1200-Bed Teaching Hospital"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-xs text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-600 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Row 3: Action Links 1 & 2 */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                <div className="space-y-2">
+                  <span className="text-[11px] font-bold uppercase text-slate-700 dark:text-slate-300 block">
+                    Action Link 1 (Standard Link)
+                  </span>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="text"
+                      placeholder="Label (e.g. Patient Desk)"
+                      value={topbarLink1Text}
+                      onChange={(e) => setTopbarLink1Text(e.target.value)}
+                      className="px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-xs dark:bg-slate-800 dark:text-white"
+                    />
+                    <input
+                      type="text"
+                      placeholder="URL (e.g. /contact)"
+                      value={topbarLink1Url}
+                      onChange={(e) => setTopbarLink1Url(e.target.value)}
+                      className="px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-xs dark:bg-slate-800 dark:text-white font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold uppercase text-slate-700 dark:text-slate-300 block">
+                      Action Link 2 (Highlighted Admission CTA)
+                    </span>
+                    <label className="flex items-center gap-1.5 text-[10px] font-semibold text-amber-600 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={topbarLink2Highlight}
+                        onChange={(e) => setTopbarLink2Highlight(e.target.checked)}
+                        className="rounded"
+                      />
+                      <span>Gold Highlight Badge</span>
+                    </label>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="text"
+                      placeholder="Label (e.g. NEET Admissions 2026)"
+                      value={topbarLink2Text}
+                      onChange={(e) => setTopbarLink2Text(e.target.value)}
+                      className="px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-xs dark:bg-slate-800 dark:text-white"
+                    />
+                    <input
+                      type="text"
+                      placeholder="URL (e.g. /admissions)"
+                      value={topbarLink2Url}
+                      onChange={(e) => setTopbarLink2Url(e.target.value)}
+                      className="px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-xs dark:bg-slate-800 dark:text-white font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 5: Website Header Live Preview & Interactive Controls (EDITABLE) */}
           <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-xs space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
                   <Globe className="w-4 h-4 text-blue-600" />
-                  <span>4. Website Header Live Preview & Layout Controls</span>
+                  <span>5. Website Header Live Preview &amp; Layout Controls</span>
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">
                   Interactive real-time preview of how the header appears to public visitors.
@@ -451,18 +832,47 @@ export const SettingsAdminPage: React.FC = () => {
 
             {/* Full Public Website Header Live Preview UI Box */}
             <div className="rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-md">
-              {/* Announcement Bar Simulation */}
-              <div className="bg-amber-500 text-slate-950 px-4 py-1.5 text-[11px] font-bold flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="bg-slate-950 text-amber-400 px-2 py-0.5 rounded text-[10px] uppercase font-black">
-                    ALERTS
-                  </span>
-                  <span className="truncate">Admissions Open 2026 • Campus Placement Drive Active</span>
+              {/* Topbar Announcement Simulation (Dynamic based on topbarActive) */}
+              {topbarActive && (
+                <div
+                  style={{ backgroundColor: topbarBgColor, color: topbarTextColor, borderColor: 'rgba(255,255,255,0.15)' }}
+                  className={`px-4 py-1.5 text-[11px] font-medium flex items-center gap-2 border-b ${
+                    topbarPosition === 'center' ? 'justify-center text-center' :
+                    topbarPosition === 'left' ? 'justify-start text-left' :
+                    topbarPosition === 'right' ? 'justify-end text-right' :
+                    'justify-between'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="flex items-center gap-1.5 font-bold">
+                      {topbarIcon === 'HeartPulse' && <HeartPulse className="w-3.5 h-3.5 text-rose-400 animate-pulse" />}
+                      {topbarIcon === 'Phone' && <Phone className="w-3.5 h-3.5 text-emerald-400" />}
+                      {topbarIcon === 'Bell' && <Bell className="w-3.5 h-3.5 text-amber-400" />}
+                      {topbarIcon === 'AlertCircle' && <AlertCircle className="w-3.5 h-3.5 text-red-400" />}
+                      {topbarIcon === 'Sparkles' && <Sparkles className="w-3.5 h-3.5 text-yellow-400" />}
+                      {topbarIcon === 'Megaphone' && <Megaphone className="w-3.5 h-3.5 text-cyan-400" />}
+                      <span>{topbarHeadline || '24/7 Casualty & Helpline / Announcement'}</span>
+                    </span>
+                    {topbarBadgeText && (
+                      <>
+                        <span className="opacity-40">|</span>
+                        <span className="opacity-80 text-[10px]">{topbarBadgeText}</span>
+                      </>
+                    )}
+                  </div>
+                  {(topbarLink1Text || topbarLink2Text) && (
+                    <div className="flex items-center gap-2 text-[10px]">
+                      {topbarLink1Text && <span className="underline opacity-90">{topbarLink1Text}</span>}
+                      {topbarLink1Text && topbarLink2Text && <span className="opacity-40">•</span>}
+                      {topbarLink2Text && (
+                        <span className={topbarLink2Highlight ? 'bg-amber-400 text-slate-950 font-bold px-1.5 py-0.5 rounded' : 'underline'}>
+                          {topbarLink2Text}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
-                <div className="hidden sm:block text-[10px] font-black uppercase tracking-wider">
-                  Official University Portal
-                </div>
-              </div>
+              )}
 
               {/* Main Header Container Simulation */}
               <div

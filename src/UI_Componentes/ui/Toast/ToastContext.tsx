@@ -8,6 +8,10 @@ interface ToastContextType {
     warning: (message: string, title?: string, duration?: number) => void;
     info: (message: string, title?: string, duration?: number) => void;
   };
+  success: (message: string, title?: string, duration?: number) => void;
+  error: (message: string, title?: string, duration?: number) => void;
+  warning: (message: string, title?: string, duration?: number) => void;
+  info: (message: string, title?: string, duration?: number) => void;
   dismissToast: (id: string) => void;
 }
 
@@ -21,7 +25,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, []);
 
   const addToast = useCallback(
-    (type: ToastType, message: string, title?: string, duration = 4000) => {
+    (type: ToastType, message: string, title?: string, duration = 1500) => {
       const id = Math.random().toString(36).substring(2, 9);
       const newToast: ToastItem = { id, type, message, title, duration };
 
@@ -48,13 +52,20 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   return (
-    <ToastContext.Provider value={{ toast, dismissToast }}>
+    <ToastContext.Provider value={{
+      toast,
+      success: toast.success,
+      error: toast.error,
+      warning: toast.warning,
+      info: toast.info,
+      dismissToast
+    }}>
       {children}
 
-      {/* Floating Toasts Viewport */}
+      {/* Floating Right-Side Toasts Viewport */}
       <div
         aria-live="assertive"
-        className="fixed top-5 right-5 z-50 flex flex-col gap-2.5 pointer-events-none max-w-sm w-full"
+        className="fixed top-6 right-6 z-[9999] flex flex-col gap-2.5 pointer-events-none max-w-sm w-full"
       >
         {toasts.map((t) => (
           <div key={t.id} className="pointer-events-auto">

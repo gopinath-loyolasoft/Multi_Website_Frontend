@@ -1,19 +1,28 @@
-﻿import { TemplatePackage } from '../contracts/TemplateContracts';
+import { TemplatePackage } from '../contracts/TemplateContracts';
 import { universityConfig } from './config';
+import { UNIVERSITY_THEME } from './theme';
 import { UniversityHeader } from './UniversityHeader';
 import { UniversityPageHero } from './UniversityPageHero';
 import { UniversityFooter } from './UniversityFooter';
-import { UniversityHeroTemplate } from '../../components/sections/hero-templates/UniversityHeroTemplate';
+import { UniversityHeroTemplate } from './UniversityHeroTemplate';
 
-export const universityTemplate: TemplatePackage = {
+export const UniversityTemplatePackage: TemplatePackage = {
   config: universityConfig,
+  themeStyles: UNIVERSITY_THEME,
   Header: UniversityHeader,
   PageHero: UniversityPageHero,
   Footer: UniversityFooter,
-  Hero: UniversityHeroTemplate
+  Hero: UniversityHeroTemplate,
 };
 
-export * from './config';
-export * from './UniversityHeader';
-export * from './UniversityPageHero';
-export * from './UniversityFooter';
+export const universityTemplate = UniversityTemplatePackage;
+export const UNIVERSITY_CONFIG = universityConfig;
+
+export {
+  universityConfig,
+  UNIVERSITY_THEME,
+  UniversityHeader,
+  UniversityPageHero,
+  UniversityFooter,
+  UniversityHeroTemplate,
+};

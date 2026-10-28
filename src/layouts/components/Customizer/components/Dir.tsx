@@ -1,4 +1,4 @@
-import { useLayoutContext } from '@/context/useLayoutContext'
+import { useLayoutContext } from '@/contexts/useLayoutContext'
 import type { CustomizationOptionType } from '../index'
 
 import ltrImg from '@/assets/images/layouts/dir-ltr.png'

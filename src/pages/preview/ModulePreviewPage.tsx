@@ -26,7 +26,8 @@ import {
   Trophy,
   Briefcase,
   FileCheck,
-  TrendingUp
+  TrendingUp,
+  Megaphone
 } from 'lucide-react';
 
 const getPreviewStatIcon = (iconName?: string) => {
@@ -55,6 +56,7 @@ const getPreviewStatIcon = (iconName?: string) => {
   }
 };
 import { useTenant } from '../../tenant/TenantContext';
+import { TopbarAnnouncementBar } from '../../components/common/TopbarAnnouncementBar';
 import { MarqueeBar } from '../../components/common/MarqueeBar';
 import { NewsSection } from '../../components/sections/NewsSection';
 import { EventsSection } from '../../components/sections/EventsSection';
@@ -89,6 +91,7 @@ export const ModulePreviewPage: React.FC = () => {
 
   // Map module keys to metadata
   const moduleMeta: Record<string, { name: string; icon: React.ElementType; desc: string }> = {
+    topbar: { name: 'Topbar Announcement Card', icon: Megaphone, desc: 'Top helpline, accreditation, and announcement banner' },
     marquee: { name: 'Marquee Announcement Ticker', icon: Volume2, desc: 'Top rolling notification banner' },
     header: { name: 'Navigation Menu & Top Header', icon: MenuIcon, desc: 'Main navigation bar with dropdowns' },
     menus: { name: 'Navigation Menu & Top Header', icon: MenuIcon, desc: 'Main navigation bar with dropdowns' },
@@ -146,6 +149,7 @@ export const ModulePreviewPage: React.FC = () => {
             }}
             className="px-3 py-1 rounded-lg bg-slate-950 border border-slate-800 text-xs font-semibold text-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
           >
+            <option value="topbar">Topbar Announcement Card</option>
             <option value="marquee">Marquee Ticker</option>
             <option value="header">Navigation Header</option>
             <option value="banners">Hero Banners</option>
@@ -178,6 +182,33 @@ export const ModulePreviewPage: React.FC = () => {
       <div className="flex-1 overflow-y-auto bg-slate-100 dark:bg-slate-950 p-4 sm:p-8 flex flex-col items-center justify-center">
         <div className="w-full max-w-7xl bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden min-h-[400px]">
           
+          {/* Module 0: TOPBAR CARD */}
+          {activeModule === 'topbar' && (
+            <div className="p-6 space-y-6">
+              <div className="p-3 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 rounded-xl text-xs text-blue-900 dark:text-blue-200 font-medium flex items-center justify-between">
+                <span>Rendering isolated Topbar Announcement &amp; Helpline Card:</span>
+                <span className="font-mono text-[10px] bg-blue-100 dark:bg-blue-900 px-2 py-0.5 rounded font-bold">Header Top</span>
+              </div>
+
+              <div className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm">
+                <TopbarAnnouncementBar siteConfig={siteConfig} />
+              </div>
+
+              {/* Notice when inactive */}
+              {siteConfig?.settings?.socialLinks?.topbar?.isActive === false && (
+                <div className="p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl text-xs text-amber-800 dark:text-amber-300 font-medium">
+                  Note: Topbar Card is currently set to <strong>INACTIVE</strong> in database settings, so it returns null for public visitors until enabled in the admin portal.
+                </div>
+              )}
+
+              {/* Sample Context Cards */}
+              <div className="p-8 text-center text-slate-400 border border-dashed border-slate-300 dark:border-slate-800 rounded-xl">
+                <p className="text-xs font-semibold">Topbar Card Module isolation frame active.</p>
+                <p className="text-[11px] text-slate-500 mt-1">Changes made in Topbar Card Admin reflect across all templates.</p>
+              </div>
+            </div>
+          )}
+
           {/* Module 1: MARQUEE */}
           {activeModule === 'marquee' && (
             <div className="p-6 space-y-6">
@@ -407,40 +438,50 @@ export const ModulePreviewPage: React.FC = () => {
 
               <div className="max-w-4xl mx-auto p-6 sm:p-10 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl flex flex-col md:flex-row items-center gap-6 sm:gap-10 relative overflow-hidden">
                 <div className="absolute top-0 left-0 right-0 h-1 bg-primary" />
-                <div className="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-full overflow-hidden border-4 border-primary/25 shadow-xl bg-slate-100 dark:bg-slate-800 shrink-0 relative">
-                  <img
-                    key={siteConfig?.quote?.authorImageUrl || siteConfig?.quote?.authorImage || '/assets/templates/common/leader_portrait.svg'}
-                    src={
-                      siteConfig?.quote?.authorImageUrl ||
-                      siteConfig?.quote?.authorImage ||
-                      '/assets/templates/common/leader_portrait.svg'
-                    }
-                    alt={siteConfig?.quote?.authorName || 'Leadership'}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        '/assets/templates/common/leader_portrait.svg';
-                    }}
-                  />
-                  <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-md">
-                    <Quote className="w-4 h-4" />
+                {(siteConfig?.quote?.authorImageUrl || siteConfig?.quote?.authorImage) ? (
+                  <div className="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-full overflow-hidden border-4 border-primary/25 shadow-xl bg-slate-100 dark:bg-slate-800 shrink-0 relative">
+                    <img
+                      key={siteConfig?.quote?.authorImageUrl || siteConfig?.quote?.authorImage}
+                      src={
+                        siteConfig?.quote?.authorImageUrl ||
+                        siteConfig?.quote?.authorImage
+                      }
+                      alt={siteConfig?.quote?.authorName || 'Leadership'}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = 'none';
+                      }}
+                    />
+                    <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-md">
+                      <Quote className="w-4 h-4" />
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                    <Quote className="w-8 h-8" />
+                  </div>
+                )}
                 <div className="space-y-3 text-center md:text-left flex-1">
                   <blockquote className="text-base sm:text-lg lg:text-xl font-serif italic text-slate-800 dark:text-slate-100 leading-relaxed">
                     "{siteConfig?.quote?.quoteText || 'Empowering learners to think innovatively, solve real-world problems, and lead humanity forward with ethical excellence.'}"
                   </blockquote>
-                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
-                    <div className="font-bold text-base text-slate-900 dark:text-white">
-                      {siteConfig?.quote?.authorName || 'Dr. Aruna Krishnan, Ph.D.'}
+                  {(siteConfig?.quote?.authorName || siteConfig?.quote?.designation || siteConfig?.quote?.authorTitle || siteConfig?.quote?.subText) && (
+                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                      {siteConfig?.quote?.authorName && (
+                        <div className="font-bold text-base text-slate-900 dark:text-white">
+                          {siteConfig.quote.authorName}
+                        </div>
+                      )}
+                      {(siteConfig?.quote?.designation || siteConfig?.quote?.authorTitle) && (
+                        <div className="text-xs sm:text-sm font-semibold text-primary">
+                          {siteConfig?.quote?.designation || siteConfig?.quote?.authorTitle}
+                        </div>
+                      )}
+                      {siteConfig?.quote?.subText && (
+                        <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{siteConfig.quote.subText}</div>
+                      )}
                     </div>
-                    <div className="text-xs sm:text-sm font-semibold text-primary">
-                      {siteConfig?.quote?.designation || siteConfig?.quote?.authorTitle || 'Principal & Dean'}
-                    </div>
-                    {siteConfig?.quote?.subText && (
-                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{siteConfig.quote.subText}</div>
-                    )}
-                  </div>
+                  )}
                 </div>
               </div>
             </div>

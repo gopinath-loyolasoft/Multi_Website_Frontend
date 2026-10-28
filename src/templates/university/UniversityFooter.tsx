@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { ExternalLink, Mail, MapPin, Phone } from 'lucide-react';
 import { TemplateFooterProps } from '../contracts/TemplateContracts';
@@ -34,25 +34,27 @@ export const UniversityFooter: React.FC<TemplateFooterProps> = ({ siteConfig }) 
         {/* Col 3: Academic Faculties */}
         <div>
           <h4 className="text-xs font-black text-white uppercase tracking-wider mb-4 border-b border-slate-800/80 pb-2">
-            University Faculties
+            Academic Faculties
           </h4>
           <ul className="space-y-2 text-xs">
-            <li><Link to="/departments" className="hover:text-white transition">Faculties & Centers</Link></li>
-            <li><Link to="/courses" className="text-rose-400 font-bold hover:underline">Academic Degrees →</Link></li>
+            <li><Link to="/departments" className="hover:text-white transition">Faculties & Research Centers</Link></li>
+            <li><Link to="/courses" className="text-rose-400 font-bold hover:underline">Degree Curricula & Syllabi →</Link></li>
+            <li><Link to="/library" className="hover:text-white transition">Central Library & Archives</Link></li>
+            <li><Link to="/faculty" className="hover:text-white transition">Chaired Professors</Link></li>
           </ul>
         </div>
 
-        {/* Col 4: Quick Student Links */}
+        {/* Col 4: Campus Life & Portals */}
         <div>
           <h4 className="text-xs font-black text-white uppercase tracking-wider mb-4 border-b border-slate-800/80 pb-2">
-            University Portal
+            University Portals
           </h4>
           <ul className="space-y-2 text-xs">
-            <li><Link to="/admissions" className="hover:text-white transition">Admissions</Link></li>
-            <li><Link to="/events" className="hover:text-white transition">Conferences & Events</Link></li>
-            <li><Link to="/gallery" className="hover:text-white transition">Campus Panorama</Link></li>
-            <li><Link to="/faculty" className="hover:text-white transition">Chaired Professors</Link></li>
-            <li><Link to="/news" className="hover:text-white transition">Gazette & Press</Link></li>
+            <li><Link to="/placements" className="hover:text-white transition">Career Development & Placement</Link></li>
+            <li><Link to="/transport" className="hover:text-white transition">Campus Transit & Shuttles</Link></li>
+            <li><Link to="/hostels" className="hover:text-white transition">Halls of Residence</Link></li>
+            <li><Link to="/alumni" className="hover:text-white transition">Global Alumni Network</Link></li>
+            <li><Link to="/compliance" className="hover:text-white transition text-rose-300 font-medium">UGC & Statutory Disclosures</Link></li>
           </ul>
         </div>
 

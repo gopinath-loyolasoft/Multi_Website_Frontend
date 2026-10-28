@@ -1,4 +1,4 @@
-﻿import { Landmark } from 'lucide-react';
+import { Landmark } from 'lucide-react';
 import { TemplateConfig } from '../contracts/TemplateContracts';
 
 export const universityConfig: TemplateConfig = {
@@ -10,7 +10,7 @@ export const universityConfig: TemplateConfig = {
   nameFont: 'font-serif font-black tracking-tight text-white',
   titleFont: 'font-serif',
   badgeFont: 'font-sans font-extrabold uppercase text-rose-400 tracking-wider text-[10px]',
-  defaultBadge: 'Central Research University • Multi-Faculty',
+  defaultBadge: '',
   crestBg: 'bg-rose-900 shadow-rose-950/25',
   CrestIcon: Landmark,
   heroGradient: 'bg-gradient-to-r from-rose-950 via-slate-950 to-slate-900',

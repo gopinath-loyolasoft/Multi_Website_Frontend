@@ -23,13 +23,19 @@ import {
   Unlock,
   RotateCcw,
   Sparkles,
+  ClipboardCopy,
+  ClipboardPaste,
+  FolderDown,
+  Download,
+  Files,
+  ExternalLink,
 } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 import { useTenant } from '../../tenant/TenantContext';
 import { PageSection, SectionSettings } from '../../types';
 import { FormDrawer, Drawer, Input, Select, Switch, LivePreviewModal, ConfirmDialog } from '../../UI_Componentes/ui';
 import { SectionContentEditor } from '../../components/admin/SectionContentEditor';
-// import { VisualSectionPickerModal, SectionBlockPreset } from '../../components/admin/VisualSectionPickerModal';
+import { SectionWizardDrawer } from '../../components/admin/SectionWizardDrawer';
 import { slugify, copyToClipboard } from '../../utils/helpers';
 
 interface AdminPageItem {
@@ -50,6 +56,7 @@ interface SectionTypeItem {
 }
 
 const SECTION_TYPE_CATALOG: SectionTypeItem[] = [
+  { code: 'CUSTOM_CANVAS', name: 'Visual Drag & Drop Canvas' },
   { code: 'HERO', name: 'Hero Banner' },
   { code: 'HERO_SLIDER', name: 'Hero Slider' },
   { code: 'BANNERS', name: 'Banners (Slider)' },
@@ -61,12 +68,24 @@ const SECTION_TYPE_CATALOG: SectionTypeItem[] = [
   { code: 'STATISTICS', name: 'Statistics' },
   { code: 'STATS', name: 'Stats (alias)' },
   { code: 'ICON_CARDS', name: 'Icon Cards' },
+  { code: 'DOCUMENTS', name: 'Document / PDF Downloads' },
+  { code: 'TABLE', name: 'Data Table / Matrix' },
+  { code: 'TIMELINE', name: 'Timeline / Milestones' },
+  { code: 'TABS', name: 'Tabs / Switchable Content' },
+  { code: 'TESTIMONIALS', name: 'Testimonials / Stories' },
+  { code: 'EMBED', name: 'Embed / Virtual Tour' },
   { code: 'NEWS', name: 'News Feed' },
   { code: 'EVENTS', name: 'Events Feed' },
   { code: 'NOTICES', name: 'Notices' },
-  { code: 'COURSES', name: 'Courses' },
+  { code: 'COURSES', name: 'Courses & Programs' },
   { code: 'DEPARTMENTS', name: 'Departments' },
   { code: 'FACULTY', name: 'Faculty' },
+  { code: 'PLACEMENTS', name: 'Placement Partners (Logo Marquee)' },
+  { code: 'COMPLIANCE', name: 'Mandatory Disclosures & Statutory Compliance' },
+  { code: 'HOSTELS', name: 'Hostel & Mess Facilities' },
+  { code: 'TRANSPORT', name: 'Transport & Bus Routes' },
+  { code: 'LIBRARY', name: 'Library & E-Resources' },
+  { code: 'ALUMNI', name: 'Alumni Network & Spotlight' },
   { code: 'GALLERY', name: 'Gallery' },
   { code: 'CTA', name: 'Call to Action' },
   { code: 'CALL_TO_ACTION', name: 'Call to Action (alias)' },
@@ -75,6 +94,219 @@ const SECTION_TYPE_CATALOG: SectionTypeItem[] = [
   { code: 'FAQ', name: 'FAQ' },
   { code: 'CONTACT', name: 'Contact Form' },
   { code: 'MAP', name: 'Map' },
+];
+
+export interface SystemModulePreset {
+  type: string;
+  name: string;
+  category: 'ACADEMICS' | 'FACILITIES' | 'COMPLIANCE_PLACEMENTS' | 'MEDIA_NEWS' | 'CONTENT';
+  categoryLabel: string;
+  icon: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  badge: string;
+}
+
+export const SYSTEM_MODULE_PRESETS: SystemModulePreset[] = [
+  {
+    type: 'PLACEMENTS',
+    name: 'Placement Partners (Logo Marquee & CTC)',
+    category: 'COMPLIANCE_PLACEMENTS',
+    categoryLabel: 'Corporate & Placements',
+    icon: '🏢',
+    title: 'Placement Partners',
+    subtitle: 'Our students are placed in leading global organizations',
+    description: 'Continuous animated right-to-left logo marquee of corporate recruiters, hiring companies, and CTC salary highlights.',
+    badge: 'Corporate',
+  },
+  {
+    type: 'COMPLIANCE',
+    name: 'Mandatory Disclosures & Statutory Compliance',
+    category: 'COMPLIANCE_PLACEMENTS',
+    categoryLabel: 'Corporate & Compliance',
+    icon: '📄',
+    title: 'Mandatory Disclosures & Statutory Compliance',
+    subtitle: 'Official statutory compliance documents and AICTE regulatory disclosures',
+    description: 'AICTE, UGC, NAAC, NIRF approval letters, anti-ragging policies, and searchable PDF circulars.',
+    badge: 'Compliance',
+  },
+  {
+    type: 'TRANSPORT',
+    name: 'Campus Transport & Bus Services',
+    category: 'FACILITIES',
+    categoryLabel: 'Campus Facilities',
+    icon: '🚌',
+    title: 'Campus Transport & Bus Services',
+    subtitle: 'Comprehensive fleet connecting major transit hubs to campus',
+    description: 'College bus route schedules, pickup stops, departure timings, bus numbers, and driver contact cards.',
+    badge: 'Transit',
+  },
+  {
+    type: 'HOSTELS',
+    name: 'Hostels & Residential Living',
+    category: 'FACILITIES',
+    categoryLabel: 'Campus Facilities',
+    icon: '🏠',
+    title: 'Hostels & Residential Facilities',
+    subtitle: 'Safe, comfortable, and modern campus housing for students',
+    description: 'Boys & Girls hostel capacity, room types (AC/Non-AC), amenities, mess menu, and warden contacts.',
+    badge: 'Living',
+  },
+  {
+    type: 'LIBRARY',
+    name: 'Central Library & E-Resources',
+    category: 'FACILITIES',
+    categoryLabel: 'Campus Facilities',
+    icon: '📚',
+    title: 'Central Library & Learning Resources',
+    subtitle: 'Access e-journals, previous question papers, and academic repositories',
+    description: 'Digital library catalog, previous question papers, IEEE e-journals, and departmental book archives.',
+    badge: 'Library',
+  },
+  {
+    type: 'ALUMNI',
+    name: 'Alumni Network & Spotlight',
+    category: 'COMPLIANCE_PLACEMENTS',
+    categoryLabel: 'Corporate & Placements',
+    icon: '🎓',
+    title: 'Distinguished Alumni',
+    subtitle: 'Celebrating our graduates leading industries around the globe',
+    description: 'Distinguished alumni career stories, graduation batch years, designations, and global company spotlights.',
+    badge: 'Alumni',
+  },
+  {
+    type: 'DEPARTMENTS',
+    name: 'Academic Departments & Schools',
+    category: 'ACADEMICS',
+    categoryLabel: 'Academics & Degrees',
+    icon: '🏛️',
+    title: 'Academic Departments',
+    subtitle: 'Specialized schools offering cutting-edge undergraduate & postgraduate disciplines',
+    description: 'Specialized engineering, science, arts, management, and medical school profiles with lab specifications.',
+    badge: 'Academics',
+  },
+  {
+    type: 'COURSES',
+    name: 'Courses & Degree Programs',
+    category: 'ACADEMICS',
+    categoryLabel: 'Academics & Degrees',
+    icon: '🎓',
+    title: 'Courses & Programs',
+    subtitle: 'Industry-aligned degree tracks designed for professional success',
+    description: 'Undergraduate, Postgraduate, Diploma, and Ph.D. program cards with duration and eligibility badges.',
+    badge: 'Degrees',
+  },
+  {
+    type: 'FACULTY',
+    name: 'Distinguished Faculty Directory',
+    category: 'ACADEMICS',
+    categoryLabel: 'Academics & Degrees',
+    icon: '👨‍🏫',
+    title: 'Distinguished Faculty',
+    subtitle: 'Renowned researchers, doctorate scholars, and industry fellows',
+    description: 'Professor headshots, academic designations, department affiliations, and research areas.',
+    badge: 'Faculty',
+  },
+  {
+    type: 'NEWS',
+    name: 'Campus News & Publications',
+    category: 'MEDIA_NEWS',
+    categoryLabel: 'Media & Updates',
+    icon: '📰',
+    title: 'Latest Campus News',
+    subtitle: 'Discover research breakthroughs, honors, and campus updates',
+    description: 'Dynamic news articles, press releases, research publications, and campus milestones with date tags.',
+    badge: 'News',
+  },
+  {
+    type: 'EVENTS',
+    name: 'Upcoming Campus Events & Fests',
+    category: 'MEDIA_NEWS',
+    categoryLabel: 'Media & Updates',
+    icon: '📅',
+    title: 'Upcoming Campus Events',
+    subtitle: 'Academic conferences, symposiums, student fests, and cultural celebrations',
+    description: 'Interactive events cards with calendar badges, venue details, and registration links.',
+    badge: 'Events',
+  },
+  {
+    type: 'NOTICES',
+    name: 'Official Notice Board',
+    category: 'MEDIA_NEWS',
+    categoryLabel: 'Media & Updates',
+    icon: '📢',
+    title: 'Official Notice Board',
+    subtitle: 'Important administrative updates, examination schedules, and circulars',
+    description: 'Pinned administrative circulars, exam notifications, and downloadable notices.',
+    badge: 'Notices',
+  },
+  {
+    type: 'GALLERY',
+    name: 'Campus Photo Gallery',
+    category: 'MEDIA_NEWS',
+    categoryLabel: 'Media & Updates',
+    icon: '🖼️',
+    title: 'Campus Photo Gallery',
+    subtitle: 'A visual journey across our world-class facilities',
+    description: 'Curated photo grid showcasing campus architecture, labs, library, auditoriums, and sports grounds.',
+    badge: 'Gallery',
+  },
+  {
+    type: 'TESTIMONIALS',
+    name: 'Student & Alumni Testimonials',
+    category: 'CONTENT',
+    categoryLabel: 'Content & Impact',
+    icon: '💬',
+    title: 'Voices of Our Achievers',
+    subtitle: 'Read authentic reflections from graduates shaping global industries',
+    description: 'Student quotes, star ratings, career reflections, and recruiter testimonials.',
+    badge: 'Stories',
+  },
+  {
+    type: 'STATISTICS',
+    name: 'Statistics & Milestone Counters',
+    category: 'CONTENT',
+    categoryLabel: 'Content & Impact',
+    icon: '📊',
+    title: 'Campus at a Glance',
+    subtitle: 'Excellence in numbers — ranking, placements, research & community',
+    description: 'Animated counters for student enrollment, placement percentage, campus acres, and NIRF rank.',
+    badge: 'Stats',
+  },
+  {
+    type: 'QUOTE',
+    name: 'Leadership & Vision Message',
+    category: 'CONTENT',
+    categoryLabel: 'Content & Impact',
+    icon: '✍️',
+    title: 'Leadership & Vision',
+    subtitle: 'Message from the Chancellor & Academic Directorate',
+    description: 'Chancellor, President, or Dean portrait photo, inspiring vision quote, and governance title.',
+    badge: 'Leadership',
+  },
+  {
+    type: 'FAQ',
+    name: 'Frequently Asked Questions',
+    category: 'CONTENT',
+    categoryLabel: 'Content & Impact',
+    icon: '❓',
+    title: 'Frequently Asked Questions',
+    subtitle: 'Clear answers to common questions about admissions, fees, hostel, and academics',
+    description: 'Accordion FAQ items addressing admissions criteria, hostel rules, scholarship options, and fees.',
+    badge: 'FAQ',
+  },
+  {
+    type: 'CONTACT',
+    name: 'Campus Helpdesk & Location Map',
+    category: 'CONTENT',
+    categoryLabel: 'Content & Impact',
+    icon: '📍',
+    title: 'Campus Helpdesk & Location',
+    subtitle: 'Reach our admissions desk, administrative offices, and visit our campus',
+    description: 'Interactive contact form, admissions hotline, email address, and Google Maps location.',
+    badge: 'Contact',
+  },
 ];
 
 const emptyPageDraft = { slug: '', title: '', metaDescription: '', isPublished: true };
@@ -104,28 +336,7 @@ export const PagesAdminPage: React.FC = () => {
   const [sectionDrawerOpen, setSectionDrawerOpen] = useState(false);
   const [sectionDrawerMode, setSectionDrawerMode] = useState<'create' | 'edit'>('create');
   const [editingSectionId, setEditingSectionId] = useState<string | number | null>(null);
-  const [sectionDraft, setSectionDraft] = useState<{
-    sectionType: string;
-    title: string;
-    subtitle: string;
-    content: Record<string, any>;
-    settings: SectionSettings;
-    isVisible: boolean;
-  }>({
-    sectionType: 'HERO',
-    title: '',
-    subtitle: '',
-    content: {},
-    settings: {
-      columns: 3,
-      cardVariant: 'standard',
-      alignment: 'center',
-      background: 'light',
-      spacing: 'normal',
-      containerWidth: 'standard',
-    },
-    isVisible: true,
-  });
+  const [editingSectionObj, setEditingSectionObj] = useState<PageSection | null>(null);
   const [sectionSaving, setSectionSaving] = useState(false);
   const [sectionError, setSectionError] = useState<string | null>(null);
   const [sectionTypes, setSectionTypes] = useState<SectionTypeItem[]>(SECTION_TYPE_CATALOG);
@@ -136,6 +347,38 @@ export const PagesAdminPage: React.FC = () => {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewTitle, setPreviewTitle] = useState('Website Live Preview');
   const [previewUrlPath, setPreviewUrlPath] = useState('/');
+
+  // Copy / Paste & Cross-Page Import State
+  const [copiedSection, setCopiedSection] = useState<{
+    sectionType: string;
+    title?: string;
+    subtitle?: string;
+    content?: any;
+    settings?: any;
+    sourcePageTitle?: string;
+  } | null>(() => {
+    try {
+      const saved = localStorage.getItem('cms_copied_section');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const [importModalOpen, setImportModalOpen] = useState(false);
+  const [importActiveTab, setImportActiveTab] = useState<'MODULES' | 'PAGES'>('MODULES');
+  const [importCategoryFilter, setImportCategoryFilter] = useState<string>('ALL');
+  const [importCombinedSections, setImportCombinedSections] = useState<{
+    pageId: string | number;
+    pageTitle: string;
+    pageSlug: string;
+    section: PageSection;
+  }[]>([]);
+  const [importFilterPageId, setImportFilterPageId] = useState<string | number | 'ALL'>('ALL');
+  const [importFilterType, setImportFilterType] = useState<string>('ALL');
+  const [importLoading, setImportLoading] = useState(false);
+  const [importActionLoading, setImportActionLoading] = useState<string | number | null>(null);
+  const [importSearch, setImportSearch] = useState('');
 
   const collegeName = siteConfig?.tenant?.name || 'College';
 
@@ -351,21 +594,7 @@ export const PagesAdminPage: React.FC = () => {
 
   const openCreateSection = () => {
     setEditingSectionId(null);
-    setSectionDraft({
-      sectionType: 'HERO',
-      title: '',
-      subtitle: '',
-      content: {},
-      settings: {
-        columns: 3,
-        cardVariant: 'standard',
-        alignment: 'center',
-        background: 'light',
-        spacing: 'normal',
-        containerWidth: 'standard',
-      },
-      isVisible: true,
-    });
+    setEditingSectionObj(null);
     setSectionError(null);
     setSectionDrawerMode('create');
     setSectionDrawerOpen(true);
@@ -373,43 +602,36 @@ export const PagesAdminPage: React.FC = () => {
 
   const openEditSection = (section: PageSection) => {
     setEditingSectionId(section.id);
-    setSectionDraft({
-      sectionType: section.sectionType || 'HERO',
-      title: section.title || '',
-      subtitle: section.subtitle || '',
-      content: section.content || {},
-      settings: section.settings || {
-        columns: 3,
-        cardVariant: 'standard',
-        alignment: 'center',
-        background: 'light',
-        spacing: 'normal',
-        containerWidth: 'standard',
-      },
-      isVisible: Boolean(section.isVisible),
-    });
+    setEditingSectionObj(section);
     setSectionError(null);
     setSectionDrawerMode('edit');
     setSectionDrawerOpen(true);
   };
 
-  const handleSaveSection = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSaveSectionWizard = async (draftData: {
+    sectionType: string;
+    title: string;
+    subtitle: string;
+    content: Record<string, any>;
+    settings: SectionSettings;
+    sortOrder: number;
+    isVisible: boolean;
+  }) => {
     if (!sectionsPage) return;
-    if (!sectionDraft.sectionType) {
+    if (!draftData.sectionType) {
       setSectionError('Section type is required.');
       return;
     }
     const isEdit = sectionDrawerMode === 'edit';
     const existing = isEdit ? sections.find((s) => String(s.id) === String(editingSectionId)) : undefined;
     const payload = {
-      sectionType: sectionDraft.sectionType,
-      title: sectionDraft.title.trim(),
-      subtitle: sectionDraft.subtitle.trim(),
-      content: sectionDraft.content,
-      settings: sectionDraft.settings,
-      sortOrder: isEdit ? Number(existing?.sortOrder) || 1 : sections.length + 1,
-      isVisible: sectionDraft.isVisible,
+      sectionType: draftData.sectionType,
+      title: draftData.title.trim(),
+      subtitle: draftData.subtitle.trim(),
+      content: draftData.content,
+      settings: draftData.settings,
+      sortOrder: isEdit ? Number(existing?.sortOrder) || draftData.sortOrder : draftData.sortOrder || sections.length + 1,
+      isVisible: draftData.isVisible,
     };
     try {
       setSectionSaving(true);
@@ -436,6 +658,7 @@ export const PagesAdminPage: React.FC = () => {
       await fetchPages();
     } catch (err: any) {
       setSectionError(err?.response?.data?.message || err?.message || 'Failed to save section');
+      throw err;
     } finally {
       setSectionSaving(false);
     }
@@ -549,6 +772,12 @@ export const PagesAdminPage: React.FC = () => {
         { type: 'DEPARTMENTS', title: 'Academic Departments', subtitle: 'Specialized schools offering cutting-edge undergraduate & postgraduate disciplines' },
         { type: 'COURSES', title: 'Degree Programs & Curricula', subtitle: 'Industry-aligned academic pathways and career-oriented certifications' },
         { type: 'FACULTY', title: 'Distinguished Faculty', subtitle: 'Renowned professors, doctorate researchers, and industry fellows' },
+        { type: 'PLACEMENTS', title: 'Placement Partners', subtitle: 'Our students are placed in leading global organizations' },
+        { type: 'COMPLIANCE', title: 'Mandatory Disclosures & Compliance', subtitle: 'Official statutory compliance documents and AICTE regulatory disclosures' },
+        { type: 'TRANSPORT', title: 'Campus Transport & Bus Services', subtitle: 'Comprehensive fleet connecting major transit hubs to campus' },
+        { type: 'HOSTELS', title: 'Hostels & Residential Facilities', subtitle: 'Safe, comfortable, and modern campus housing for students' },
+        { type: 'LIBRARY', title: 'Central Library & Learning Resources', subtitle: 'Access e-journals, previous question papers, and academic repositories' },
+        { type: 'ALUMNI', title: 'Distinguished Alumni', subtitle: 'Celebrating our graduates leading industries around the globe' },
         { type: 'NEWS', title: 'Latest Campus News', subtitle: 'Campus events, research breakthroughs, honors, and press announcements' },
         { type: 'EVENTS', title: 'Upcoming Campus Events', subtitle: 'Academic conferences, symposiums, student fests, and cultural celebrations' },
         { type: 'NOTICES', title: 'Official Notice Board', subtitle: 'Important administrative updates, examination schedules, and circulars' },
@@ -592,6 +821,194 @@ export const PagesAdminPage: React.FC = () => {
       notify(err?.response?.data?.message || err?.message || 'Failed to auto-seed sections', 'error');
     } finally {
       setIsSeedingSections(false);
+    }
+  };
+
+  const handleQuickAddSingleModule = async (mod: { type: string; title: string; subtitle: string }) => {
+    if (!sectionsPage) return;
+    const existing = sections.find((s) => s.sectionType?.toUpperCase() === mod.type.toUpperCase());
+    if (existing) {
+      notify(`"${existing.title || mod.title}" is already on this page (Position #${existing.sortOrder || '?'}).`, 'error');
+      return;
+    }
+
+    try {
+      setBusyId(`quick-${mod.type}`);
+      const payload = {
+        sectionType: mod.type,
+        title: mod.title,
+        subtitle: mod.subtitle,
+        content: {},
+        settings: {
+          columns: 3,
+          cardVariant: 'standard',
+          alignment: 'center',
+          background: 'light',
+          spacing: 'normal',
+          containerWidth: 'standard',
+        },
+        sortOrder: sections.length + 1,
+        isVisible: true,
+      };
+
+      const res = await apiClient.post(`/admin/pages/${sectionsPage.id}/sections`, payload);
+      if (!res.data?.success) throw new Error(res.data?.message || 'Failed to add section');
+      notify(`Added "${mod.title}" to page successfully!`);
+      const fresh = await apiClient.get(`/admin/pages/${sectionsPage.id}/sections`);
+      const data = fresh.data?.data;
+      setSections(Array.isArray(data) ? data : Array.isArray(data?.items) ? data.items : []);
+      refreshConfig?.();
+      await fetchPages();
+    } catch (err: any) {
+      notify(err?.response?.data?.message || err?.message || 'Failed to add module section', 'error');
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  // ---------------- Cross-Page Section Copy / Paste / Duplicate / Import ----------------
+
+  const handleCopySection = (section: PageSection) => {
+    const payload = {
+      sectionType: section.sectionType,
+      title: section.title || '',
+      subtitle: section.subtitle || '',
+      content: section.content || {},
+      settings: section.settings || {},
+      sourcePageTitle: sectionsPage?.title || 'Unknown Page',
+    };
+    setCopiedSection(payload);
+    try {
+      localStorage.setItem('cms_copied_section', JSON.stringify(payload));
+    } catch {
+      // ignore
+    }
+    notify(`Section "${section.title || section.sectionType}" copied! Ready to paste into any page.`);
+  };
+
+  const handleDuplicateSection = async (section: PageSection) => {
+    if (!sectionsPage) return;
+    try {
+      setBusyId(section.id);
+      const payload = {
+        sectionType: section.sectionType,
+        title: section.title ? `${section.title} (Copy)` : `${section.sectionType} (Copy)`,
+        subtitle: section.subtitle || '',
+        content: section.content || {},
+        settings: section.settings || {},
+        sortOrder: sections.length + 1,
+        isVisible: true,
+      };
+      const res = await apiClient.post(`/admin/pages/${sectionsPage.id}/sections`, payload);
+      if (!res.data?.success) throw new Error(res.data?.message || 'Failed to duplicate section');
+      notify(`Section duplicated as "${payload.title}"`);
+      const fresh = await apiClient.get(`/admin/pages/${sectionsPage.id}/sections`);
+      const data = fresh.data?.data;
+      setSections(Array.isArray(data) ? data : Array.isArray(data?.items) ? data.items : []);
+      refreshConfig?.();
+      await fetchPages();
+    } catch (err: any) {
+      notify(err?.response?.data?.message || err?.message || 'Failed to duplicate section', 'error');
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const handlePasteSection = async () => {
+    if (!sectionsPage || !copiedSection) return;
+    try {
+      setBusyId('paste');
+      const payload = {
+        sectionType: copiedSection.sectionType,
+        title: copiedSection.title || '',
+        subtitle: copiedSection.subtitle || '',
+        content: copiedSection.content || {},
+        settings: copiedSection.settings || {},
+        sortOrder: sections.length + 1,
+        isVisible: true,
+      };
+      const res = await apiClient.post(`/admin/pages/${sectionsPage.id}/sections`, payload);
+      if (!res.data?.success) throw new Error(res.data?.message || 'Failed to paste section');
+      notify(`Pasted "${copiedSection.title || copiedSection.sectionType}" into "${sectionsPage.title}"!`);
+      const fresh = await apiClient.get(`/admin/pages/${sectionsPage.id}/sections`);
+      const data = fresh.data?.data;
+      setSections(Array.isArray(data) ? data : Array.isArray(data?.items) ? data.items : []);
+      refreshConfig?.();
+      await fetchPages();
+    } catch (err: any) {
+      notify(err?.response?.data?.message || err?.message || 'Failed to paste section', 'error');
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const handleOpenImportModal = async () => {
+    setImportFilterPageId('ALL');
+    setImportFilterType('ALL');
+    setImportSearch('');
+    setImportModalOpen(true);
+    setImportLoading(true);
+
+    try {
+      const otherPages = pages.filter((p) => String(p.id) !== String(sectionsPage?.id));
+      const promises = otherPages.map(async (p) => {
+        try {
+          const res = await apiClient.get(`/admin/pages/${p.id}/sections`);
+          const data = res.data?.data;
+          const list = Array.isArray(data) ? data : Array.isArray(data?.items) ? data.items : [];
+          return list.map((sec: PageSection) => ({
+            pageId: p.id,
+            pageTitle: p.title,
+            pageSlug: p.slug,
+            section: sec,
+          }));
+        } catch {
+          return [];
+        }
+      });
+
+      const results = await Promise.allSettled(promises);
+      const combined: { pageId: string | number; pageTitle: string; pageSlug: string; section: PageSection }[] = [];
+      results.forEach((r) => {
+        if (r.status === 'fulfilled' && Array.isArray(r.value)) {
+          combined.push(...r.value);
+        }
+      });
+
+      setImportCombinedSections(combined);
+    } catch {
+      notify('Failed to load sections across pages', 'error');
+      setImportCombinedSections([]);
+    } finally {
+      setImportLoading(false);
+    }
+  };
+
+  const handleImportSectionToCurrentPage = async (section: PageSection) => {
+    if (!sectionsPage) return;
+    setImportActionLoading(section.id);
+    try {
+      const payload = {
+        sectionType: section.sectionType,
+        title: section.title || '',
+        subtitle: section.subtitle || '',
+        content: section.content || {},
+        settings: section.settings || {},
+        sortOrder: sections.length + 1,
+        isVisible: true,
+      };
+      const res = await apiClient.post(`/admin/pages/${sectionsPage.id}/sections`, payload);
+      if (!res.data?.success) throw new Error(res.data?.message || 'Failed to import section');
+      notify(`Imported "${section.title || section.sectionType}" into "${sectionsPage.title}" successfully!`);
+      const fresh = await apiClient.get(`/admin/pages/${sectionsPage.id}/sections`);
+      const data = fresh.data?.data;
+      setSections(Array.isArray(data) ? data : Array.isArray(data?.items) ? data.items : []);
+      refreshConfig?.();
+      await fetchPages();
+    } catch (err: any) {
+      notify(err?.response?.data?.message || err?.message || 'Failed to import section', 'error');
+    } finally {
+      setImportActionLoading(null);
     }
   };
 
@@ -983,19 +1400,45 @@ export const PagesAdminPage: React.FC = () => {
         size="xl"
         closeOnOutsideClick={false}
         footer={
-          <div className="flex items-center justify-between gap-3 w-full">
-            <button
-              type="button"
-              onClick={handleSeedDefaultSections}
-              disabled={isSeedingSections || sectionsLoading}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-900 transition cursor-pointer shadow-xs disabled:opacity-50"
-              title="Populate missing standard college module sections (Hero, Stats, Quote, Departments, Courses, Faculty, News, Events, Notices, Gallery, Contact)"
-            >
-              <Sparkles className={`w-4 h-4 ${isSeedingSections ? 'animate-spin' : 'text-indigo-600'}`} />
-              <span>{isSeedingSections ? 'Syncing Sections...' : '⚡ Auto-Generate All Sections'}</span>
-            </button>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 w-full">
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                type="button"
+                onClick={handleSeedDefaultSections}
+                disabled={isSeedingSections || sectionsLoading}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-900 transition cursor-pointer shadow-xs disabled:opacity-50"
+                title="Populate missing standard college module sections (Hero, Stats, Quote, Departments, Courses, Faculty, News, Events, Notices, Gallery, Contact)"
+              >
+                <Sparkles className={`w-3.5 h-3.5 ${isSeedingSections ? 'animate-spin' : 'text-indigo-600'}`} />
+                <span>{isSeedingSections ? 'Syncing...' : '⚡ Auto-Generate'}</span>
+              </button>
 
-            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={handleOpenImportModal}
+                disabled={sectionsLoading}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900 transition cursor-pointer shadow-xs"
+                title="Import/Copy an existing section from any other page into this page"
+              >
+                <FolderDown className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Import from Another Page</span>
+              </button>
+
+              {copiedSection && (
+                <button
+                  type="button"
+                  onClick={handlePasteSection}
+                  disabled={busyId === 'paste' || sectionsLoading}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900 transition cursor-pointer shadow-xs"
+                  title={`Paste copied section: "${copiedSection.title || copiedSection.sectionType}" (from ${copiedSection.sourcePageTitle || 'page'})`}
+                >
+                  <ClipboardPaste className="w-3.5 h-3.5 text-amber-600" />
+                  <span className="truncate max-w-[150px]">Paste: {copiedSection.title || copiedSection.sectionType}</span>
+                </button>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2.5 justify-end">
               <button
                 type="button"
                 onClick={closeSections}
@@ -1034,11 +1477,20 @@ export const PagesAdminPage: React.FC = () => {
                 This page has no sections configured yet
               </p>
               <p className="text-xs text-slate-400 max-w-sm mx-auto mt-1">
-                You can auto-generate the complete suite of institutional sections with 1-click or add custom sections manually.
+                You can import sections from any existing page, auto-generate the complete suite of institutional sections, or create custom sections manually.
               </p>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-              <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
+              <button
+                type="button"
+                onClick={handleOpenImportModal}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-emerald-200 bg-emerald-50/80 dark:bg-emerald-950/60 text-xs font-bold text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 transition cursor-pointer"
+              >
+                <FolderDown className="w-4 h-4 text-emerald-600" />
+                <span>Import from Another Page</span>
+              </button>
+              <button
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
                 onClick={handleSeedDefaultSections}
                 disabled={isSeedingSections}
               >
@@ -1048,7 +1500,7 @@ export const PagesAdminPage: React.FC = () => {
                 <span>
                   {isSeedingSections
                     ? 'Populating...'
-                    : '⚡ Auto-Generate All College Module Sections'}
+                    : '⚡ Auto-Generate College Modules'}
                 </span>
               </button>
               <button
@@ -1062,30 +1514,49 @@ export const PagesAdminPage: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-3">
-            {/* Quick Setup Recommendation Banner when Home page has fewer than 6 sections */}
-            {sectionsPage?.slug === 'home' && sections.length < 8 && (
-              <div className="p-3.5 rounded-2xl bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-900/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex items-start gap-2.5">
-                  <Sparkles className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
-                  <div>
+            {/* Dynamic Module Presets & Quick-Sync Toolbar */}
+            <div className="p-3.5 rounded-2xl bg-gradient-to-r from-indigo-50/90 via-blue-50/70 to-purple-50/90 dark:from-indigo-950/50 dark:via-slate-900 dark:to-purple-950/50 border border-indigo-200/80 dark:border-indigo-900/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+              <div className="flex items-start gap-2.5 min-w-0">
+                <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <p className="text-xs font-bold text-indigo-900 dark:text-indigo-200">
-                      Home Page Quick-Setup Available
+                      Module Section Engine & Presets
                     </p>
-                    <p className="text-[11px] text-indigo-700/80 dark:text-indigo-300/80 leading-relaxed">
-                      Your home page currently has {sections.length} section(s). Click to sync all 11 default modules (Hero, Stats, Quote, Departments, Courses, Faculty, News, Events, Notices, Gallery, Contact).
-                    </p>
+                    <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-900/80 dark:text-indigo-200">
+                      18+ System Modules Active
+                    </span>
                   </div>
+                  <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed mt-0.5">
+                    Sync or browse pre-built institutional modules (Placements, Compliance, Hostels, Transport, Library, Alumni, Departments, etc.) onto this page.
+                  </p>
                 </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setImportActiveTab('MODULES');
+                    handleOpenImportModal();
+                  }}
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-emerald-800 dark:text-emerald-200 bg-emerald-100/90 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-800 hover:bg-emerald-200/90 transition shadow-2xs flex items-center gap-1.5 cursor-pointer"
+                  title="Open the visual module picker & cross-page import catalog"
+                >
+                  <FolderDown className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span>Browse / Import Modules</span>
+                </button>
                 <button
                   type="button"
                   onClick={handleSeedDefaultSections}
                   disabled={isSeedingSections}
-                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition shadow-xs shrink-0 self-end sm:self-auto cursor-pointer"
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition shadow-xs flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  title="Populate missing institutional modules automatically"
                 >
-                  {isSeedingSections ? 'Syncing...' : 'Sync All 12 Sections'}
+                  <Sparkles className={`w-3.5 h-3.5 ${isSeedingSections ? 'animate-spin' : ''}`} />
+                  <span>{isSeedingSections ? 'Syncing...' : 'Auto-Sync All Modules'}</span>
                 </button>
               </div>
-            )}
+            </div>
 
             <div className="flex items-center justify-between px-1 text-[11px] text-slate-400 font-semibold">
               <div className="flex items-center gap-2">
@@ -1094,22 +1565,32 @@ export const PagesAdminPage: React.FC = () => {
                   {sections.length} section{sections.length !== 1 ? 's' : ''} on page — use arrows (↑ ↓) to reorder scroll sequence
                 </span>
               </div>
-              <button
-                type="button"
-                onClick={handleSeedDefaultSections}
-                disabled={isSeedingSections}
-                className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
-              >
-                <Sparkles className="w-3 h-3" />
-                <span>Sync Modules</span>
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={handleOpenImportModal}
+                  className="text-xs font-bold text-emerald-700 dark:text-emerald-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
+                >
+                  <FolderDown className="w-3 h-3" />
+                  <span>Import Section</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSeedDefaultSections}
+                  disabled={isSeedingSections}
+                  className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
+                >
+                  <Sparkles className="w-3 h-3" />
+                  <span>Sync Modules</span>
+                </button>
+              </div>
             </div>
 
             {sections.map((section, index) => {
               const isModule = [
                 'HERO', 'HERO_SLIDER', 'BANNERS', 'STATISTICS', 'STATS', 'QUOTE',
                 'DEPARTMENTS', 'COURSES', 'FACULTY', 'NEWS', 'EVENTS', 'NOTICES',
-                'GALLERY', 'TESTIMONIALS', 'CONTACT', 'MAP'
+                'GALLERY', 'CONTACT', 'MAP'
               ].includes(section.sectionType?.toUpperCase());
 
               return (
@@ -1182,6 +1663,26 @@ export const PagesAdminPage: React.FC = () => {
                           <Eye className="w-3.5 h-3.5" />
                         )}
                       </button>
+
+                      {/* Copy to Clipboard (for Cross-Page Paste) */}
+                      <button
+                        onClick={() => handleCopySection(section)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition cursor-pointer"
+                        title="Copy section (ready to paste into any page)"
+                      >
+                        <ClipboardCopy className="w-3.5 h-3.5" />
+                      </button>
+
+                      {/* Duplicate on this page */}
+                      <button
+                        onClick={() => handleDuplicateSection(section)}
+                        disabled={busyId === section.id}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition cursor-pointer disabled:opacity-40"
+                        title="Duplicate section on this page"
+                      >
+                        <Copy className="w-3.5 h-3.5" />
+                      </button>
+
                       <button
                         onClick={() => openEditSection(section)}
                         className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition cursor-pointer"
@@ -1205,200 +1706,20 @@ export const PagesAdminPage: React.FC = () => {
         )}
       </Drawer>
 
-      {/* ---------- Section Create/Edit Drawer ---------- */}
-      <FormDrawer
+      {/* ---------- 3-Step Progressive Disclosure Section Wizard Drawer ---------- */}
+      <SectionWizardDrawer
         isOpen={sectionDrawerOpen}
-        onClose={() => !sectionSaving && setSectionDrawerOpen(false)}
-        title={sectionDrawerMode === 'create' ? 'Add Section' : 'Edit Section'}
-        subtitle={
-          sectionDrawerMode === 'create'
-            ? 'Choose a section type and fill in its content'
-            : 'Modify this section’s content, visibility or order'
-        }
-        icon={<LayoutTemplate className="w-4 h-4" />}
         mode={sectionDrawerMode}
-        loading={sectionSaving}
-        onSubmit={handleSaveSection}
-        size="xl"
-      >
-        {sectionError && (
-          <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-[11px] font-semibold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900">
-            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-            {sectionError}
-          </div>
-        )}
-
-        {sectionDraftTypeEditable && (
-          <Select
-            label="Section Type"
-            required
-            value={sectionDraft.sectionType}
-            onChange={(e) =>
-              setSectionDraft({ ...sectionDraft, sectionType: e.target.value, content: {} })
-            }
-            options={allSectionOptions}
-            helperText="The section type determines how the content is rendered on the live site."
-          />
-        )}
-
-        {!sectionDraftTypeEditable && (
-          <div className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900">
-            <div>
-              <p className="text-[11px] font-bold text-blue-700 dark:text-blue-300">
-                {sectionTypeLabel(sectionDraft.sectionType)}
-              </p>
-              <p className="text-[10px] text-blue-500 dark:text-blue-400">
-                Section type is locked after creation
-              </p>
-            </div>
-            <LayoutTemplate className="w-4 h-4 text-blue-400" />
-          </div>
-        )}
-
-        <Input
-          label="Section Title"
-          value={sectionDraft.title}
-          onChange={(e) => setSectionDraft({ ...sectionDraft, title: e.target.value })}
-          placeholder="Visible heading for this section (optional)"
-        />
-
-        <Input
-          label="Section Subtitle"
-          value={sectionDraft.subtitle}
-          onChange={(e) => setSectionDraft({ ...sectionDraft, subtitle: e.target.value })}
-          placeholder="Short supporting line (optional)"
-        />
-
-        <div className="pt-1 border-t border-slate-100 dark:border-slate-800">
-          <p className="text-[11px] font-black uppercase tracking-wider text-slate-400 mb-3">
-            Section Content
-          </p>
-          <SectionContentEditor
-            sectionType={sectionDraft.sectionType}
-            content={sectionDraft.content}
-            onChange={(content) => setSectionDraft({ ...sectionDraft, content })}
-          />
-        </div>
-
-        {/* Visual Design Settings Inspector Panel */}
-        <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-3">
-          <div className="flex items-center justify-between">
-            <p className="text-[11px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-400">
-              Visual Design & Layout Inspector
-            </p>
-            <span className="text-[10px] text-slate-400">Template-aware dynamic styles</span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <Select
-              label="Layout Columns"
-              value={String(sectionDraft.settings?.columns || 3)}
-              onChange={(e) =>
-                setSectionDraft({
-                  ...sectionDraft,
-                  settings: { ...sectionDraft.settings, columns: Number(e.target.value) || 3 },
-                })
-              }
-              options={[
-                { value: '1', label: '1 Column (Full Row)' },
-                { value: '2', label: '2 Columns (Split)' },
-                { value: '3', label: '3 Columns (Standard Grid)' },
-                { value: '4', label: '4 Columns (Compact Grid)' },
-              ]}
-            />
-
-            <Select
-              label="Card Style Variant"
-              value={sectionDraft.settings?.cardVariant || 'standard'}
-              onChange={(e) =>
-                setSectionDraft({
-                  ...sectionDraft,
-                  settings: { ...sectionDraft.settings, cardVariant: e.target.value as any },
-                })
-              }
-              options={[
-                { value: 'standard', label: 'Standard Flat' },
-                { value: 'elevated', label: 'Elevated Shadow' },
-                { value: 'bordered', label: 'Bordered Accent' },
-                { value: 'minimal', label: 'Minimal Ghost' },
-              ]}
-            />
-
-            <Select
-              label="Content Alignment"
-              value={sectionDraft.settings?.alignment || 'center'}
-              onChange={(e) =>
-                setSectionDraft({
-                  ...sectionDraft,
-                  settings: { ...sectionDraft.settings, alignment: e.target.value as any },
-                })
-              }
-              options={[
-                { value: 'left', label: 'Left Aligned' },
-                { value: 'center', label: 'Center Aligned' },
-              ]}
-            />
-
-            <Select
-              label="Section Background"
-              value={sectionDraft.settings?.background || 'light'}
-              onChange={(e) =>
-                setSectionDraft({
-                  ...sectionDraft,
-                  settings: { ...sectionDraft.settings, background: e.target.value as any },
-                })
-              }
-              options={[
-                { value: 'light', label: 'Light / Crisp White' },
-                { value: 'muted', label: 'Muted Slate Gray' },
-                { value: 'dark', label: 'Dark Navy Contrast' },
-                { value: 'gradient', label: 'Theme Primary Gradient' },
-              ]}
-            />
-
-            <Select
-              label="Vertical Spacing (Padding)"
-              value={sectionDraft.settings?.spacing || 'normal'}
-              onChange={(e) =>
-                setSectionDraft({
-                  ...sectionDraft,
-                  settings: { ...sectionDraft.settings, spacing: e.target.value as any },
-                })
-              }
-              options={[
-                { value: 'compact', label: 'Compact (Py-8)' },
-                { value: 'normal', label: 'Normal (Py-16)' },
-                { value: 'large', label: 'Spacious (Py-24)' },
-              ]}
-            />
-
-            <Select
-              label="Container Width"
-              value={sectionDraft.settings?.containerWidth || 'standard'}
-              onChange={(e) =>
-                setSectionDraft({
-                  ...sectionDraft,
-                  settings: { ...sectionDraft.settings, containerWidth: e.target.value as any },
-                })
-              }
-              options={[
-                { value: 'narrow', label: 'Narrow (Max-W-4XL)' },
-                { value: 'standard', label: 'Standard (Max-W-7XL)' },
-                { value: 'full', label: 'Edge-to-Edge Fluid' },
-              ]}
-            />
-          </div>
-        </div>
-
-        <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
-          <Switch
-            checked={sectionDraft.isVisible}
-            onChange={(v) => setSectionDraft({ ...sectionDraft, isVisible: v })}
-            label="Make this section visible"
-            description="Hidden sections stay saved but are not rendered on the live page."
-          />
-        </div>
-      </FormDrawer>
+        editingSection={editingSectionObj}
+        onClose={() => !sectionSaving && setSectionDrawerOpen(false)}
+        onSave={handleSaveSectionWizard}
+        isSaving={sectionSaving}
+        serverError={sectionError}
+        defaultSortOrder={sections.length + 1}
+        availablePages={pages}
+        currentPageId={sectionsPage?.id}
+        targetPageTitle={sectionsPage?.title}
+      />
 
       {/* ---------- Delete Page Confirm ---------- */}
       <ConfirmDialog
@@ -1423,6 +1744,312 @@ export const PagesAdminPage: React.FC = () => {
         variant="danger"
         loading={Boolean(deleteSectionTarget?.id && busyId === deleteSectionTarget.id)}
       />
+
+      {/* ---------- Import & Add Module Sections Hub Drawer ---------- */}
+      <Drawer
+        isOpen={importModalOpen}
+        onClose={() => setImportModalOpen(false)}
+        title="Import & Add Module Sections"
+        subtitle={sectionsPage ? `Add pre-built institutional modules or clone sections into "${sectionsPage.title}"` : 'Add or clone sections'}
+        icon={<FolderDown className="w-4 h-4 text-emerald-600" />}
+        size="xl"
+      >
+        <div className="space-y-4">
+          {/* Navigation Tabs */}
+          <div className="flex items-center gap-2 p-1 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60">
+            <button
+              type="button"
+              onClick={() => setImportActiveTab('MODULES')}
+              className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
+                importActiveTab === 'MODULES'
+                  ? 'bg-white dark:bg-slate-900 text-indigo-700 dark:text-indigo-300 shadow-2xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              <span>System Module Presets ({SYSTEM_MODULE_PRESETS.length})</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setImportActiveTab('PAGES')}
+              className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
+                importActiveTab === 'PAGES'
+                  ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-300 shadow-2xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+              }`}
+            >
+              <FolderDown className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span>Clone from Other Pages ({importCombinedSections.length})</span>
+            </button>
+          </div>
+
+          {/* TAB 1: SYSTEM MODULE PRESETS */}
+          {importActiveTab === 'MODULES' && (
+            <div className="space-y-4">
+              {/* Category & Search Filter */}
+              <div className="bg-slate-50 dark:bg-slate-900/60 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
+                    Filter Institutional Modules:
+                  </label>
+                  <span className="text-[11px] font-semibold text-indigo-700 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded-full border border-indigo-200 dark:border-indigo-800">
+                    18+ Available Modules
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                  <div className="sm:col-span-7">
+                    <Input
+                      placeholder="Search module (e.g. placements, compliance, transport, hostel, library)..."
+                      value={importSearch}
+                      onChange={(e) => setImportSearch(e.target.value)}
+                      leftIcon={<Search className="w-3.5 h-3.5" />}
+                    />
+                  </div>
+                  <div className="sm:col-span-5">
+                    <select
+                      value={importCategoryFilter}
+                      onChange={(e) => setImportCategoryFilter(e.target.value)}
+                      className="w-full py-2.5 px-3 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs font-semibold text-slate-900 dark:text-slate-100 shadow-2xs focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                    >
+                      <option value="ALL">🌐 All Module Categories (18)</option>
+                      <option value="COMPLIANCE_PLACEMENTS">🏢 Corporate, Placements & Compliance</option>
+                      <option value="FACILITIES">🏠 Campus Facilities, Hostels & Transport</option>
+                      <option value="ACADEMICS">🏛️ Academics, Degrees & Faculty</option>
+                      <option value="MEDIA_NEWS">📰 News, Events, Notices & Gallery</option>
+                      <option value="CONTENT">✍️ Content, Quotes & FAQs</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Modules Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[480px] overflow-y-auto pr-1">
+                {SYSTEM_MODULE_PRESETS
+                  .filter((mod) => {
+                    if (importCategoryFilter !== 'ALL' && mod.category !== importCategoryFilter) {
+                      return false;
+                    }
+                    if (!importSearch.trim()) return true;
+                    const q = importSearch.toLowerCase();
+                    return (
+                      mod.name.toLowerCase().includes(q) ||
+                      mod.title.toLowerCase().includes(q) ||
+                      mod.subtitle.toLowerCase().includes(q) ||
+                      mod.description.toLowerCase().includes(q) ||
+                      mod.type.toLowerCase().includes(q) ||
+                      mod.categoryLabel.toLowerCase().includes(q)
+                    );
+                  })
+                  .map((mod) => {
+                    const isAdded = sections.some((s) => s.sectionType?.toUpperCase() === mod.type.toUpperCase());
+                    const isBusy = busyId === `quick-${mod.type}`;
+
+                    return (
+                      <div
+                        key={mod.type}
+                        className={`p-3.5 rounded-2xl border transition-all flex flex-col justify-between gap-3 ${
+                          isAdded
+                            ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/60'
+                            : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-2xs hover:border-indigo-300 dark:hover:border-indigo-700'
+                        }`}
+                      >
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className="text-xl shrink-0">{mod.icon}</span>
+                              <div className="min-w-0">
+                                <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
+                                  {mod.title}
+                                </h4>
+                                <span className="text-[10px] font-mono text-indigo-600 dark:text-indigo-400 font-semibold">
+                                  #{mod.type}
+                                </span>
+                              </div>
+                            </div>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 shrink-0">
+                              {mod.badge}
+                            </span>
+                          </div>
+
+                          <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-2">
+                            {mod.description}
+                          </p>
+                        </div>
+
+                        <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-2">
+                          <span className="text-[10px] font-medium text-slate-400 truncate">
+                            {mod.categoryLabel}
+                          </span>
+
+                          <button
+                            type="button"
+                            onClick={() => handleQuickAddSingleModule(mod)}
+                            disabled={isBusy || isAdded}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shrink-0 shadow-xs ${
+                              isAdded
+                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300 cursor-default opacity-90'
+                                : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                            }`}
+                          >
+                            {isBusy ? (
+                              <>
+                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                <span>Adding...</span>
+                              </>
+                            ) : isAdded ? (
+                              <>
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                                <span>Already on Page</span>
+                              </>
+                            ) : (
+                              <>
+                                <Plus className="w-3.5 h-3.5" />
+                                <span>Add to Page</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: CLONE FROM OTHER PAGES */}
+          {importActiveTab === 'PAGES' && (
+            <div className="space-y-4">
+              {/* Header Filter Bar */}
+              <div className="bg-slate-50 dark:bg-slate-900/60 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
+                    Browse Sections on Other Pages:
+                  </label>
+                  <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+                    {importCombinedSections.length} section{importCombinedSections.length !== 1 ? 's' : ''} available
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                  <div className="sm:col-span-7">
+                    <Input
+                      placeholder="Search by title, keywords or type (e.g. quote, faculty, stats)..."
+                      value={importSearch}
+                      onChange={(e) => setImportSearch(e.target.value)}
+                      leftIcon={<Search className="w-3.5 h-3.5" />}
+                    />
+                  </div>
+                  <div className="sm:col-span-5">
+                    <select
+                      value={String(importFilterPageId)}
+                      onChange={(e) => setImportFilterPageId(e.target.value)}
+                      className="w-full py-2.5 px-3 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs font-semibold text-slate-900 dark:text-slate-100 shadow-2xs focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer"
+                    >
+                      <option value="ALL">📂 All Other Pages (Combined)</option>
+                      {pages
+                        .filter((p) => String(p.id) !== String(sectionsPage?.id))
+                        .map((p) => (
+                          <option key={p.id} value={String(p.id)}>
+                            {p.title} (/{p.slug})
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Combined Sections List */}
+              <div className="space-y-2 pt-1">
+                {importLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="w-6 h-6 animate-spin text-emerald-600" />
+                  </div>
+                ) : importCombinedSections.length === 0 ? (
+                  <div className="py-10 text-center text-xs text-slate-400 border border-dashed rounded-xl border-slate-200 dark:border-slate-800 space-y-2">
+                    <p className="font-semibold text-slate-600 dark:text-slate-300">No sections found on other pages.</p>
+                    <p className="text-slate-400">You can use the <strong>System Module Presets</strong> tab above to add any standard college module directly!</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2.5 max-h-[460px] overflow-y-auto pr-1">
+                    {importCombinedSections
+                      .filter((entry) => {
+                        if (importFilterPageId !== 'ALL' && String(entry.pageId) !== String(importFilterPageId)) {
+                          return false;
+                        }
+                        if (!importSearch.trim()) return true;
+                        const q = importSearch.toLowerCase();
+                        return (
+                          entry.section.title?.toLowerCase().includes(q) ||
+                          entry.section.subtitle?.toLowerCase().includes(q) ||
+                          entry.section.sectionType?.toLowerCase().includes(q) ||
+                          entry.pageTitle?.toLowerCase().includes(q)
+                        );
+                      })
+                      .map((entry, sIdx) => {
+                        const sec = entry.section;
+                        const isImporting = importActionLoading === sec.id;
+                        return (
+                          <div
+                            key={`${entry.pageId}_${sec.id}`}
+                            className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs hover:border-emerald-300 dark:hover:border-emerald-700 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                          >
+                            <div className="min-w-0 space-y-1">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="text-[10px] font-black text-slate-400 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-mono">
+                                  #{sIdx + 1}
+                                </span>
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900/50">
+                                  <Sparkles className="w-2.5 h-2.5" />
+                                  <span>{sec.sectionType.toUpperCase()}</span>
+                                </span>
+                                <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
+                                  {sec.title || sectionTypeLabel(sec.sectionType)}
+                                </h4>
+                              </div>
+
+                              {sec.subtitle && (
+                                <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">
+                                  {sec.subtitle}
+                                </p>
+                              )}
+
+                              <div className="flex items-center gap-1.5 text-[10px] text-slate-400 dark:text-slate-500 font-medium">
+                                <span>📁 From:</span>
+                                <span className="font-semibold text-slate-600 dark:text-slate-300">{entry.pageTitle}</span>
+                                <span className="font-mono">({entry.pageSlug})</span>
+                              </div>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => handleImportSectionToCurrentPage(sec)}
+                              disabled={isImporting}
+                              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition cursor-pointer shadow-xs shrink-0 disabled:opacity-50"
+                            >
+                              {isImporting ? (
+                                <>
+                                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                  <span>Importing...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Download className="w-3.5 h-3.5" />
+                                  <span>Import to {sectionsPage?.title ? `"${sectionsPage.title.slice(0, 14)}..."` : 'This Page'}</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        );
+                      })}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </Drawer>
 
       {/* Live preview modal */}
       <LivePreviewModal

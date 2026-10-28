@@ -26,10 +26,10 @@ export const CtaSection: React.FC<CtaProps> = ({ content }) => {
       <div className="max-w-5xl mx-auto px-6 text-center space-y-6 relative z-10">
         
         {/* Badge */}
-        {(content.badge || true) && (
+        {content.badge && (
           <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs ${cta.badgeClass}`}>
             <Sparkles className="w-3.5 h-3.5" />
-            <span>{content.badge || 'ADMISSIONS 2026-27 ACTIVE'}</span>
+            <span>{content.badge}</span>
           </div>
         )}
 

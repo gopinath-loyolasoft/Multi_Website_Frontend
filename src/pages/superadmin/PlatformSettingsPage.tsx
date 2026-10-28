@@ -23,6 +23,7 @@ import {
   getPlatformBranding,
   savePlatformBranding,
   resetPlatformBranding,
+  syncPlatformBrandingFromServer,
   PlatformBranding,
   DEFAULT_PLATFORM_BRANDING
 } from '../../services/platformBranding';
@@ -77,6 +78,17 @@ export const PlatformSettingsPage: React.FC = () => {
   const [brandingNotice, setBrandingNotice] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
   const [previewTabTheme, setPreviewTabTheme] = useState<'dark' | 'light'>('dark');
 
+  // Load server-persisted branding on mount (shared across all SuperAdmin browsers)
+  useEffect(() => {
+    syncPlatformBrandingFromServer().then((server) => {
+      setBranding(server);
+      setPlatformName(server.platformName);
+      setPlatformSubtitle(server.platformSubtitle);
+      setLogoUrl(server.logoUrl);
+      setFaviconUrl(server.faviconUrl);
+    });
+  }, []);
+
   const showBrandingNotification = (text: string, type: 'success' | 'error' = 'success') => {
     setBrandingNotice({ text, type });
     setTimeout(() => setBrandingNotice(null), 4000);
@@ -124,18 +136,18 @@ export const PlatformSettingsPage: React.FC = () => {
     reader.readAsDataURL(file);
   };
 
-  const handleSaveBranding = (e?: React.FormEvent) => {
+  const handleSaveBranding = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     try {
       setIsSavingBranding(true);
-      const updated = savePlatformBranding({
+      const updated = await savePlatformBranding({
         platformName: platformName.trim(),
         platformSubtitle: platformSubtitle.trim(),
         logoUrl: logoUrl.trim(),
         faviconUrl: (faviconUrl || logoUrl).trim(),
       });
       setBranding(updated);
-      showBrandingNotification('Platform branding & browser tab updated successfully!', 'success');
+      showBrandingNotification('Platform branding saved server-side — visible to every SuperAdmin browser!', 'success');
     } catch (err) {
       console.error('Failed to save branding', err);
       showBrandingNotification('Failed to save platform branding.', 'error');
@@ -144,9 +156,9 @@ export const PlatformSettingsPage: React.FC = () => {
     }
   };
 
-  const handleResetBranding = () => {
-    if (window.confirm('Reset platform title, logo, and favicon to default settings?')) {
-      const restored = resetPlatformBranding();
+  const handleResetBranding = async () => {
+    if (window.confirm('Reset platform title, logo, and favicon to default settings? This resets the branding for every SuperAdmin browser.')) {
+      const restored = await resetPlatformBranding();
       setBranding(restored);
       setPlatformName(restored.platformName);
       setPlatformSubtitle(restored.platformSubtitle);

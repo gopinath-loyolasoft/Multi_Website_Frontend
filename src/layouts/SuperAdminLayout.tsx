@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import { ThemeToggle } from '../components/common/ThemeToggle';
 import { HeaderProfileDropdown } from '../components/common/HeaderProfileDropdown';
-import { useLayoutContext } from '../context/useLayoutContext';
+import { useLayoutContext } from '../contexts/useLayoutContext';
 import { Customizer } from './components/Customizer';
 import { getPlatformBranding, applyBrowserBranding, PlatformBranding } from '../services/platformBranding';
 

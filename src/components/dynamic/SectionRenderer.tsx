@@ -22,6 +22,14 @@ import { FaqSection } from '../sections/FaqSection';
 import { ContactSection } from '../sections/ContactSection';
 import { MapSection } from '../sections/MapSection';
 import { QuoteSection } from '../sections/QuoteSection';
+import { DocumentsSection } from '../sections/DocumentsSection';
+import { TableSection } from '../sections/TableSection';
+import { TimelineSection } from '../sections/TimelineSection';
+import { TabsSection } from '../sections/TabsSection';
+import { TestimonialsSection } from '../sections/TestimonialsSection';
+import { EmbedSection } from '../sections/EmbedSection';
+import { CustomCanvasSection } from '../sections/CustomCanvasSection';
+import { PlacementPartnersSection } from '../sections/PlacementPartnersSection';
 
 import { useTheme } from '../../themes/ThemeContext';
 
@@ -49,7 +57,23 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({ section }) => 
     'EVENTS',
     'NOTICES',
     'GALLERY',
-
+    'DOCUMENTS',
+    'DOCUMENT_DOWNLOADS',
+    'CIRCULARS',
+    'DOWNLOADS',
+    'TABLE',
+    'DATA_TABLE',
+    'TIMELINE',
+    'MILESTONES',
+    'TABS',
+    'CONTENT_TABS',
+    'TESTIMONIALS',
+    'TESTIMONIAL',
+    'EMBED',
+    'IFRAME',
+    'CUSTOM_CANVAS',
+    'CANVAS_BUILDER',
+    'FREE_CANVAS',
     'CALL_TO_ACTION',
     'CTA',
     'CONTACT',
@@ -62,12 +86,24 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({ section }) => 
   ].includes(section.sectionType.toUpperCase());
 
   const effectiveContent = {
+    ...settings,
     ...section.content,
     title: section.content?.title || section.title,
     subtitle: section.content?.subtitle || section.subtitle,
+    columns: section.content?.columns || settings.columns,
+    alignment: section.content?.alignment || settings.alignment,
+    background: section.content?.background || settings.background,
+    containerWidth: section.content?.containerWidth || settings.containerWidth,
+    spacing: section.content?.spacing || settings.spacing,
+    cardVariant: section.content?.cardVariant || settings.cardVariant,
   };
 
   const renderContent = () => {
+    // If this section was styled in the Visual Drag & Drop Studio (has custom blocks)
+    if (Array.isArray(section.content?.blocks) && section.content.blocks.length > 0) {
+      return <CustomCanvasSection content={effectiveContent} settings={section.settings} />;
+    }
+
     switch (section.sectionType.toUpperCase()) {
       case 'HERO':
         return <HeroSection content={effectiveContent} />;
@@ -103,13 +139,63 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({ section }) => 
         return <FacultySection content={effectiveContent} />;
       case 'GALLERY':
         return <GallerySection content={effectiveContent} />;
+      case 'COMPLIANCE':
+      case 'COMPLIANCE_DOCS':
+      case 'DISCLOSURES':
+      case 'DOCUMENTS':
+      case 'DOCUMENT_DOWNLOADS':
+      case 'CIRCULARS':
+      case 'DOWNLOADS':
+        return <DocumentsSection content={effectiveContent} />;
+      case 'TABLE':
+      case 'DATA_TABLE':
+      case 'FEES_TABLE':
+        return <TableSection content={effectiveContent} />;
+      case 'TIMELINE':
+      case 'MILESTONES':
+      case 'HISTORY':
+        return <TimelineSection content={effectiveContent} />;
+      case 'TABS':
+      case 'CONTENT_TABS':
+      case 'TABS_LAYOUT':
+        return <TabsSection content={effectiveContent} />;
+      case 'TESTIMONIALS':
+      case 'TESTIMONIAL':
+      case 'REVIEWS':
+      case 'ALUMNI_STORIES':
+      case 'ALUMNI':
+        return <TestimonialsSection content={effectiveContent} />;
+      case 'EMBED':
+      case 'IFRAME':
+      case 'VIRTUAL_TOUR':
+        return <EmbedSection content={effectiveContent} />;
+      case 'CUSTOM_CANVAS':
+      case 'CANVAS_BUILDER':
+      case 'FREE_CANVAS':
+        return <CustomCanvasSection content={effectiveContent} settings={section.settings} />;
       case 'CALL_TO_ACTION':
       case 'CTA':
         return <CtaSection content={effectiveContent} />;
       case 'VIDEO':
         return <VideoSection content={effectiveContent} />;
+      case 'PLACEMENT_PARTNERS':
+      case 'PLACEMENT_COMPANIES':
+      case 'PLACEMENTS':
+      case 'PLACEMENT':
+      case 'RECRUITERS':
+        return <PlacementPartnersSection />;
       case 'LOGO_GRID':
+      case 'PARTNERS':
+        if (Array.isArray(effectiveContent?.cards) || (Array.isArray(effectiveContent?.items) && !effectiveContent?.logos)) {
+          return <CardsSection content={effectiveContent} />;
+        }
         return <LogoGridSection content={effectiveContent} />;
+      case 'HOSTELS':
+      case 'HOSTEL':
+      case 'TRANSPORT':
+      case 'BUS_ROUTES':
+      case 'LIBRARY':
+        return <CardsSection content={effectiveContent} />;
       case 'FAQ':
         return <FaqSection content={effectiveContent} />;
       case 'CONTACT':
@@ -152,9 +238,6 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({ section }) => 
         return 'notices';
       case 'GALLERY':
         return 'gallery';
-      case 'PLACEMENTS':
-      case 'RECRUITERS':
-        return 'placements';
       case 'FAQ':
         return 'faq';
       case 'CONTACT':

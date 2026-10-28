@@ -1,4 +1,4 @@
-﻿import { BookOpen } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 import { TemplateConfig } from '../contracts/TemplateContracts';
 
 export const artsScienceConfig: TemplateConfig = {
@@ -10,7 +10,7 @@ export const artsScienceConfig: TemplateConfig = {
   nameFont: 'font-serif font-bold tracking-normal text-slate-900',
   titleFont: 'font-serif',
   badgeFont: 'font-serif italic text-emerald-700',
-  defaultBadge: 'UGC Autonomous • Heritage Institution',
+  defaultBadge: '',
   crestBg: 'bg-emerald-700 shadow-emerald-800/25',
   CrestIcon: BookOpen,
   heroGradient: 'bg-gradient-to-r from-emerald-950 via-emerald-900 to-slate-950',

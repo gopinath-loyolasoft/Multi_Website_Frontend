@@ -4,9 +4,12 @@ import { Calendar, ArrowLeft, ArrowRight, Newspaper, AlertCircle } from 'lucide-
 import { NewsItem } from '../../types';
 import { apiClient } from '../../services/apiClient';
 import { useActiveTemplate } from '../../templates/templateRegistry';
+import { TemplateCard } from '../../components/website/TemplateCard';
+import { useTenant } from '../../tenant/TenantContext';
 import DOMPurify from 'dompurify';
 
 export const NewsListPage: React.FC = () => {
+  const { siteConfig } = useTenant();
   const Template = useActiveTemplate();
   const [newsList, setNewsList] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,21 +32,33 @@ export const NewsListPage: React.FC = () => {
     fetchNews();
   }, []);
 
+  const isSlanted =
+    Template.config.code === 'DESIGN_3D_MODERN' ||
+    Template.config.code === 'SALESIAN_SLANTED' ||
+    Template.config.code === 'ARTS_SCIENCE_MODERN' ||
+    Template.config.code === 'TEMPLATE2' ||
+    Template.config.code === 'TEMPLATE_2';
+
+  const headerConfig = siteConfig?.settings?.socialLinks?.pageHeaders?.news || siteConfig?.settings?.pageHeaders?.news;
+  const badgeText = headerConfig?.badge || (isSlanted ? 'Campus News & Updates' : Template.config.code === 'MEDICAL_MODERN' ? 'Medical Bulletins & Press' : Template.config.code === 'UNIVERSITY_MODERN' ? 'University Press & Gazette' : 'Campus News & Media');
+  const titleText = headerConfig?.title || 'Campus News & Press Releases';
+  const subtitleText = headerConfig?.subtitle || 'Latest announcements, research breakthroughs, student achievements, and university media highlights.';
+
   return (
     <div className={`min-h-screen ${Template.config.bodyBgClass}`}>
       {/* Dynamic Modular Template Page Hero */}
       <Template.PageHero
-        badge={Template.config.code === 'ARTS_SCIENCE_MODERN' ? 'Scholarly Gazette & Media' : Template.config.code === 'MEDICAL_MODERN' ? 'Medical Bulletins & Press' : Template.config.code === 'UNIVERSITY_MODERN' ? 'University Press & Gazette' : 'Campus News & Media'}
-        title="Campus News & Press Releases"
-        subtitle="Latest announcements, research breakthroughs, student achievements, and university media highlights."
-        icon={<Newspaper className="w-4 h-4 text-emerald-300" />}
+        badge={badgeText}
+        title={titleText}
+        subtitle={subtitleText}
+        icon={<Newspaper className="w-4 h-4 text-amber-300" />}
       />
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-{loading ? (
+        {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-pulse">
             {[1, 2, 3, 4, 5, 6].map((n) => (
-              <div key={n} className="h-72 bg-slate-200 rounded-2xl" />
+              <div key={n} className={`h-72 bg-slate-200 ${isSlanted ? 'rounded-none' : 'rounded-2xl'}`} />
             ))}
           </div>
         ) : error ? (
@@ -61,35 +76,17 @@ export const NewsListPage: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {newsList.map((item) => (
-              <article
+              <TemplateCard
                 key={item.id}
-                className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-lg transition flex flex-col justify-between group"
-              >
-                {item.imageUrl && (
-                  <div className="aspect-[16/9] overflow-hidden bg-slate-100">
-                    <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
-                  </div>
-                )}
-                <div className="p-6 flex-1 flex flex-col justify-between">
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-xs text-slate-400">
-                      <Calendar className="w-3.5 h-3.5 text-primary" />
-                      <span>{new Date(item.publishedDate).toLocaleDateString()}</span>
-                    </div>
-                    <h3 className="font-bold text-slate-900 group-hover:text-primary transition leading-snug">{item.title}</h3>
-                    <p className="text-slate-600 text-xs sm:text-sm line-clamp-3 leading-relaxed">{item.summary}</p>
-                  </div>
-                  <div className="pt-4 mt-4 border-t border-slate-100">
-                    <Link
-                      to={`/news/${item.slug}`}
-                      className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-primary group-hover:translate-x-0.5 transition"
-                    >
-                      <span>Read Full Article</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </Link>
-                  </div>
-                </div>
-              </article>
+                title={item.title}
+                categoryBadge="Media@Campus"
+                dateBadge={new Date(item.publishedDate).toLocaleDateString()}
+                imageUrl={item.imageUrl}
+                imageAlt={item.title}
+                description={item.summary}
+                linkTo={`/news/${item.slug}`}
+                actionText="Read Article"
+              />
             ))}
           </div>
         )}

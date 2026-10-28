@@ -13,7 +13,7 @@ interface CourseOption {
 }
 
 export const AdmissionsPage: React.FC = () => {
-  const { tenantDomain } = useTenant();
+  const { tenantDomain, siteConfig } = useTenant();
   const { isArtsAndScience, isMedical, isUniversity, isEngineering } = useTheme();
   const [cmsPage, setCmsPage] = useState<PageData | null>(null);
   const [cmsLoading, setCmsLoading] = useState(true);
@@ -343,21 +343,42 @@ export const AdmissionsPage: React.FC = () => {
         </div>
       )}
       {/* Hero Banner */}
-      <section className={`relative ${heroBg} text-white py-16 md:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden`}>
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
-        <div className="max-w-7xl mx-auto relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold uppercase tracking-wider text-white mb-4">
-            <Sparkles className="w-4 h-4 text-emerald-300" />
-            <span>{isArtsAndScience ? 'Scholarly Admissions 2026 - 2027' : isMedical ? 'Medical & Clinical Admissions 2026 - 2027' : isUniversity ? 'University Enrollment 2026 - 2027' : 'Admissions Open 2026 - 2027'}</span>
-          </div>
-          <h1 className={`text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white mb-4 ${titleFont}`}>
-            Begin Your Transformative Journey
-          </h1>
-          <p className={`text-slate-200 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed ${isArtsAndScience ? 'font-serif' : ''}`}>
-            Join a vibrant university ecosystem committed to academic distinction, cutting-edge innovation, and global leadership.
-          </p>
-        </div>
-      </section>
+      {(() => {
+        const headerConfig =
+          siteConfig?.settings?.socialLinks?.pageHeaders?.admissions ||
+          siteConfig?.settings?.pageHeaders?.admissions;
+        const badgeText =
+          headerConfig?.badge ||
+          (isArtsAndScience
+            ? 'Scholarly Admissions 2026 - 2027'
+            : isMedical
+            ? 'Medical & Clinical Admissions 2026 - 2027'
+            : isUniversity
+            ? 'University Enrollment 2026 - 2027'
+            : 'Admissions Open 2026 - 2027');
+        const titleText = headerConfig?.title || 'Begin Your Transformative Journey';
+        const subtitleText =
+          headerConfig?.subtitle ||
+          'Join a vibrant university ecosystem committed to academic distinction, cutting-edge innovation, and global leadership.';
+
+        return (
+          <section className={`relative ${heroBg} text-white py-16 md:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden`}>
+            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
+            <div className="max-w-7xl mx-auto relative z-10 text-center">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold uppercase tracking-wider text-white mb-4">
+                <Sparkles className="w-4 h-4 text-emerald-300" />
+                <span>{badgeText}</span>
+              </div>
+              <h1 className={`text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white mb-4 ${titleFont}`}>
+                {titleText}
+              </h1>
+              <p className={`text-slate-200 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed ${isArtsAndScience ? 'font-serif' : ''}`}>
+                {subtitleText}
+              </p>
+            </div>
+          </section>
+        );
+      })()}
 
       {/* 4-Step Application Pipeline Cards */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20">
@@ -366,7 +387,7 @@ export const AdmissionsPage: React.FC = () => {
             {
               step: '01',
               title: 'Explore & Choose Program',
-              desc: 'Select from over 45+ accredited UG, PG, and Doctoral degrees suited to your career ambition.',
+              desc: 'Explore available accredited programs and degree courses suited to your career ambition.',
               badge: 'Step 1',
             },
             {

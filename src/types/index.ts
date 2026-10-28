@@ -4,6 +4,7 @@ export interface Tenant {
   name: string;
   slug: string;
   status: string;
+  provisioningStatus?: string;
   defaultThemeId?: string | number;
   dbConnectionString?: string;
   primaryDomain?: string;
@@ -80,6 +81,15 @@ export interface MarqueeData {
   items: MarqueeItem[];
 }
 
+export interface StatsSettings {
+  id?: string | number;
+  badge?: string;
+  title?: string;
+  subtitle?: string;
+  isActive?: boolean;
+  updatedAt?: string;
+}
+
 export interface SiteConfig {
   tenant: Tenant;
   theme?: Theme;
@@ -90,6 +100,7 @@ export interface SiteConfig {
   banners?: any[];
   marquee?: MarqueeData;
   stats?: StatItem[];
+  statsSettings?: StatsSettings;
   quote?: QuoteSettings;
 }
 
@@ -134,6 +145,7 @@ export interface NewsItem {
   imageUrl?: string;
   publishedDate: string;
   isPublished: boolean;
+  category?: string;
 }
 
 export interface EventItem {
@@ -144,6 +156,8 @@ export interface EventItem {
   location: string;
   imageUrl?: string;
   isPublished: boolean;
+  category?: string;
+  time?: string;
 }
 
 export interface NoticeItem {
@@ -158,6 +172,78 @@ export interface NoticeItem {
   expiryDate?: string;
   isPublished: boolean;
   isImportant: boolean;
+}
+
+// --- CMS Expanded Section Types ---
+export interface DocumentItem {
+  id?: string | number;
+  title: string;
+  description?: string;
+  category?: string;
+  fileUrl: string;
+  fileType?: 'PDF' | 'DOCX' | 'XLSX' | 'ZIP' | string;
+  fileSize?: string;
+  publishDate?: string;
+  openInNewTab?: boolean;
+  sortOrder?: number;
+}
+
+export interface TableColumn {
+  key: string;
+  label: string;
+  align?: 'left' | 'center' | 'right';
+}
+
+export interface TableSectionContent {
+  title?: string;
+  subtitle?: string;
+  columns?: TableColumn[];
+  rows?: Record<string, any>[];
+  striped?: boolean;
+  bordered?: boolean;
+  searchable?: boolean;
+}
+
+export interface TimelineItem {
+  id?: string | number;
+  year: string;
+  title: string;
+  description?: string;
+  badge?: string;
+  imageUrl?: string;
+  sortOrder?: number;
+}
+
+export interface TabItem {
+  id?: string | number;
+  title: string;
+  icon?: string;
+  badge?: string;
+  content: string;
+  buttonText?: string;
+  buttonUrl?: string;
+}
+
+export interface TestimonialItem {
+  id?: string | number;
+  name: string;
+  role?: string;
+  batch?: string;
+  degree?: string;
+  company?: string;
+  avatarUrl?: string;
+  quote: string;
+  rating?: number;
+}
+
+export interface EmbedSectionContent {
+  title?: string;
+  subtitle?: string;
+  embedUrl: string;
+  aspectRatio?: '16:9' | '4:3' | '1:1' | 'custom';
+  heightPx?: number;
+  allowFullscreen?: boolean;
+  caption?: string;
 }
 
 export interface AuthState {
@@ -336,17 +422,18 @@ export interface TemplateItem {
   code: string;
   name: string;
   category: string;
-  description: string;
+  description?: string;
   defaultThemeId?: string | number;
   defaultThemeCode?: string;
   defaultThemeName?: string;
   themeConfiguration?: ThemeConfig;
   supportedThemes?: string[];
-  recommendedFeatures: string[];
+  recommendedFeatures?: string[];
   starterPages?: any[];
   starterMenus?: any[];
-  collegesCount?: number;
   isActive: boolean;
+  isSystem?: boolean;
+  collegesCount?: number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -464,3 +551,237 @@ export interface CreateThemePayload {
     badgeText?: string;
   };
 }
+
+// -------------------------------------------------------------
+// College Modules & Academic Entities
+// -------------------------------------------------------------
+
+export interface LaboratoryItem {
+  name: string;
+  description?: string;
+  equipment?: string;
+  imageUrl?: string;
+}
+
+export interface SemesterSyllabusItem {
+  semesterNumber?: number;
+  semester?: number;
+  title: string;
+  pdfUrl?: string;
+  wordUrl?: string;
+  regulationYear?: string;
+  credits?: number;
+}
+
+export interface Course {
+  id: string | number;
+  departmentId?: string | number;
+  departmentName?: string;
+  name: string;
+  code: string;
+  slug?: string;
+  degreeLevel: string;
+  durationYears: number;
+  totalSemesters?: number;
+  regulationYear?: string;
+  intake?: number;
+  description: string;
+  eligibility: string;
+  feeStructure?: string;
+  tuitionFee?: string;
+  syllabusPdfUrl?: string;
+  semesterSyllabi?: SemesterSyllabusItem[];
+  curriculumHighlights?: string[];
+  imageUrl?: string;
+  thumbnailUrl?: string;
+  isActive: boolean;
+}
+
+export interface FacultyMember {
+  id: string | number;
+  departmentId?: string | number;
+  departmentName?: string;
+  name: string;
+  designation: string;
+  qualification: string;
+  specialization?: string;
+  email?: string;
+  profileImageUrl?: string;
+  bio?: string;
+  sortOrder: number;
+  isActive: boolean;
+}
+
+export interface DepartmentSyllabusItem {
+  id?: string;
+  title: string;
+  academicYear?: string;
+  regulationYear?: string;
+  fileUrl: string;
+  fileName?: string;
+  fileType?: string;
+  description?: string;
+}
+
+export interface Department {
+  id: string | number;
+  name: string;
+  code: string;
+  slug?: string;
+  description: string;
+  headOfDepartment?: string;
+  hodMessage?: string;
+  hodPhotoUrl?: string;
+  visionMission?: string;
+  stream?: string;
+  totalSemesters?: number;
+  labCount?: number;
+  studentCount?: number;
+  laboratories?: LaboratoryItem[];
+  email?: string;
+  phone?: string;
+  imageUrl?: string;
+  coverImageUrl?: string;
+  syllabusPdfUrl?: string;
+  curriculumPdfUrl?: string;
+  syllabi?: DepartmentSyllabusItem[];
+  syllabiJson?: string;
+  displayOrder?: number;
+  isActive: boolean;
+  courses?: Course[];
+  faculty?: FacultyMember[];
+}
+
+
+export interface ComplianceDocument {
+  id: string | number;
+  title: string;
+  category: string;
+  fileUrl?: string;
+  documentPdfUrl?: string;
+  fileSize?: string;
+  academicYear?: string;
+  description?: string;
+  sortOrder?: number;
+  displayOrder?: number;
+  isActive?: boolean;
+}
+
+export interface TransportStop {
+  stopName: string;
+  time?: string;
+}
+
+export interface TransportRoute {
+  id: string | number;
+  routeNumber: string;
+  routeName: string;
+  startPoint?: string;
+  startingPoint?: string;
+  endPoint?: string;
+  destination?: string;
+  departureTime?: string;
+  morningPickupTime?: string;
+  eveningDropTime?: string;
+  viaStops?: string[];
+  stopsJson?: string;
+  stops?: TransportStop[];
+  busNumber?: string;
+  driverName?: string;
+  driverPhone?: string;
+  timingPdfUrl?: string;
+  routeMapPdfUrl?: string;
+  isActive?: boolean;
+}
+
+export interface HostelRoomType {
+  type: string;
+  fee?: string;
+}
+
+export interface HostelFacility {
+  id: string | number;
+  name: string;
+  type?: string;
+  genderType?: 'BOYS' | 'GIRLS' | 'FACULTY' | string;
+  capacity?: number;
+  totalRooms?: number;
+  description?: string;
+  amenities?: string[];
+  roomTypesJson?: string;
+  roomTypes?: HostelRoomType[];
+  wardenName?: string;
+  wardenPhone?: string;
+  wardenEmail?: string;
+  messMenuPdfUrl?: string;
+  rulesPdfUrl?: string;
+  photoUrl?: string;
+  imageUrl?: string;
+  isActive?: boolean;
+}
+
+export interface LibraryResource {
+  id: string | number;
+  title: string;
+  resourceType: 'QUESTION_PAPER' | 'E_JOURNAL' | 'SYLLABUS_BOOK' | 'THESIS' | string;
+  departmentCode?: string;
+  departmentName?: string;
+  subjectCode?: string;
+  subjectName?: string;
+  semester?: number;
+  academicYear?: string;
+  externalUrl?: string;
+  fileUrl?: string;
+  pdfUrl?: string;
+  description?: string;
+  isActive?: boolean;
+}
+
+export interface AlumniMember {
+  id: string | number;
+  fullName: string;
+  email?: string;
+  phone?: string;
+  graduationYear?: number;
+  batchYear?: string | number;
+  degree?: string;
+  degreeCourse?: string;
+  currentCompany?: string;
+  currentDesignation?: string;
+  currentCity?: string;
+  testimonial?: string;
+  testimonialQuote?: string;
+  photoUrl?: string;
+  linkedinUrl?: string;
+  isFeatured?: boolean;
+  isDistinguished?: boolean;
+  isApproved?: boolean;
+  status?: 'APPROVED' | 'PENDING' | 'REJECTED' | string;
+}
+
+export interface PopupAnnouncement {
+  id: string;
+  title: string;
+  popupType: 'IMAGE_POSTER' | 'RICH_CONTENT' | 'VIDEO' | string;
+  imageUrl?: string;
+  badgeText?: string;
+  heading?: string;
+  description?: string;
+  videoUrl?: string;
+  targetUrl?: string;
+  ctaText?: string;
+  secondaryCtaText?: string;
+  secondaryTargetUrl?: string;
+  openInNewTab?: boolean;
+  delaySeconds?: number;
+  displayFrequency?: 'EVERY_VISIT' | 'ONCE_PER_SESSION' | 'ONCE_PER_DAY' | string;
+  targetPages?: 'HOMEPAGE_ONLY' | 'ALL_PAGES' | 'CUSTOM_SLUGS' | string;
+  customTargetSlugs?: string;
+  startDate?: string;
+  endDate?: string;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+

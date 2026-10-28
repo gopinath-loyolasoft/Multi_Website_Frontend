@@ -1,4 +1,4 @@
-import { useLayoutContext } from '@/context/useLayoutContext'
+import { useLayoutContext } from '@/contexts/useLayoutContext'
 import { toPascalCase } from '@/utils/helpers'
 import type { CustomizationOptionType } from '../index'
 

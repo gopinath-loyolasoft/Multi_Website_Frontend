@@ -24,6 +24,7 @@ import {
 } from '../../UI_Componentes/ui';
 import { Tenant, Theme } from '../../types';
 import { apiClient } from '../../services/apiClient';
+import { resolveTenantPortalUrl, formatDisplayDomain } from '../../utils/domainUtils';
 import { CreateCollegeDrawer } from './CreateCollegeDrawer';
 import { EditCollegeModal } from './EditCollegeModal';
 import { DeleteCollegeModal } from './DeleteCollegeModal';
@@ -124,32 +125,21 @@ export const CollegesPage: React.FC = () => {
     {
       header: 'Routing Domain',
       render: (_, col) => {
-        const portSuffix = window.location.port ? `:${window.location.port}` : '';
-        const primaryDomain = col.primaryDomain || `${col.tenantCode.toLowerCase()}.localhost`;
-        const isProdDomain = !primaryDomain.endsWith('.localhost');
-        const localDevHost = `${col.tenantCode.toLowerCase()}.localhost`;
-        const launchUrl =
-          isProdDomain && window.location.hostname === 'localhost'
-            ? `http://${localDevHost}${portSuffix}`
-            : `http://${primaryDomain}${portSuffix}`;
+        const displayDomain = formatDisplayDomain(col.primaryDomain, col.tenantCode, col.slug);
+        const launchUrl = resolveTenantPortalUrl(col.primaryDomain, col.tenantCode, col.slug);
 
         return (
-          <div className="space-y-0.5">
-            <div className="flex items-center gap-1.5 font-mono text-slate-800 dark:text-slate-200 font-medium">
-              <span>{primaryDomain}</span>
-              {isProdDomain && (
-                <Badge variant="purple" size="sm">
-                  PROD
-                </Badge>
-              )}
+          <div className="space-y-1">
+            <div className="flex items-center gap-1.5 font-mono text-slate-800 dark:text-slate-200 font-medium text-xs">
+              <span>{displayDomain}</span>
             </div>
             <a
               href={launchUrl}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1 text-[11px] font-mono text-blue-600 dark:text-blue-400 hover:underline"
+              className="inline-flex items-center gap-1 text-[11px] font-medium text-blue-600 dark:text-blue-400 hover:underline"
             >
-              <span>{isProdDomain ? `Dev: ${localDevHost}${portSuffix}` : 'Open Portal'}</span>
+              <span>Open Portal</span>
               <ExternalLink className="w-3 h-3 text-blue-500" />
             </a>
           </div>

@@ -1,8 +1,10 @@
-﻿import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Globe2, ArrowUp } from 'lucide-react';
 import { useTenant } from '../tenant/TenantContext';
+import { MenuItem } from '../types';
 import { MarqueeBar } from '../components/common/MarqueeBar';
+import { SitePopupModal } from '../components/common/SitePopupModal';
 import { useActiveTemplate } from '../templates/templateRegistry';
 
 export const WebsiteLayout: React.FC = () => {
@@ -113,7 +115,17 @@ export const WebsiteLayout: React.FC = () => {
     setMobileExpanded((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const visibleMenus = (siteConfig.primaryMenu || []).filter((item) => item.isVisible !== false);
+  // Recursively preserve all active navigation menus & submenus configured by Admin
+  const filterMenuItems = (items: MenuItem[]): MenuItem[] => {
+    return (items || [])
+      .filter((item) => item.isVisible !== false)
+      .map((item) => ({
+        ...item,
+        children: item.children ? filterMenuItems(item.children) : [],
+      }));
+  };
+
+  const visibleMenus = filterMenuItems(siteConfig.primaryMenu || []);
 
   return (
     <div className={Template.config.pageContainerClass}>
@@ -154,6 +166,9 @@ export const WebsiteLayout: React.FC = () => {
           <ArrowUp className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" />
         </button>
       )}
+
+      {/* 6. Dynamic Modal Popup / Entry Lightbox Announcement */}
+      <SitePopupModal />
     </div>
   );
 };

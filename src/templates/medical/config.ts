@@ -1,4 +1,4 @@
-﻿import { Activity } from 'lucide-react';
+import { Activity } from 'lucide-react';
 import { TemplateConfig } from '../contracts/TemplateContracts';
 
 export const medicalConfig: TemplateConfig = {
@@ -10,7 +10,7 @@ export const medicalConfig: TemplateConfig = {
   nameFont: 'font-sans font-extrabold tracking-tight',
   titleFont: 'font-sans',
   badgeFont: 'font-sans font-semibold text-cyan-700',
-  defaultBadge: 'NMC Recognized • 1200-Bed Teaching Hospital',
+  defaultBadge: '',
   crestBg: 'bg-cyan-700 shadow-cyan-800/25',
   CrestIcon: Activity,
   heroGradient: 'bg-gradient-to-r from-teal-950 via-teal-900 to-slate-950',

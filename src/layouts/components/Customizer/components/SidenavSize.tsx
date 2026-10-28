@@ -1,4 +1,4 @@
-import { useLayoutContext } from '@/context/useLayoutContext'
+import { useLayoutContext } from '@/contexts/useLayoutContext'
 
 import compactImg from '@/assets/images/layouts/sidenav-size-compact.png'
 import condensedImg from '@/assets/images/layouts/sidenav-size-condensed.png'

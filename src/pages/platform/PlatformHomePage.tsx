@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 import { Tenant } from '../../types';
+import { formatDisplayDomain, resolveTenantPortalUrl } from '../../utils/domainUtils';
 
 export const PlatformHomePage: React.FC = () => {
   const [colleges, setColleges] = useState<Tenant[]>([]);
@@ -135,12 +136,8 @@ export const PlatformHomePage: React.FC = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {colleges.map((col) => {
-              const collegeDomain = col.primaryDomain || `${col.tenantCode.toLowerCase()}.localhost`;
-              const isProdDomain = !collegeDomain.endsWith('.localhost');
-              const localDevHost = `${col.tenantCode.toLowerCase()}.localhost`;
-              const collegeUrl = isProdDomain && window.location.hostname === 'localhost'
-                ? `http://${localDevHost}${currentPort}`
-                : `http://${collegeDomain}${currentPort}`;
+              const collegeDomain = formatDisplayDomain(col.primaryDomain, col.tenantCode, col.slug);
+              const collegeUrl = resolveTenantPortalUrl(col.primaryDomain, col.tenantCode, col.slug);
 
               return (
                 <div

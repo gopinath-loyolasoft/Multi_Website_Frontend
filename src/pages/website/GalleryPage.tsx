@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Image as ImageIcon, Maximize2, X, ChevronRight, AlertCircle } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 import { useActiveTemplate } from '../../templates/templateRegistry';
+import { useTenant } from '../../tenant/TenantContext';
 
 interface GalleryItem {
   id: string;
@@ -15,6 +16,7 @@ interface GalleryItem {
 
 export const GalleryPage: React.FC = () => {
   const Template = useActiveTemplate();
+  const { siteConfig } = useTenant();
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -63,13 +65,32 @@ export const GalleryPage: React.FC = () => {
       item.category.toLowerCase() === selectedCategory.toLowerCase()
   );
 
+  const headerConfig =
+    siteConfig?.settings?.socialLinks?.pageHeaders?.gallery ||
+    siteConfig?.settings?.pageHeaders?.gallery;
+
+  const defaultBadge =
+    Template.config.code === 'ARTS_SCIENCE_MODERN'
+      ? 'Heritage & Photo Archives'
+      : Template.config.code === 'MEDICAL_MODERN'
+      ? 'Clinical Facilities & Labs Photo Tour'
+      : Template.config.code === 'UNIVERSITY_MODERN'
+      ? 'Campus Panorama & Archives'
+      : 'Campus Panorama & Labs';
+
+  const badgeText = headerConfig?.badge || defaultBadge;
+  const titleText = headerConfig?.title || 'Campus Life & Multimedia Gallery';
+  const subtitleText =
+    headerConfig?.subtitle ||
+    'Take a visual tour through our world-class laboratories, verdant university grounds, vibrant student societies, and athletic championships.';
+
   return (
     <div className={`min-h-screen ${Template.config.bodyBgClass}`}>
       {/* Dynamic Modular Template Page Hero */}
       <Template.PageHero
-        badge={Template.config.code === 'ARTS_SCIENCE_MODERN' ? 'Heritage & Photo Archives' : Template.config.code === 'MEDICAL_MODERN' ? 'Clinical Facilities & Labs Photo Tour' : Template.config.code === 'UNIVERSITY_MODERN' ? 'Campus Panorama & Archives' : 'Campus Panorama & Labs'}
-        title="Campus Life & Multimedia Gallery"
-        subtitle="Take a visual tour through our world-class laboratories, verdant university grounds, vibrant student societies, and athletic championships."
+        badge={badgeText}
+        title={titleText}
+        subtitle={subtitleText}
         icon={<ImageIcon className="w-4 h-4 text-emerald-300" />}
       />
 
