@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Trash2, AlertTriangle, Database, Globe, Loader2 } from 'lucide-react';
 import { Drawer } from '../../UI_Componentes/ui';
 import { Tenant } from '../../types';
-import { apiClient } from '../../services/apiClient';
+import { apiClient, getApiErrorMessage } from '../../services/apiClient';
 
 interface Props {
   isOpen: boolean;
@@ -58,7 +58,7 @@ export const DeleteCollegeModal: React.FC<Props> = ({
       }
     } catch (err: any) {
       console.error(err);
-      setError(err.response?.data?.message || err.message || 'Error occurred while deleting college');
+      setError(getApiErrorMessage(err, 'Error occurred while deleting college'));
     } finally {
       setLoading(false);
     }

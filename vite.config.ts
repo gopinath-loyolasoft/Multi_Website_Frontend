@@ -21,7 +21,7 @@ export default defineConfig({
     allowedHosts: true,
     proxy: {
       '/uploads': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:5189',
         changeOrigin: true,
       },
     },

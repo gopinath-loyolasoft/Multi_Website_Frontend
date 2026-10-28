@@ -19,7 +19,7 @@ interface UserTenantMembership {
   tenantId: string | number;
   roleId?: string | number | null;
 }
-import { apiClient } from '../../services/apiClient';
+import { apiClient, getApiErrorMessage } from '../../services/apiClient';
 import { FormDrawer, Input, ConfirmDialog, useToast } from '../../UI_Componentes/ui';
 
 const getCurrentUsername = (): string => {
@@ -268,7 +268,7 @@ export const CollegeAdminsPage: React.FC = () => {
         toast.error(res.data?.message || 'Failed to delete administrator');
       }
     } catch (err: any) {
-      toast.error(err.response?.data?.message || err.message || 'Failed to delete administrator');
+      toast.error(getApiErrorMessage(err, 'Failed to delete administrator'));
     } finally {
       setDeleteBusy(false);
     }
@@ -287,7 +287,7 @@ export const CollegeAdminsPage: React.FC = () => {
     return c ? `${c.name} (${c.tenantCode})` : null;
   };
 
-  const tableCellAction = 'px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition cursor-pointer inline-flex items-center gap-1 border';
+  const tableCellAction = 'h-7 px-2.5 rounded-lg text-[11px] font-semibold transition cursor-pointer inline-flex items-center justify-center gap-1.5 border whitespace-nowrap shadow-2xs select-none flex-shrink-0';
 
   return (
     <div className="space-y-6 text-slate-900 font-sans">
@@ -354,7 +354,7 @@ export const CollegeAdminsPage: React.FC = () => {
                 <th className="py-3 px-6">Role</th>
                 <th className="py-3 px-6">Tenant Scope</th>
                 <th className="py-3 px-6">Status</th>
-                <th className="py-3 px-6 text-right">Actions</th>
+                <th className="py-3 px-6 text-right whitespace-nowrap min-w-[360px]">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-700">
@@ -410,14 +410,14 @@ export const CollegeAdminsPage: React.FC = () => {
                           {u.isActive ? 'Active' : 'Inactive'}
                         </span>
                       </td>
-                      <td className="py-3.5 px-6 text-right">
-                        <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                      <td className="py-3.5 px-6 text-right whitespace-nowrap">
+                        <div className="inline-flex items-center justify-end gap-1.5 flex-nowrap">
                           <button
                             onClick={() => openAssignDrawer(u)}
                             className={`${tableCellAction} text-blue-700 bg-blue-50 border-blue-200 hover:bg-blue-100`}
                             title="Assign colleges to this administrator"
                           >
-                            <Building2 className="w-3.5 h-3.5" />
+                            <Building2 className="w-3.5 h-3.5 flex-shrink-0" />
                             <span>Colleges</span>
                           </button>
                           <button
@@ -425,7 +425,7 @@ export const CollegeAdminsPage: React.FC = () => {
                             className={`${tableCellAction} text-amber-700 bg-amber-50 border-amber-200 hover:bg-amber-100`}
                             title="Reset password"
                           >
-                            <KeyRound className="w-3.5 h-3.5" />
+                            <KeyRound className="w-3.5 h-3.5 flex-shrink-0" />
                             <span>Password</span>
                           </button>
                           <button
@@ -433,7 +433,7 @@ export const CollegeAdminsPage: React.FC = () => {
                             className={`${tableCellAction} text-slate-700 bg-slate-100 border-slate-200 hover:bg-slate-200`}
                             title="Edit profile"
                           >
-                            <Pencil className="w-3.5 h-3.5" />
+                            <Pencil className="w-3.5 h-3.5 flex-shrink-0" />
                             <span>Edit</span>
                           </button>
                           <button
@@ -444,16 +444,16 @@ export const CollegeAdminsPage: React.FC = () => {
                               : 'text-emerald-700 bg-emerald-50 border-emerald-200 hover:bg-emerald-100'} disabled:opacity-50`}
                             title={u.isActive ? 'Disable login for this administrator' : 'Re-enable login'}
                           >
-                            <Power className="w-3.5 h-3.5" />
+                            <Power className="w-3.5 h-3.5 flex-shrink-0" />
                             <span>{u.isActive ? 'Disable' : 'Enable'}</span>
                           </button>
                           <button
                             onClick={() => setDeleteTarget(u)}
                             disabled={isSelf}
-                            className={`${tableCellAction} text-red-700 bg-red-50 border-red-200 hover:bg-red-100 disabled:opacity-40 disabled:cursor-not-allowed`}
+                            className="h-7 w-7 rounded-lg text-red-700 bg-red-50 border border-red-200 hover:bg-red-100 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer inline-flex items-center justify-center shadow-2xs flex-shrink-0"
                             title={isSelf ? 'You cannot delete your own account' : 'Delete administrator'}
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash2 className="w-3.5 h-3.5 flex-shrink-0" />
                           </button>
                         </div>
                       </td>

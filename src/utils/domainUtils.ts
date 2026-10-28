@@ -98,13 +98,8 @@ export const resolveTenantPortalUrl = (
   const basePlatform = getPlatformBaseDomain();
 
   if (isLocal) {
-    if (primaryDomain && primaryDomain.trim()) {
-      let clean = primaryDomain.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '').split(':')[0];
-      if (!clean.includes('.')) {
-        clean = `${clean}.localhost`;
-      }
-      return `http://${clean}${portSuffix}`;
-    }
+    // In local development, always route to http://<codeOrSlug>.localhost:port (e.g. http://shc.localhost:3000)
+    // Chrome, Edge, and Firefox natively resolve *.localhost to 127.0.0.1 without any DNS or hosts configuration!
     return `http://${codeOrSlug}.localhost${portSuffix}`;
   }
 
