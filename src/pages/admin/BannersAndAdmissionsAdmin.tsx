@@ -1035,8 +1035,8 @@ export const BannersManagementPage: React.FC = () => {
               label="BACKGROUND IMAGE"
               value={imageUrl}
               onChange={setImageUrl}
-              placeholder="/assets/templates/... or choose local image file"
-              helpText="Upload a local image file (SVG, PNG, JPG, WebP) or enter an asset path."
+              placeholder="https://... live online image URL or /assets/templates/..."
+              helpText="Paste any live online image URL (https://...) or click 'Upload Local File' to upload from your computer."
             />
 
             {/* Primary & Secondary Action Buttons */}

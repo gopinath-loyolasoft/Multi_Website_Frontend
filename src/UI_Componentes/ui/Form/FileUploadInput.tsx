@@ -17,9 +17,9 @@ export const FileUploadInput: React.FC<FileUploadInputProps> = ({
   label = 'Upload Image or File',
   value,
   onChange,
-  placeholder = 'https://... or choose a local file',
+  placeholder = 'https://... live online image URL or /assets/templates/...',
   required = false,
-  helpText,
+  helpText = 'Paste any live online image URL (https://...) or choose a local file.',
   accept = '*/*',
   className = '',
 }) => {
@@ -98,8 +98,11 @@ export const FileUploadInput: React.FC<FileUploadInputProps> = ({
     if (!url) return false;
     return (
       url.startsWith('data:image/') ||
-      /\.(jpeg|jpg|gif|png|webp|svg)(\?.*)?$/i.test(url) ||
-      url.includes('/uploads/')
+      url.startsWith('http://') ||
+      url.startsWith('https://') ||
+      /\.(jpeg|jpg|gif|png|webp|svg|jfif|bmp|ico)(\?.*)?$/i.test(url) ||
+      url.includes('/uploads/') ||
+      url.includes('/assets/')
     );
   };
 

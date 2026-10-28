@@ -305,7 +305,7 @@ export const CreateCollegeDrawer: React.FC<Props> = ({
     const cleanSlug = currentName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     const codeKey = currentCode.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
     const prefix = codeKey || cleanSlug;
-    const base = 'loyolasoft.com';
+    const base = getPlatformBaseDomain();
 
     if (!isDomainTouchedRef.current) {
       setPrimaryDomain(prefix ? `${prefix}.${base}` : '');
@@ -341,7 +341,7 @@ export const CreateCollegeDrawer: React.FC<Props> = ({
     const code = (tenantCode || name.replace(/[^a-zA-Z]/g, '').slice(0, 5)).toUpperCase();
     const generatedSlug = slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     const prefix = (code || generatedSlug || 'college').toLowerCase().replace(/[^a-z0-9]/g, '');
-    const base = 'loyolasoft.com';
+    const base = getPlatformBaseDomain();
 
     if (!tenantCode && code) setTenantCode(code);
     if (!slug && generatedSlug) setSlug(generatedSlug);
@@ -638,13 +638,13 @@ export const CreateCollegeDrawer: React.FC<Props> = ({
 
               <Input
                 label="Official College Domain / Subdomain"
-                placeholder="e.g. rcm.loyolasoft.com or custom college domain"
+                placeholder={`e.g. rcm.${getPlatformBaseDomain()} or custom college domain`}
                 value={primaryDomain}
                 onChange={(e) => {
                   isDomainTouchedRef.current = e.target.value.trim().length > 0;
                   setPrimaryDomain(e.target.value);
                 }}
-                helperText="Auto-suggested subdomain (e.g. shc.loyolasoft.com) or enter a custom domain (e.g. rcmcollege.com)"
+                helperText={`Auto-suggested subdomain (e.g. shc.${getPlatformBaseDomain()}) or enter a custom domain (e.g. rcmcollege.com)`}
                 required
               />
             </div>
