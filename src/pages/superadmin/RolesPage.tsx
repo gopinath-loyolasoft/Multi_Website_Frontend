@@ -18,7 +18,9 @@ import {
   ChevronDown,
   ChevronUp,
   XCircle,
-  AlertCircle
+  AlertCircle,
+  Pencil,
+  Save
 } from 'lucide-react';
 import { RoleItem, PermissionItem, CreateRolePayload } from '../../types';
 import { apiClient } from '../../services/apiClient';
@@ -48,6 +50,15 @@ export const RolesPage: React.FC = () => {
   const [modalError, setModalError] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<RoleItem | null>(null);
   const [deleteBusy, setDeleteBusy] = useState(false);
+
+  // Edit drawer state (rename role / update description / edit permissions)
+  const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
+  const [editTarget, setEditTarget] = useState<RoleItem | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editDesc, setEditDesc] = useState('');
+  const [editPermIds, setEditPermIds] = useState<string[]>([]);
+  const [editSaving, setEditSaving] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
 
   const fetchRolesAndPermissions = async () => {
     try {
@@ -90,6 +101,69 @@ export const RolesPage: React.FC = () => {
     setSelectedPermIds(prev =>
       prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
     );
+  };
+
+  // ─── Edit role handlers ───────────────────────────────────────────
+  const openEditDrawer = (role: RoleItem) => {
+    setEditTarget(role);
+    setEditName(role.name);
+    setEditDesc(role.description || '');
+    setEditPermIds(role.permissions.map(p => p.id));
+    setEditError(null);
+    setIsEditDrawerOpen(true);
+  };
+
+  const handleToggleEditPermission = (id: string) => {
+    setEditPermIds(prev =>
+      prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
+    );
+  };
+
+  const handleToggleEditModulePerms = (modulePerms: PermissionItem[]) => {
+    const modulePermIds = modulePerms.map(p => p.id);
+    const allSelected = modulePermIds.every(id => editPermIds.includes(id));
+    if (allSelected) {
+      setEditPermIds(prev => prev.filter(id => !modulePermIds.includes(id)));
+    } else {
+      setEditPermIds(prev => Array.from(new Set([...prev, ...modulePermIds])));
+    }
+  };
+
+  const handleSelectAllEditPerms = () => {
+    if (editPermIds.length === permissions.length) {
+      setEditPermIds([]);
+    } else {
+      setEditPermIds(permissions.map(p => p.id));
+    }
+  };
+
+  const handleSaveRoleEdits = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editTarget || !editName.trim()) return;
+
+    try {
+      setEditSaving(true);
+      setEditError(null);
+
+      // 1. Update role identity (name + description)
+      await apiClient.put(`/superadmin/roles/${editTarget.id}`, {
+        name: editName.trim(),
+        description: editDesc.trim()
+      });
+
+      // 2. Replace permission entitlements
+      await apiClient.put(`/superadmin/roles/${editTarget.id}/permissions`, {
+        permissionIds: editPermIds
+      });
+
+      setIsEditDrawerOpen(false);
+      setEditTarget(null);
+      await fetchRolesAndPermissions();
+    } catch (err: any) {
+      setEditError(err.response?.data?.message || err.message || 'Failed to save role changes');
+    } finally {
+      setEditSaving(false);
+    }
   };
 
   const handleToggleModulePerms = (modulePerms: PermissionItem[]) => {
@@ -470,18 +544,30 @@ export const RolesPage: React.FC = () => {
 
                   {/* Actions Footer */}
                   <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedRole(role);
-                        setDrawerMode('view');
-                        setIsDrawerOpen(true);
-                      }}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/60 rounded-xl transition cursor-pointer"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                      <span>View Details</span>
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedRole(role);
+                          setDrawerMode('view');
+                          setIsDrawerOpen(true);
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/60 rounded-xl transition cursor-pointer"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>View Details</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => openEditDrawer(role)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 rounded-xl transition cursor-pointer"
+                        title="Edit role name, description and permissions"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                        <span>Edit</span>
+                      </button>
+                    </div>
 
                     {!role.isSystem && (
                       <button
@@ -728,6 +814,132 @@ export const RolesPage: React.FC = () => {
             </div>
           </div>
         )}
+      </FormDrawer>
+
+      {/* EDIT ROLE DRAWER — rename, re-describe and re-grant permissions */}
+      <FormDrawer
+        isOpen={isEditDrawerOpen}
+        onClose={() => {
+          setIsEditDrawerOpen(false);
+          setEditTarget(null);
+        }}
+        title={`Edit Role — '${editTarget?.name || ''}'`}
+        subtitle={`System Code: ${editTarget?.code || ''} (immutable)`}
+        icon={<Pencil className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />}
+        mode="edit"
+        size="lg"
+        loading={editSaving}
+        onSubmit={handleSaveRoleEdits}
+        submitText="Save Role Changes"
+      >
+        <div className="space-y-5 text-xs">
+          {editError && (
+            <div className="p-3.5 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-300 text-xs font-semibold flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
+              <span>{editError}</span>
+            </div>
+          )}
+
+          <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-200 font-medium">
+            Changes take effect immediately for every administrator holding this role. All edits are recorded in the platform audit trail.
+          </div>
+
+          <Input
+            label="Role Title"
+            required
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+            placeholder="e.g. Academic Dean or Auditor"
+          />
+
+          <div>
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+              Description / Responsibility Scope
+            </label>
+            <textarea
+              rows={2}
+              placeholder="Explain what this administrator role is authorized to modify..."
+              value={editDesc}
+              onChange={(e) => setEditDesc(e.target.value)}
+              className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
+            />
+          </div>
+
+          {/* Permission Selection by Module */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
+                Granted Permissions ({editPermIds.length}/{permissions.length} Selected)
+              </label>
+              <button
+                type="button"
+                onClick={handleSelectAllEditPerms}
+                className="text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+              >
+                {editPermIds.length === permissions.length ? 'Deselect All' : 'Select All'}
+              </button>
+            </div>
+
+            <div className="p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 max-h-72 overflow-y-auto space-y-5">
+              {Object.entries(permissionsByModule).map(([module, perms]) => {
+                const modulePermIds = perms.map(p => p.id);
+                const isModuleAllSelected = modulePermIds.every(id => editPermIds.includes(id));
+
+                return (
+                  <div key={module} className="space-y-2.5">
+                    <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-1">
+                      <span className="font-mono text-[11px] text-blue-600 dark:text-blue-400 uppercase font-bold tracking-wider">
+                        {module} Module
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleToggleEditModulePerms(perms)}
+                        className="text-[10px] font-bold text-slate-500 dark:text-slate-400 hover:text-blue-600 cursor-pointer"
+                      >
+                        {isModuleAllSelected ? 'Deselect Module' : 'Select Module'}
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {perms.map((p) => {
+                        const isChecked = editPermIds.includes(p.id);
+                        const wasGranted = editTarget?.permissions.some(orig => orig.id === p.id) ?? false;
+                        return (
+                          <label
+                            key={p.id}
+                            className={`flex items-center gap-2.5 p-2.5 rounded-xl border text-xs cursor-pointer transition ${
+                              isChecked
+                                ? wasGranted
+                                  ? 'bg-blue-50/80 dark:bg-blue-950/70 border-blue-200 dark:border-blue-800 text-blue-900 dark:text-blue-100 font-bold'
+                                  : 'bg-emerald-50/80 dark:bg-emerald-950/70 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-100 font-bold'
+                                : wasGranted
+                                  ? 'bg-red-50/60 dark:bg-red-950/50 border-red-200 dark:border-red-900 text-red-900 dark:text-red-200 line-through'
+                                  : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100/70 dark:hover:bg-slate-800'
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={() => handleToggleEditPermission(p.id)}
+                              className="rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500 shrink-0"
+                            />
+                            <div className="truncate">
+                              <span className="font-semibold block truncate text-xs">{p.name}</span>
+                              <span className="font-mono text-[10px] text-slate-400 block">{p.code}</span>
+                            </div>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <p className="text-[11px] text-slate-400 dark:text-slate-500">
+              Green = newly granted · Struck-through red = will be revoked on save
+            </p>
+          </div>
+        </div>
       </FormDrawer>
 
       {/* DELETE CONFIRM DIALOG */}

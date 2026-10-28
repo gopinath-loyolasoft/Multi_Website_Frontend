@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   Settings,
@@ -15,9 +15,16 @@ import {
   Crown
 } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
+import { applyBrowserBranding } from '../../services/platformBranding';
 
 export const SuperAdminLoginPage: React.FC = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Ensure SuperAdmin title and favicon load immediately on opening login page
+    applyBrowserBranding();
+  }, []);
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -37,46 +44,50 @@ export const SuperAdminLoginPage: React.FC = () => {
         localStorage.setItem('college_auth_user', JSON.stringify(res.data.data));
         navigate('/superadmin/dashboard');
       } else if (res.data.success) {
-        setError('This account does not have SuperAdmin platform privileges.');
+        setError('Unauthorized: This portal is exclusively for Platform SuperAdmins.');
       } else {
-        setError(res.data.message || 'Authentication failed');
+        setError(res.data.message || 'Login failed');
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Invalid credentials');
+      setError(err.response?.data?.message || 'Invalid superadmin credentials. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col lg:flex-row bg-[#0b1026] font-sans text-slate-100 selection:bg-indigo-600 selection:text-white overflow-x-hidden">
+    <div className="min-h-screen w-full flex flex-col lg:flex-row bg-[#080d24] font-sans relative overflow-hidden select-none">
 
-      {/* ============================================================================ */}
-      {/* LEFT 60%: Midnight Blue Platform Control Visual Canvas */}
-      {/* ============================================================================ */}
-      <div className="relative lg:w-[60%] min-h-[600px] lg:min-h-screen flex flex-col justify-between p-8 sm:p-12 lg:p-14 overflow-hidden bg-[#0b1026] text-white">
+      {/* ---------------------------------------------------- */}
+      {/* LEFT COLUMN: HERO & BRANDING (DEEP NAVY THEME)      */}
+      {/* ---------------------------------------------------- */}
+      <div className="w-full lg:w-[58%] xl:w-[60%] bg-[#0b102b] relative overflow-hidden flex flex-col justify-between p-8 sm:p-12 lg:p-14 text-white">
 
-        {/* Subtle Map / Grid Background Texture */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(99,102,241,0.15),transparent_70%)] pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_70%,rgba(168,85,247,0.12),transparent_70%)] pointer-events-none" />
+        {/* Ambient Dark Navy/Indigo Glow Highlights */}
+        <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-indigo-600/15 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute -bottom-40 left-1/3 w-[500px] h-[500px] bg-purple-600/15 rounded-full blur-[140px] pointer-events-none" />
+
+        {/* Subtle Matrix Dot Grid Background */}
         <div
           className="absolute inset-0 opacity-[0.07] pointer-events-none"
           style={{
-            backgroundImage: `radial-gradient(#a5b4fc 1.5px, transparent 1.5px)`,
-            backgroundSize: '28px 28px'
+            backgroundImage: `radial-gradient(#818cf8 1px, transparent 1px)`,
+            backgroundSize: '24px 24px'
           }}
         />
 
-        {/* Top Brand Header */}
+        {/* Top Header / Branding */}
         <div className="relative z-20 flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 text-white flex items-center justify-center shadow-lg shadow-indigo-600/30 border border-indigo-400/20 shrink-0">
-            <Settings className="w-6 h-6 animate-spin-slow" />
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 p-[2px] shadow-lg shadow-indigo-500/20">
+            <div className="w-full h-full bg-[#0b102b] rounded-[10px] flex items-center justify-center">
+              <Settings className="w-5 h-5 text-indigo-400 animate-spin-slow" />
+            </div>
           </div>
           <div>
-            <h2 className="text-xl font-bold tracking-tight text-white leading-tight">
+            <h2 className="text-lg font-bold text-white tracking-wide flex items-center gap-2">
               Super Admin
             </h2>
-            <p className="text-xs font-medium text-slate-400">
+            <p className="text-xs text-slate-400 font-medium">
               Multi-Tenant College Management
             </p>
           </div>
@@ -167,27 +178,28 @@ export const SuperAdminLoginPage: React.FC = () => {
           </div>
 
           {/* Prominent 3D Isometric Central Visual (6 cols) */}
-          <div className="hidden xl:flex xl:col-span-6 items-center justify-center relative pr-12 pt-14 -translate-x-10 translate-y-10">            <div className="relative w-full max-w-lg lg:max-w-xl scale-105">
-            <img
-              src="/assets/superadmin_hub.png"
-              alt="3D Multi-Tenant Platform Cloud Visual"
-              className="w-full h-auto object-contain drop-shadow-[0_25px_50px_rgba(79,70,229,0.45)]"
-              onError={(e) => {
-                (e.target as HTMLElement).style.display = 'none';
-              }}
-            />
+          <div className="hidden xl:flex xl:col-span-6 items-center justify-center relative pr-12 pt-14 -translate-x-10 translate-y-10">
+            <div className="relative w-full max-w-lg lg:max-w-xl scale-105">
+              <img
+                src="/assets/superadmin_hub.png"
+                alt="3D Multi-Tenant Platform Cloud Visual"
+                className="w-full h-auto object-contain drop-shadow-[0_25px_50px_rgba(79,70,229,0.45)]"
+                onError={(e) => {
+                  (e.target as HTMLElement).style.display = 'none';
+                }}
+              />
 
-            {/* Floating College Badges - Positioned over Larger Graphic */}
-            <div className="absolute top-[18%] left-[26%] -translate-x-1/2 px-3 py-1 rounded-md bg-[#0f1738]/95 border border-indigo-500/50 text-[11px] font-bold text-indigo-300 backdrop-blur-sm shadow-xl pointer-events-none">
-              College 1
+              {/* Floating College Badges - Positioned over Larger Graphic */}
+              <div className="absolute top-[18%] left-[26%] -translate-x-1/2 px-3 py-1 rounded-md bg-[#0f1738]/95 border border-indigo-500/50 text-[11px] font-bold text-indigo-300 backdrop-blur-sm shadow-xl pointer-events-none">
+                College 1
+              </div>
+              <div className="absolute top-[50%] left-[6%] px-3 py-1 rounded-md bg-[#0f1738]/95 border border-purple-500/50 text-[11px] font-bold text-purple-300 backdrop-blur-sm shadow-xl pointer-events-none">
+                College 2
+              </div>
+              <div className="absolute bottom-[18%] right-[16%] px-3 py-1 rounded-md bg-[#0f1738]/95 border border-indigo-400/50 text-[11px] font-bold text-indigo-200 backdrop-blur-sm shadow-xl pointer-events-none">
+                College 3
+              </div>
             </div>
-            <div className="absolute top-[50%] left-[6%] px-3 py-1 rounded-md bg-[#0f1738]/95 border border-purple-500/50 text-[11px] font-bold text-purple-300 backdrop-blur-sm shadow-xl pointer-events-none">
-              College 2
-            </div>
-            <div className="absolute bottom-[18%] right-[16%] px-3 py-1 rounded-md bg-[#0f1738]/95 border border-indigo-400/50 text-[11px] font-bold text-indigo-200 backdrop-blur-sm shadow-xl pointer-events-none">
-              College 3
-            </div>
-          </div>
           </div>
 
         </div>
@@ -198,113 +210,109 @@ export const SuperAdminLoginPage: React.FC = () => {
           <span>CENTRALIZE &nbsp;|&nbsp; SIMPLIFY &nbsp;|&nbsp; EMPOWER</span>
         </div>
 
-        {/* Multi-Layered Curved Purple Ribbon Edge SVG */}
+        {/* Multi-Layered Curved Purple Ribbon & White Cove Divider SVG */}
         <div className="hidden lg:block absolute -right-[1px] top-0 bottom-0 w-44 pointer-events-none z-30">
           <svg className="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
             <defs>
-              <linearGradient id="ribbonBand1" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.35" />
-                <stop offset="50%" stopColor="#6366f1" stopOpacity="0.45" />
-                <stop offset="100%" stopColor="#a855f7" stopOpacity="0.2" />
-              </linearGradient>
-              <linearGradient id="ribbonBand2" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#6366f1" />
-                <stop offset="50%" stopColor="#8b5cf6" />
+              <linearGradient id="purpleRibbon" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#8b5cf6" />
+                <stop offset="50%" stopColor="#6366f1" />
                 <stop offset="100%" stopColor="#a855f7" />
               </linearGradient>
+              <linearGradient id="purpleGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.4" />
+                <stop offset="50%" stopColor="#6366f1" stopOpacity="0.3" />
+                <stop offset="100%" stopColor="#a855f7" stopOpacity="0.15" />
+              </linearGradient>
             </defs>
-
-            {/* Layer 1: Wide Outer Soft Purple Glow Ribbon */}
-            <path d="M100 0 C 15 25, 55 75, 100 100 L 100 100 L 100 0 Z" fill="url(#ribbonBand1)" />
-
-            {/* Layer 2: Vibrant Indigo-Purple Ribbon Accent Band */}
-            <path d="M100 0 C 26 28, 66 72, 100 100 L 100 100 L 100 0 Z" fill="url(#ribbonBand2)" />
-
-            {/* Layer 3: Solid Off-White Right Panel Cutout */}
-            <path d="M100 0 C 35 30, 75 70, 100 100 L 100 100 L 100 0 Z" fill="#F5F7FB" />
+            {/* Outer soft glowing purple ribbon */}
+            <path
+              d="M 100 0 C 22 25, 22 75, 100 100 L 100 100 L 100 0 Z"
+              fill="url(#purpleGlow)"
+            />
+            {/* White/Off-White Form Panel Cove Body */}
+            <path
+              d="M 100 0 C 35 25, 35 75, 100 100 L 100 100 L 100 0 Z"
+              fill="#F5F7FB"
+            />
+            {/* Vibrant Purple Edge Ribbon Stroke */}
+            <path
+              d="M 100 0 C 35 25, 35 75, 100 100"
+              fill="none"
+              stroke="url(#purpleRibbon)"
+              strokeWidth="2.8"
+            />
           </svg>
         </div>
 
       </div>
 
+      {/* ---------------------------------------------------- */}
+      {/* RIGHT COLUMN: LOGIN FORM (CLEAN WHITE / SLATE)      */}
+      {/* ---------------------------------------------------- */}
+      <div className="w-full lg:w-[42%] xl:w-[40%] bg-[#F5F7FB] flex flex-col justify-center items-center p-8 sm:p-12 lg:p-16 relative z-20 overflow-hidden">
 
-      {/* ============================================================================ */}
-      {/* RIGHT 40%: Soft Off-White Panel & Master Form */}
-      {/* ============================================================================ */}
-      <div className="w-full lg:w-[40%] flex items-center justify-center p-6 sm:p-12 lg:p-16 bg-[#F5F7FB] text-slate-900 relative z-20 min-h-screen">
+        {/* Ambient Top Right Subtle Dot Accent */}
+        <div
+          className="absolute top-8 right-8 w-24 h-24 opacity-25 pointer-events-none"
+          style={{
+            backgroundImage: `radial-gradient(#94a3b8 1.5px, transparent 1.5px)`,
+            backgroundSize: '10px 10px'
+          }}
+        />
 
-        {/* Top-Right Decorative Dot Matrix */}
-        <div className="absolute top-8 right-8 z-10 pointer-events-none opacity-40">
-          <div className="grid grid-cols-4 gap-2">
-            {[...Array(16)].map((_, i) => (
-              <span key={i} className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-            ))}
-          </div>
-        </div>
-
-        {/* Bottom-Right Soft Leaf/Floral Decorative Outline */}
-        <div className="absolute bottom-0 right-0 z-0 pointer-events-none opacity-20 text-indigo-400">
-          <svg width="220" height="220" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.2">
-            <path d="M100 100 C 60 90, 40 60, 40 0 C 70 40, 90 60, 100 100 Z" fill="rgba(99,102,241,0.05)" />
-            <path d="M100 80 C 70 70, 55 50, 55 10 C 75 35, 90 55, 100 80 Z" />
-            <path d="M80 100 C 70 70, 50 55, 10 55 C 35 75, 55 90, 80 100 Z" />
+        {/* Decorative Botanical Corner Curve Accent (Bottom Right) */}
+        <div className="hidden lg:block absolute -bottom-6 -right-6 w-56 h-56 pointer-events-none opacity-20">
+          <svg className="w-full h-full" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M200 200 C 130 160, 90 110, 110 30 C 120 80, 150 130, 200 160 Z" stroke="#6366f1" strokeWidth="1.5" fill="none" />
+            <path d="M200 200 C 160 130, 110 90, 30 110 C 80 120, 130 150, 160 200 Z" stroke="#8b5cf6" strokeWidth="1.5" fill="none" />
+            <path d="M200 200 C 160 160, 120 120, 70 70 C 120 100, 150 140, 200 200 Z" stroke="#a855f7" strokeWidth="1.2" fill="none" />
+            <path d="M200 120 C 140 100, 100 60, 120 0 C 130 40, 160 80, 200 90 Z" stroke="#6366f1" strokeWidth="1.2" fill="none" />
+            <path d="M120 200 C 100 140, 60 100, 0 120 C 40 130, 80 160, 90 200 Z" stroke="#8b5cf6" strokeWidth="1.2" fill="none" />
           </svg>
         </div>
 
-        <div className="w-full max-w-sm space-y-7 text-center relative z-20">
+        <div className="w-full max-w-sm space-y-6 text-center relative z-10">
 
-          {/* Centered Crown Shield Emblem */}
-          <div className="space-y-3 flex flex-col items-center">
-            {/* Custom Shield with Crown Emblem */}
-            <div className="relative w-16 h-18 flex items-center justify-center">
-              <svg className="w-16 h-18 text-indigo-600 drop-shadow-md" viewBox="0 0 64 72" fill="none">
-                <path
-                  d="M32 3 L58 12 V34 C58 50 46 63 32 68 C18 63 6 50 6 34 V12 L32 3 Z"
-                  fill="#ffffff"
-                  stroke="#4f46e5"
-                  strokeWidth="3.5"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <Crown className="w-8 h-8 text-indigo-600 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+          {/* Shield Icon Header */}
+          <div className="flex flex-col items-center space-y-3">
+            <div className="w-14 h-14 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-[#4f46e5] shadow-xs">
+              <Crown className="w-7 h-7 stroke-[1.8]" />
             </div>
-
-            <div className="space-y-1 pt-1">
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            <div>
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight">
                 Super Admin Login
               </h2>
-              <p className="text-xs font-semibold text-slate-500">
+              <p className="text-xs font-semibold text-slate-400 mt-1">
                 Access the central administration panel
               </p>
             </div>
           </div>
 
-          {/* Error Alert */}
+          {/* Error Message */}
           {error && (
-            <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-center justify-between text-left shadow-2xs">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-red-500 shrink-0" />
-                <span>{error}</span>
-              </div>
-              <button onClick={() => setError(null)} className="text-red-400 hover:text-red-700 font-bold ml-2 text-base">×</button>
+            <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold text-left animate-shake">
+              {error}
             </div>
           )}
 
-          {/* Login Form */}
+          {/* Form */}
           <form onSubmit={handleLogin} className="space-y-4 text-left">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1.5">
                 Username
               </label>
               <div className="relative">
-                <User className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <User className="w-4 h-4" />
+                </div>
                 <input
                   type="text"
+                  required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Enter your username"
-                  className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder-slate-400 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 shadow-2xs transition"
-                  required
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-800 text-sm font-medium placeholder-slate-400 focus:outline-hidden focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition shadow-2xs"
                 />
               </div>
             </div>
@@ -314,19 +322,21 @@ export const SuperAdminLoginPage: React.FC = () => {
                 Password
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <Lock className="w-4 h-4" />
+                </div>
                 <input
                   type={showPassword ? 'text' : 'password'}
+                  required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full pl-11 pr-11 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder-slate-400 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 shadow-2xs transition"
-                  required
+                  className="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-200 bg-white text-slate-800 text-sm font-medium placeholder-slate-400 focus:outline-hidden focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition shadow-2xs"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700"
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 transition cursor-pointer"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -339,7 +349,7 @@ export const SuperAdminLoginPage: React.FC = () => {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300 cursor-pointer"
+                  className="w-4 h-4 rounded-sm border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                 />
                 <span className="text-xs font-semibold text-slate-600">Remember me</span>
               </label>
@@ -395,4 +405,3 @@ export const SuperAdminLoginPage: React.FC = () => {
     </div>
   );
 };
-

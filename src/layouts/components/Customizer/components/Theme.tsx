@@ -1,4 +1,4 @@
-import { useLayoutContext } from '@/context/useLayoutContext'
+import { useLayoutContext } from '@/contexts/useLayoutContext'
 import { useThemeMode, ThemeMode } from '@/contexts/ThemeModeContext'
 import { toTitleCase } from '@/utils/helpers'
 import type { CustomizationOptionType } from '../index'

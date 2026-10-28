@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Palette, RefreshCw, Plus, Sparkles, Eye } from 'lucide-react';
+import { Palette, RefreshCw, Plus, Sparkles, Eye, Pencil, Trash2 } from 'lucide-react';
 import { Theme, CreateThemePayload } from '../../types';
 import { apiClient } from '../../services/apiClient';
-import { FormDrawer, DrawerMode } from '../../UI_Componentes/ui';
+import { FormDrawer, DrawerMode, ConfirmDialog, useToast } from '../../UI_Componentes/ui';
+
+import { SYSTEM_THEMES_SEED_LIST } from './TemplatesPage';
 
 export const ThemesPage: React.FC = () => {
+  const { toast } = useToast();
   const [themes, setThemes] = useState<Theme[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,19 +26,53 @@ export const ThemesPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [modalError, setModalError] = useState<string | null>(null);
 
+  // Edit & delete state
+  const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
+  const [editTarget, setEditTarget] = useState<Theme | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editPrimaryColor, setEditPrimaryColor] = useState('#1e40af');
+  const [editSecondaryColor, setEditSecondaryColor] = useState('#f59e0b');
+  const [editAccentColor, setEditAccentColor] = useState('#3b82f6');
+  const [editFontFamily, setEditFontFamily] = useState('Inter, sans-serif');
+  const [editBadgeText, setEditBadgeText] = useState('Excellence in Higher Education');
+  const [editIsActive, setEditIsActive] = useState(true);
+  const [editSaving, setEditSaving] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Theme | null>(null);
+  const [deleteBusy, setDeleteBusy] = useState(false);
+
   const fetchThemes = async () => {
     try {
       setLoading(true);
       setError(null);
       const res = await apiClient.get('/superadmin/themes');
-      if (res.data.success) {
-        setThemes(res.data.data || []);
-      } else {
-        setError(res.data.message || 'Failed to fetch themes');
-      }
+      const rawThemes: Theme[] = res.data.success ? (res.data.data || []) : [];
+      
+      const themeMap = new Map<string, Theme>();
+      SYSTEM_THEMES_SEED_LIST.forEach(seed => {
+        themeMap.set(seed.code, { ...seed });
+      });
+
+      rawThemes.forEach(dbTheme => {
+        const c = dbTheme.code?.toUpperCase();
+        if (c && themeMap.has(c)) {
+          const current = themeMap.get(c)!;
+          themeMap.set(c, {
+            ...current,
+            id: dbTheme.id || current.id,
+            isActive: dbTheme.isActive ?? current.isActive,
+            configuration: dbTheme.configuration || current.configuration
+          });
+        } else if (c) {
+          themeMap.set(c, dbTheme);
+        }
+      });
+
+      setThemes(Array.from(themeMap.values()));
     } catch (err: any) {
       console.error(err);
       setError(err.response?.data?.message || err.message || 'Failed to load themes');
+      setThemes(SYSTEM_THEMES_SEED_LIST);
     } finally {
       setLoading(false);
     }
@@ -92,6 +129,76 @@ export const ThemesPage: React.FC = () => {
       try { return JSON.parse(cfgObj); } catch { return {}; }
     }
     return cfgObj;
+  };
+
+  // ─── Edit & delete handlers ───────────────────────────────────────
+  const openEditDrawer = (theme: Theme) => {
+    const cfg = parseConfig(theme.configuration);
+    setEditTarget(theme);
+    setEditName(theme.name);
+    setEditPrimaryColor(cfg?.primaryColor || '#1e40af');
+    setEditSecondaryColor(cfg?.secondaryColor || '#f59e0b');
+    setEditAccentColor(cfg?.accentColor || '#3b82f6');
+    setEditFontFamily(cfg?.fontFamily || 'Inter, sans-serif');
+    setEditBadgeText(cfg?.badgeText || 'Official College Portal');
+    setEditIsActive(theme.isActive);
+    setEditError(null);
+    setIsEditDrawerOpen(true);
+  };
+
+  const handleUpdateTheme = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editTarget || !editName.trim()) return;
+    try {
+      setEditSaving(true);
+      setEditError(null);
+
+      const res = await apiClient.put(`/superadmin/themes/${editTarget.id}`, {
+        name: editName.trim(),
+        isActive: editIsActive,
+        configuration: {
+          themeName: editName.trim(),
+          primaryColor: editPrimaryColor,
+          secondaryColor: editSecondaryColor,
+          accentColor: editAccentColor,
+          fontFamily: editFontFamily,
+          headerStyle: 'solid',
+          badgeText: editBadgeText.trim() || 'Official College Portal'
+        }
+      });
+
+      if (res.data?.success) {
+        toast.success(`Theme '${editName.trim()}' updated successfully`);
+        setIsEditDrawerOpen(false);
+        setEditTarget(null);
+        await fetchThemes();
+      } else {
+        setEditError(res.data?.message || 'Failed to update theme');
+      }
+    } catch (err: any) {
+      setEditError(err.response?.data?.message || err.message || 'Failed to update theme');
+    } finally {
+      setEditSaving(false);
+    }
+  };
+
+  const handleDeleteTheme = async () => {
+    if (!deleteTarget) return;
+    try {
+      setDeleteBusy(true);
+      const res = await apiClient.delete(`/superadmin/themes/${deleteTarget.id}`);
+      if (res.data?.success) {
+        toast.success(`Theme '${deleteTarget.name}' deleted`);
+        setDeleteTarget(null);
+        await fetchThemes();
+      } else {
+        toast.error(res.data?.message || 'Failed to delete theme');
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || err.message || 'Failed to delete theme');
+    } finally {
+      setDeleteBusy(false);
+    }
   };
 
   return (
@@ -211,7 +318,7 @@ export const ThemesPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-slate-100 flex justify-end">
+                <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
                   <button
                     type="button"
                     onClick={() => {
@@ -224,6 +331,26 @@ export const ThemesPage: React.FC = () => {
                     <Eye className="w-3.5 h-3.5" />
                     <span>View Palette & Tokens</span>
                   </button>
+
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => openEditDrawer(theme)}
+                      className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold text-indigo-600 hover:bg-indigo-50 rounded-lg transition"
+                      title="Edit theme colors, typography and status"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                      <span>Edit</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDeleteTarget(theme)}
+                      className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 rounded-lg transition"
+                      title="Delete theme from platform registry"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             );
@@ -367,6 +494,42 @@ export const ThemesPage: React.FC = () => {
               </div>
             </div>
 
+            {/* 9 Template Theme Preset Quick-Load Buttons */}
+            <div className="space-y-1.5 pt-1">
+              <span className="text-[11px] font-bold text-slate-700 block">
+                Quick Preset: Match Template Suite
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {[
+                  { name: 'Blueprint Navy', code: 'THEME_BLUE', p: '#1e40af', s: '#f59e0b', a: '#3b82f6', tag: 'T1' },
+                  { name: 'Gold & Maroon', code: 'THEME_GOLD', p: '#991b1b', s: '#d97706', a: '#b45309', tag: 'T2' },
+                  { name: 'Clinical Teal', code: 'THEME_TEAL', p: '#0f766e', s: '#06b6d4', a: '#14b8a6', tag: 'T3' },
+                  { name: 'Oxford Crimson', code: 'THEME_CRIMSON', p: '#881337', s: '#1e3a8a', a: '#be123c', tag: 'T4' },
+                  { name: 'Slanted Navy & Gold', code: 'THEME_SLANTED_NAVY', p: '#134975', s: '#e5a912', a: '#3b82f6', tag: 'T5' },
+                  { name: 'Cyber Glass Aurora', code: 'THEME_CYBER_GLASS', p: '#0891b2', s: '#8b5cf6', a: '#06b6d4', tag: 'T6' },
+                  { name: 'Tactile Isometric', code: 'THEME_TACTILE_VOXEL', p: '#d97706', s: '#0f172a', a: '#f59e0b', tag: 'T7' },
+                  { name: 'Kinetic Neon Flip', code: 'THEME_KINETIC_NEON', p: '#e11d48', s: '#7c3aed', a: '#f43f5e', tag: 'T8' },
+                  { name: 'Soft Neumorphic', code: 'THEME_SOFT_NEUMORPHIC', p: '#0d9488', s: '#334155', a: '#14b8a6', tag: 'T9' },
+                ].map((pre) => (
+                  <button
+                    key={pre.tag}
+                    type="button"
+                    onClick={() => {
+                      setName(pre.name);
+                      setCode(pre.code);
+                      setPrimaryColor(pre.p);
+                      setSecondaryColor(pre.s);
+                      setAccentColor(pre.a);
+                    }}
+                    className="px-2 py-1 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 rounded-md text-[10px] font-semibold text-slate-700 hover:text-blue-700 transition cursor-pointer flex items-center gap-1 shadow-2xs"
+                  >
+                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: pre.p }} />
+                    <span>{pre.tag}: {pre.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Color Pickers Grid */}
             <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
               <span className="font-semibold text-slate-800 block text-xs">Dynamic CSS Color Palette</span>
@@ -484,6 +647,188 @@ export const ThemesPage: React.FC = () => {
           </div>
         )}
       </FormDrawer>
+
+      {/* EDIT THEME DRAWER — colors, typography, activation */}
+      <FormDrawer
+        isOpen={isEditDrawerOpen}
+        onClose={() => {
+          setIsEditDrawerOpen(false);
+          setEditTarget(null);
+        }}
+        title={`Edit Theme — '${editTarget?.name || ''}'`}
+        subtitle={`Theme Code: ${editTarget?.code || ''} (immutable)`}
+        icon={<Pencil className="w-5 h-5 text-indigo-600" />}
+        mode="edit"
+        size="lg"
+        loading={editSaving}
+        onSubmit={handleUpdateTheme}
+        submitText="Save Theme Changes"
+      >
+        <div className="space-y-4 text-xs">
+          {editError && (
+            <div className="p-3.5 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs font-medium">
+              {editError}
+            </div>
+          )}
+
+          <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 font-medium">
+            Colleges currently assigned to this theme will pick up the new colors on their next page load.
+          </div>
+
+          <div>
+            <label className="block text-slate-700 font-medium mb-1">Theme Name</label>
+            <input
+              type="text"
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              className="w-full px-3.5 py-2 rounded-lg bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium"
+              required
+            />
+          </div>
+
+          {/* Color Pickers Grid */}
+          <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+            <span className="font-semibold text-slate-800 block text-xs">Dynamic CSS Color Palette</span>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label className="block text-slate-600 font-medium mb-1">Primary Color</label>
+                <div className="flex items-center gap-2 p-1.5 rounded-lg bg-white border border-slate-300">
+                  <input
+                    type="color"
+                    value={editPrimaryColor}
+                    onChange={(e) => setEditPrimaryColor(e.target.value)}
+                    className="w-7 h-7 rounded cursor-pointer bg-transparent border-0"
+                  />
+                  <input
+                    type="text"
+                    value={editPrimaryColor}
+                    onChange={(e) => setEditPrimaryColor(e.target.value)}
+                    className="w-full bg-transparent font-mono text-xs text-slate-900 focus:outline-none font-medium"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-600 font-medium mb-1">Secondary Color</label>
+                <div className="flex items-center gap-2 p-1.5 rounded-lg bg-white border border-slate-300">
+                  <input
+                    type="color"
+                    value={editSecondaryColor}
+                    onChange={(e) => setEditSecondaryColor(e.target.value)}
+                    className="w-7 h-7 rounded cursor-pointer bg-transparent border-0"
+                  />
+                  <input
+                    type="text"
+                    value={editSecondaryColor}
+                    onChange={(e) => setEditSecondaryColor(e.target.value)}
+                    className="w-full bg-transparent font-mono text-xs text-slate-900 focus:outline-none font-medium"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-600 font-medium mb-1">Accent Color</label>
+                <div className="flex items-center gap-2 p-1.5 rounded-lg bg-white border border-slate-300">
+                  <input
+                    type="color"
+                    value={editAccentColor}
+                    onChange={(e) => setEditAccentColor(e.target.value)}
+                    className="w-7 h-7 rounded cursor-pointer bg-transparent border-0"
+                  />
+                  <input
+                    type="text"
+                    value={editAccentColor}
+                    onChange={(e) => setEditAccentColor(e.target.value)}
+                    className="w-full bg-transparent font-mono text-xs text-slate-900 focus:outline-none font-medium"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Typography & Badge */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-slate-700 font-medium mb-1">Font Family</label>
+              <select
+                value={editFontFamily}
+                onChange={(e) => setEditFontFamily(e.target.value)}
+                className="w-full px-3.5 py-2 rounded-lg bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
+              >
+                <option value="Inter, sans-serif">Inter (Modern Clean Sans)</option>
+                <option value="Merriweather, serif">Merriweather (Classic Academic Serif)</option>
+                <option value="'Roboto', sans-serif">Roboto (Tech & Modern)</option>
+                <option value="'Playfair Display', serif">Playfair Display (Prestigious Heritage)</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-slate-700 font-medium mb-1">Default Header Badge Text</label>
+              <input
+                type="text"
+                value={editBadgeText}
+                onChange={(e) => setEditBadgeText(e.target.value)}
+                className="w-full px-3.5 py-2 rounded-lg bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium"
+              />
+            </div>
+          </div>
+
+          <label className="flex items-center gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={editIsActive}
+              onChange={(e) => setEditIsActive(e.target.checked)}
+              className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 shrink-0"
+            />
+            <div>
+              <span className="font-semibold text-slate-900 block">Theme Active</span>
+              <span className="text-[11px] text-slate-500 block">
+                Inactive themes cannot be assigned to new colleges.
+              </span>
+            </div>
+          </label>
+
+          {/* Live Preview Card */}
+          <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
+            <div className="flex items-center gap-1.5 text-slate-600 font-semibold text-[11px]">
+              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+              <span>Live Theme Preview</span>
+            </div>
+            <div className="p-3.5 rounded-lg border border-slate-200 bg-white text-slate-900 flex items-center justify-between shadow-2xs">
+              <div>
+                <div className="font-bold text-slate-900 text-sm" style={{ fontFamily: editFontFamily }}>
+                  {editName || 'Sample College Title'}
+                </div>
+                <span className="text-[11px] font-semibold block mt-0.5" style={{ color: editAccentColor }}>
+                  {editBadgeText || 'Official College Portal'}
+                </span>
+              </div>
+              <div className="flex gap-2">
+                <span className="px-3 py-1 rounded-md text-[11px] font-bold text-white shadow-xs" style={{ backgroundColor: editPrimaryColor }}>
+                  Primary
+                </span>
+                <span className="px-3 py-1 rounded-md text-[11px] font-bold text-slate-950 shadow-xs" style={{ backgroundColor: editSecondaryColor }}>
+                  Secondary
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </FormDrawer>
+
+      {/* DELETE THEME CONFIRMATION */}
+      <ConfirmDialog
+        isOpen={Boolean(deleteTarget)}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDeleteTheme}
+        title={`Delete Theme "${deleteTarget?.name}"?`}
+        message="Colleges currently assigned to this theme will fall back to the platform default. This action is recorded in the audit trail."
+        confirmText="Delete Theme"
+        cancelText="Cancel"
+        variant="danger"
+        loading={deleteBusy}
+      />
     </div>
   );
 };

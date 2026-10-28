@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { ExternalLink, Mail, MapPin, Phone } from 'lucide-react';
 import { TemplateFooterProps } from '../contracts/TemplateContracts';
@@ -36,23 +36,25 @@ export const ArtsScienceFooter: React.FC<TemplateFooterProps> = ({ siteConfig })
           <h4 className="text-xs font-black text-white uppercase tracking-wider mb-4 border-b border-slate-800/80 pb-2">
             Academic Schools
           </h4>
-          <ul className="space-y-2 text-xs">
-            <li><Link to="/departments" className="hover:text-white transition">Departments Directory</Link></li>
-            <li><Link to="/courses" className="text-primary font-bold hover:underline">Explore Degree Programs →</Link></li>
+          <ul className="space-y-2 text-xs font-serif">
+            <li><Link to="/departments" className="hover:text-white transition">Departments & Faculties</Link></li>
+            <li><Link to="/courses" className="text-emerald-400 font-bold hover:underline">Degrees & Syllabi →</Link></li>
+            <li><Link to="/library" className="hover:text-white transition">Digital Academic Library</Link></li>
+            <li><Link to="/faculty" className="hover:text-white transition">Faculty Directory</Link></li>
           </ul>
         </div>
 
-        {/* Col 4: Quick Student Links */}
+        {/* Col 4: Campus Life & Portals */}
         <div>
           <h4 className="text-xs font-black text-white uppercase tracking-wider mb-4 border-b border-slate-800/80 pb-2">
-            Admissions & Campus
+            Campus Portals
           </h4>
-          <ul className="space-y-2 text-xs">
-            <li><Link to="/admissions" className="hover:text-white transition">Admissions</Link></li>
-            <li><Link to="/events" className="hover:text-white transition">Events Calendar</Link></li>
-            <li><Link to="/gallery" className="hover:text-white transition">Campus Gallery</Link></li>
-            <li><Link to="/faculty" className="hover:text-white transition">Faculty Directory</Link></li>
-            <li><Link to="/news" className="hover:text-white transition">Latest News</Link></li>
+          <ul className="space-y-2 text-xs font-serif">
+            <li><Link to="/placements" className="hover:text-white transition">Training & Placements</Link></li>
+            <li><Link to="/transport" className="hover:text-white transition">Transport & Bus Routes</Link></li>
+            <li><Link to="/hostels" className="hover:text-white transition">Campus Hostels</Link></li>
+            <li><Link to="/alumni" className="hover:text-white transition">Alumni Association</Link></li>
+            <li><Link to="/compliance" className="hover:text-white transition text-emerald-300 font-medium">Mandatory Disclosures</Link></li>
           </ul>
         </div>
 

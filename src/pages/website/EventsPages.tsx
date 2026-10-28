@@ -4,12 +4,34 @@ import { CalendarDays, MapPin, ArrowLeft, CheckCircle, Send, AlertCircle } from 
 import { EventItem } from '../../types';
 import { apiClient } from '../../services/apiClient';
 import { useTheme } from '../../themes/ThemeContext';
+import { useActiveTemplate } from '../../templates/templateRegistry';
+import { useTenant } from '../../tenant/TenantContext';
+import { TemplateCard } from '../../components/website/TemplateCard';
 
 export const EventsListPage: React.FC = () => {
+  const Template = useActiveTemplate();
+  const { siteConfig } = useTenant();
   const { isArtsAndScience, isMedical, isUniversity, isEngineering } = useTheme();
   const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const isSlanted =
+    Template.config.code === 'DESIGN_3D_MODERN' ||
+    Template.config.code === 'SALESIAN_SLANTED' ||
+    Template.config.code === 'ARTS_SCIENCE_MODERN' ||
+    Template.config.code === 'TEMPLATE2' ||
+    Template.config.code === 'TEMPLATE_2';
+
+  const headerConfig =
+    siteConfig?.settings?.socialLinks?.pageHeaders?.events ||
+    siteConfig?.settings?.pageHeaders?.events;
+
+  const badgeText = headerConfig?.badge || (isSlanted ? 'Academic Symposia & Campus Events' : 'Events & Campus Calendar');
+  const titleText = headerConfig?.title || 'Events & Campus Calendar';
+  const subtitleText =
+    headerConfig?.subtitle ||
+    'Conferences, distinguished guest lectures, hackathons, academic symposiums, and sports championships.';
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -28,40 +50,21 @@ export const EventsListPage: React.FC = () => {
     fetchEvents();
   }, []);
 
-  const heroBg = isArtsAndScience
-    ? 'bg-gradient-to-r from-emerald-950 via-emerald-900 to-slate-950'
-    : isMedical
-    ? 'bg-gradient-to-r from-teal-950 via-teal-900 to-slate-950'
-    : isUniversity
-    ? 'bg-gradient-to-r from-rose-950 via-slate-950 to-slate-900'
-    : 'bg-gradient-to-r from-slate-950 via-blue-950 to-slate-900';
-
-  const titleFont = isArtsAndScience || isUniversity ? 'font-serif' : 'font-sans';
-
   return (
-    <div className={`min-h-screen ${isArtsAndScience ? 'bg-amber-50/30' : isMedical ? 'bg-teal-50/20' : 'bg-slate-50'}`}>
-      {/* Header Banner */}
-      <section className={`relative ${heroBg} text-white py-16 md:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden`}>
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
-        <div className="max-w-7xl mx-auto relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold uppercase tracking-wider text-white mb-4">
-            <CalendarDays className="w-4 h-4 text-emerald-300" />
-            <span>{isArtsAndScience ? 'Academic Symposia & Cultural Events' : isMedical ? 'Clinical Conferences & Seminars' : isUniversity ? 'Grand University Assemblies' : 'Campus Schedule & Tech Fests'}</span>
-          </div>
-          <h1 className={`text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white mb-4 ${titleFont}`}>
-            Events & Campus Calendar
-          </h1>
-          <p className={`text-slate-200 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed ${isArtsAndScience ? 'font-serif' : ''}`}>
-            Conferences, distinguished guest lectures, hackathons, academic symposiums, and sports championships.
-          </p>
-        </div>
-      </section>
+    <div className={`min-h-screen ${Template.config.bodyBgClass}`}>
+      {/* Dynamic Modular Template Page Hero */}
+      <Template.PageHero
+        badge={badgeText}
+        title={titleText}
+        subtitle={subtitleText}
+        icon={<CalendarDays className="w-4 h-4 text-amber-300" />}
+      />
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-{loading ? (
+        {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-pulse">
             {[1, 2, 3].map((n) => (
-              <div key={n} className="h-64 bg-slate-200 rounded-2xl" />
+              <div key={n} className={`h-64 bg-slate-200 ${isArtsAndScience ? 'rounded-none' : 'rounded-2xl'}`} />
             ))}
           </div>
         ) : error ? (
@@ -80,43 +83,20 @@ export const EventsListPage: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {events.map((evt) => {
               const d = new Date(evt.eventDate);
-              const month = d.toLocaleString('default', { month: 'short' });
-              const day = d.getDate();
+              const dateStr = `${d.toLocaleDateString()} • ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
 
               return (
-                <div
+                <TemplateCard
                   key={evt.id}
-                  className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs hover:shadow-lg transition flex flex-col justify-between group hover:-translate-y-0.5 duration-200"
-                >
-                  <div className="space-y-4">
-                    <div className="flex items-start gap-4">
-                      <div className="bg-primary/10 border border-primary/20 rounded-xl px-3.5 py-2 text-center shrink-0">
-                        <span className="block text-xs font-bold uppercase tracking-wider text-primary">{month}</span>
-                        <span className="block text-2xl font-black text-slate-900">{day}</span>
-                      </div>
-
-                      <div>
-                        <h3 className="font-bold text-slate-900 group-hover:text-primary transition leading-snug">{evt.title}</h3>
-                        <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1.5">
-                          <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
-                          <span className="line-clamp-1">{evt.location}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <p className="text-slate-600 text-xs sm:text-sm line-clamp-3 leading-relaxed">
-                      {evt.description}
-                    </p>
-                  </div>
-
-                  <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between">
-                    <span className="text-xs text-slate-400">{d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                    <Link to={`/events/${evt.id}`} className="text-xs font-bold text-primary group-hover:translate-x-0.5 transition inline-flex items-center gap-1">
-                      <span>View Details</span>
-                      <span>→</span>
-                    </Link>
-                  </div>
-                </div>
+                  title={evt.title}
+                  categoryBadge="Event@Campus"
+                  dateBadge={dateStr}
+                  subtitle={`📍 ${evt.location}`}
+                  description={evt.description}
+                  linkTo={`/events/${evt.id}`}
+                  actionText="View Details"
+                  tags={[evt.location]}
+                />
               );
             })}
           </div>

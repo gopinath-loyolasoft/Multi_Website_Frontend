@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useTenant } from '../../tenant/TenantContext';
 import { apiClient } from '../../services/apiClient';
+import { ModulePageHeaderCustomizer } from '../../components/admin/ModulePageHeaderCustomizer';
 
 export const ContactInfoAdminPage: React.FC = () => {
   const { siteConfig, refreshConfig } = useTenant();
@@ -134,6 +135,15 @@ export const ContactInfoAdminPage: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Public Page Banner Customizer */}
+      <ModulePageHeaderCustomizer
+        moduleKey="contact"
+        moduleLabel="Contact & Admissions Office"
+        defaultBadge="Connect & Helpdesk"
+        defaultTitle="Contact & Admissions Office"
+        defaultSubtitle="Reach out to our academic departments, admissions counselors, or submit an institutional inquiry below."
+      />
 
       {/* Notification */}
       {message && (

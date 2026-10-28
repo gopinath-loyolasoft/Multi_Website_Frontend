@@ -1,19 +1,32 @@
-﻿import { TemplatePackage } from '../contracts/TemplateContracts';
+import { TemplatePackage } from '../contracts/TemplateContracts';
 import { artsScienceConfig } from './config';
+import { ARTS_SCIENCE_THEME } from './theme';
 import { ArtsScienceHeader } from './ArtsScienceHeader';
 import { ArtsSciencePageHero } from './ArtsSciencePageHero';
 import { ArtsScienceFooter } from './ArtsScienceFooter';
-import { ArtsScienceHeroTemplate } from '../../components/sections/hero-templates/ArtsScienceHeroTemplate';
+import { ArtsScienceHeroTemplate } from './ArtsScienceHeroTemplate';
 
-export const artsScienceTemplate: TemplatePackage = {
+export const ArtsScienceTemplatePackage: TemplatePackage = {
   config: artsScienceConfig,
+  themeStyles: ARTS_SCIENCE_THEME,
   Header: ArtsScienceHeader,
   PageHero: ArtsSciencePageHero,
   Footer: ArtsScienceFooter,
   Hero: ArtsScienceHeroTemplate
 };
 
-export * from './config';
-export * from './ArtsScienceHeader';
-export * from './ArtsSciencePageHero';
-export * from './ArtsScienceFooter';
+export const artsScienceTemplate = ArtsScienceTemplatePackage;
+export const ARTS_SCIENCE_CONFIG = artsScienceConfig;
+
+export {
+  artsScienceConfig,
+  ARTS_SCIENCE_THEME,
+  ArtsScienceHeader,
+  ArtsSciencePageHero,
+  ArtsScienceFooter,
+  ArtsScienceHeroTemplate as ArtsScienceHero,
+  ArtsScienceHeroTemplate
+};
+
+
+

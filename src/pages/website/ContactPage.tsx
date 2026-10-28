@@ -2,8 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { MapPin, Phone, Mail, Send, CheckCircle2, MessageSquare, Compass, AlertCircle } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 import { useTheme } from '../../themes/ThemeContext';
+import { useActiveTemplate } from '../../templates/templateRegistry';
+import { useTenant } from '../../tenant/TenantContext';
 
 export const ContactPage: React.FC = () => {
+  const Template = useActiveTemplate();
+  const { siteConfig } = useTenant();
   const { isArtsAndScience, isMedical, isUniversity, isEngineering } = useTheme();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -13,6 +17,13 @@ export const ContactPage: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const isSlanted =
+    Template.config.code === 'DESIGN_3D_MODERN' ||
+    Template.config.code === 'SALESIAN_SLANTED' ||
+    Template.config.code === 'ARTS_SCIENCE_MODERN' ||
+    Template.config.code === 'TEMPLATE2' ||
+    Template.config.code === 'TEMPLATE_2';
 
   const [contactInfo, setContactInfo] = useState<{
     siteName?: string;
@@ -71,43 +82,33 @@ export const ContactPage: React.FC = () => {
     }
   };
 
-  const hasAnyContactDetail = contactInfo.address || contactInfo.phone || contactInfo.email;
+  const headerConfig =
+    siteConfig?.settings?.socialLinks?.pageHeaders?.contact ||
+    siteConfig?.settings?.pageHeaders?.contact;
 
-  const heroBg = isArtsAndScience
-    ? 'bg-gradient-to-r from-emerald-950 via-emerald-900 to-slate-950'
-    : isMedical
-    ? 'bg-gradient-to-r from-teal-950 via-teal-900 to-slate-950'
-    : isUniversity
-    ? 'bg-gradient-to-r from-rose-950 via-slate-950 to-slate-900'
-    : 'bg-gradient-to-r from-slate-950 via-blue-950 to-slate-900';
-
-  const titleFont = isArtsAndScience || isUniversity ? 'font-serif' : 'font-sans';
+  const badgeText = headerConfig?.badge || (isSlanted ? 'Connect & Institutional Helpdesk' : 'Connect & Visit');
+  const titleText = headerConfig?.title || 'Contact & Admissions Office';
+  const subtitleText =
+    headerConfig?.subtitle ||
+    'Reach out to our academic departments, admissions counselors, or submit an institutional inquiry below.';
+  const hasAnyContactDetail = Boolean(contactInfo.address || contactInfo.phone || contactInfo.email);
 
   return (
-    <div className={`min-h-screen ${isArtsAndScience ? 'bg-amber-50/30' : isMedical ? 'bg-teal-50/20' : 'bg-slate-50'}`}>
-      {/* Hero Banner */}
-      <section className={`relative ${heroBg} text-white py-16 md:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden`}>
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
-        <div className="max-w-7xl mx-auto relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold uppercase tracking-wider text-white mb-4">
-            <MessageSquare className="w-4 h-4 text-emerald-300" />
-            <span>Connect & Visit</span>
-          </div>
-          <h1 className={`text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white mb-4 ${titleFont}`}>
-            Contact & Institutional Registry
-          </h1>
-          <p className={`text-slate-200 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed ${isArtsAndScience ? 'font-serif' : ''}`}>
-            Reach out to our offices or submit an inquiry directly below.
-          </p>
-        </div>
-      </section>
+    <div className={`min-h-screen ${Template.config.bodyBgClass}`}>
+      {/* Dynamic Modular Template Page Hero */}
+      <Template.PageHero
+        badge={badgeText}
+        title={titleText}
+        subtitle={subtitleText}
+        icon={<MessageSquare className="w-4 h-4 text-amber-300" />}
+      />
 
       {/* Admin Contact Cards - only rendered if admin configured contact details */}
       {contactLoading ? (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-pulse">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-32 bg-slate-200 rounded-2xl" />
+              <div key={i} className={`h-32 bg-slate-200 ${isSlanted ? 'rounded-none' : 'rounded-2xl'}`} />
             ))}
           </div>
         </section>
@@ -122,9 +123,9 @@ export const ContactPage: React.FC = () => {
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {contactInfo.address && (
-              <div className="bg-white rounded-2xl p-6 shadow-md border border-slate-200/80 hover:shadow-xl transition-all">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4">
-                  <MapPin className="w-6 h-6" />
+              <div className={`bg-white p-6 shadow-md border hover:shadow-2xl transition-all ${isSlanted ? 'rounded-none border-l-4 border-l-[#e5a912] border-slate-200' : 'rounded-2xl border-slate-200/80'}`}>
+                <div className={`w-12 h-12 flex items-center justify-center mb-4 ${isSlanted ? '-skew-x-12 bg-[#134975] text-amber-300' : 'rounded-xl bg-primary/10 text-primary'}`}>
+                  <MapPin className={`w-6 h-6 ${isSlanted ? 'skew-x-12' : ''}`} />
                 </div>
                 <h3 className="text-base font-bold text-slate-900">Campus Location</h3>
                 <p className="text-xs text-slate-600 mt-2 leading-relaxed whitespace-pre-line">
@@ -134,13 +135,13 @@ export const ContactPage: React.FC = () => {
             )}
 
             {contactInfo.phone && (
-              <div className="bg-white rounded-2xl p-6 shadow-md border border-slate-200/80 hover:shadow-xl transition-all">
-                <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
-                  <Phone className="w-6 h-6" />
+              <div className={`bg-white p-6 shadow-md border hover:shadow-2xl transition-all ${isSlanted ? 'rounded-none border-l-4 border-l-[#e5a912] border-slate-200' : 'rounded-2xl border-slate-200/80'}`}>
+                <div className={`w-12 h-12 flex items-center justify-center mb-4 ${isSlanted ? '-skew-x-12 bg-[#134975] text-amber-300' : 'rounded-xl bg-emerald-50 text-emerald-600'}`}>
+                  <Phone className={`w-6 h-6 ${isSlanted ? 'skew-x-12' : ''}`} />
                 </div>
                 <h3 className="text-base font-bold text-slate-900">Official Helpline</h3>
                 <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                  <a href={`tel:${contactInfo.phone}`} className="hover:text-emerald-600 font-semibold text-slate-800">
+                  <a href={`tel:${contactInfo.phone}`} className="hover:text-amber-600 font-semibold text-slate-800">
                     {contactInfo.phone}
                   </a>
                 </p>
@@ -148,13 +149,13 @@ export const ContactPage: React.FC = () => {
             )}
 
             {contactInfo.email && (
-              <div className="bg-white rounded-2xl p-6 shadow-md border border-slate-200/80 hover:shadow-xl transition-all">
-                <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4">
-                  <Mail className="w-6 h-6" />
+              <div className={`bg-white p-6 shadow-md border hover:shadow-2xl transition-all ${isSlanted ? 'rounded-none border-l-4 border-l-[#e5a912] border-slate-200' : 'rounded-2xl border-slate-200/80'}`}>
+                <div className={`w-12 h-12 flex items-center justify-center mb-4 ${isSlanted ? '-skew-x-12 bg-[#134975] text-amber-300' : 'rounded-xl bg-blue-50 text-blue-600'}`}>
+                  <Mail className={`w-6 h-6 ${isSlanted ? 'skew-x-12' : ''}`} />
                 </div>
                 <h3 className="text-base font-bold text-slate-900">Official Email Inquiries</h3>
                 <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                  <a href={`mailto:${contactInfo.email}`} className="hover:text-blue-600 font-semibold text-slate-800">
+                  <a href={`mailto:${contactInfo.email}`} className="hover:text-amber-600 font-semibold text-slate-800">
                     {contactInfo.email}
                   </a>
                 </p>
@@ -277,10 +278,14 @@ export const ContactPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full py-3 bg-primary text-white font-bold text-xs sm:text-sm rounded-xl shadow-md hover:opacity-95 transition-all flex items-center justify-center gap-2"
+                  className={`w-full py-3 font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                    isSlanted
+                      ? '-skew-x-12 bg-[#e5a912] hover:bg-[#d49a0d] text-slate-950 font-black hover:scale-102'
+                      : 'rounded-xl bg-primary text-white hover:opacity-95'
+                  }`}
                 >
-                  <Send className="w-4 h-4" />
-                  <span>{submitting ? 'Transmitting Message...' : 'Send Message'}</span>
+                  <Send className={`w-4 h-4 ${isSlanted ? 'skew-x-12' : ''}`} />
+                  <span className={isSlanted ? 'skew-x-12' : ''}>{submitting ? 'Transmitting Message...' : 'Send Message'}</span>
                 </button>
               </form>
             )}

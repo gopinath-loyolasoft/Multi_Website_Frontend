@@ -45,11 +45,20 @@ export const FileUploadInput: React.FC<FileUploadInputProps> = ({
         },
       });
 
-      if (response.data.success) {
-        const uploadedPath = response.data.data?.filePath || response.data.data?.url || '';
+      const uploadedPath =
+        response.data?.data?.filePath ||
+        response.data?.data?.url ||
+        (typeof response.data?.data === 'string' ? response.data.data : '') ||
+        response.data?.filePath ||
+        response.data?.url ||
+        '';
+
+      if (uploadedPath) {
         onChange(uploadedPath);
+      } else if (response.data?.data?.id) {
+        onChange(response.data.data.filePath || response.data.data.fileName || '');
       } else {
-        setError(response.data.message || 'Failed to upload file');
+        setError(response.data?.message || 'Failed to upload file');
       }
     } catch (err: any) {
       console.error('File upload error:', err);

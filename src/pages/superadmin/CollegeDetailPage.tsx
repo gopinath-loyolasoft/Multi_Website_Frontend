@@ -12,12 +12,93 @@ import {
   Power,
   Trash2,
   CheckCircle2,
-  XCircle
+  XCircle,
+  LayoutTemplate,
+  Sparkles,
+  Check
 } from 'lucide-react';
 import { CollegeDetails, Theme } from '../../types';
 import { apiClient } from '../../services/apiClient';
 import { DeleteCollegeModal } from './DeleteCollegeModal';
 import { ConfirmDialog } from '../../UI_Componentes/ui';
+import { formatDisplayDomain } from '../../utils/domainUtils';
+
+const TEMPLATE_OPTIONS = [
+  { code: 'ENGINEERING_MODERN', number: 'PACK 1', name: 'Engineering & High-Tech Blueprint Suite', icon: '⚙️', defaultTheme: 'THEME_BLUE' },
+  { code: 'ARTS_SCIENCE_MODERN', number: 'PACK 2', name: 'Arts & Science Modern Suite', icon: '🎨', defaultTheme: 'THEME_GOLD' },
+  { code: 'MEDICAL_MODERN', number: 'PACK 3', name: 'Medical & Healthcare Institute Suite', icon: '⚕️', defaultTheme: 'THEME_TEAL' },
+  { code: 'UNIVERSITY_MODERN', number: 'PACK 4', name: 'University & Multi-Faculty Suite', icon: '🎓', defaultTheme: 'THEME_CRIMSON' },
+  { code: 'SALESIAN_SLANTED', number: 'PACK 5', name: '3D Slanted Navy & Gold Suite', icon: '⚡', defaultTheme: 'THEME_BLUE' },
+  { code: 'DESIGN_3D_GLASS', number: 'PACK 6', name: '3D Holographic Glassmorphism Suite', icon: '💎', defaultTheme: 'THEME_TEAL' },
+  { code: 'DESIGN_3D_ISOMETRIC', number: 'PACK 7', name: '3D Isometric Tactile Elevation Suite', icon: '🧊', defaultTheme: 'THEME_GOLD' },
+  { code: 'DESIGN_3D_KINETIC', number: 'PACK 8', name: '3D Kinetic Perspective & Flip Suite', icon: '⚡', defaultTheme: 'THEME_CRIMSON' },
+  { code: 'DESIGN_3D_NEUMORPHIC', number: 'PACK 9', name: '3D Neumorphic Soft Depth Suite', icon: '🛡️', defaultTheme: 'THEME_TEAL' },
+];
+
+const FEATURE_LABEL_MAP: Record<string, string> = {
+  PAGES: 'Custom Pages Builder',
+  SECTIONS: 'Dynamic Home Sections',
+  MENUS: 'Navigation Header/Footer',
+  THEMES: 'Theme Customizer',
+  ABOUT: 'About Institution',
+  BANNERS: 'Hero Slider Banners',
+  MARQUEE: 'Announcement Ticker',
+  STATS: 'Counters & Stats Bar',
+  STATISTICS: 'Counters & Stats Bar',
+  QUOTE: 'Leadership Quote',
+  QUOTES: 'Leadership Quote',
+  DEPARTMENTS: 'Academic Departments',
+  COURSES: 'Course Catalog & Syllabus',
+  FACULTY: 'Faculty Directory',
+  NEWS: 'Campus News & Press',
+  EVENTS: 'Events Calendar',
+  NOTICES: 'Circulars & Notices',
+  GALLERY: 'Photo & Video Gallery',
+  MEDIA: 'Media Library',
+  PLACEMENTS: 'Placements & Recruiters',
+  COMPLIANCE: 'Mandatory Compliance',
+  TRANSPORT: 'Campus Transport Network',
+  HOSTELS: 'Hostels & Residence',
+  LIBRARY: 'Digital Library',
+  ALUMNI: 'Alumni Network',
+  ADMISSIONS: 'Admissions Portal',
+  CONTACT: 'Contact & Campus Map',
+  POPUPS: 'Popup Lightbox Alerts',
+  POPUP: 'Popup Lightbox Alerts'
+};
+
+const FEATURE_GROUPS = [
+  {
+    category: 'Core CMS & Layout',
+    icon: '📄',
+    codes: ['PAGES', 'SECTIONS', 'MENUS', 'THEMES']
+  },
+  {
+    category: 'Dynamic Home Sections',
+    icon: '⚡',
+    codes: ['BANNERS', 'MARQUEE', 'STATS', 'QUOTE', 'POPUPS']
+  },
+  {
+    category: 'Academics & Faculty',
+    icon: '🎓',
+    codes: ['DEPARTMENTS', 'COURSES', 'FACULTY']
+  },
+  {
+    category: 'Campus Life & Logistics',
+    icon: '🏛️',
+    codes: ['NEWS', 'EVENTS', 'NOTICES', 'GALLERY', 'MEDIA', 'TRANSPORT', 'HOSTELS', 'LIBRARY']
+  },
+  {
+    category: 'Statutory & Careers',
+    icon: '💼',
+    codes: ['COMPLIANCE', 'PLACEMENTS', 'ALUMNI']
+  },
+  {
+    category: 'Admissions & Communication',
+    icon: '📬',
+    codes: ['ADMISSIONS', 'CONTACT', 'ABOUT']
+  }
+];
 
 export const CollegeDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -46,6 +127,7 @@ export const CollegeDetailPage: React.FC = () => {
   const [newDomain, setNewDomain] = useState('');
   const [isAddingDomain, setIsAddingDomain] = useState(false);
   const [selectedThemeId, setSelectedThemeId] = useState<string | number>('');
+  const [selectedTemplateCode, setSelectedTemplateCode] = useState<string>('ENGINEERING_MODERN');
   const [featuresState, setFeaturesState] = useState<{ [key: string]: boolean }>({});
   const [savingFeatures, setSavingFeatures] = useState(false);
   const [dbHealthLoading, setDbHealthLoading] = useState(false);
@@ -83,6 +165,7 @@ export const CollegeDetailPage: React.FC = () => {
         const data: CollegeDetails = colRes.data.data;
         setDetails(data);
         setSelectedThemeId(data.tenant.defaultThemeId || data.theme?.id || '');
+        setSelectedTemplateCode(data.tenant.templateCode || 'ENGINEERING_MODERN');
 
         const featMap: { [key: string]: boolean } = {};
         data.features.forEach(f => {
@@ -114,6 +197,45 @@ export const CollegeDetailPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleTemplateChange = async (newCode: string) => {
+    if (!details) return;
+    try {
+      setSelectedTemplateCode(newCode);
+      await apiClient.put(`/superadmin/colleges/${details.tenant.id}`, {
+        templateCode: newCode
+      });
+      showNotice(`Website template package switched to ${newCode}.`);
+      await fetchCollegeDetails();
+    } catch (err: any) {
+      console.error(err);
+      showActionError(err.response?.data?.message || 'Failed to update website template.');
+    }
+  };
+
+  const handleEnableAllFeatures = () => {
+    const next: { [key: string]: boolean } = {};
+    if (details) {
+      details.features.forEach(f => {
+        next[f.featureCode] = true;
+      });
+    }
+    // Also include all standard 22 codes if not already present
+    Object.keys(FEATURE_LABEL_MAP).forEach(code => {
+      next[code] = true;
+    });
+    setFeaturesState(next);
+  };
+
+  const handleDisableAllFeatures = () => {
+    const next: { [key: string]: boolean } = {};
+    if (details) {
+      details.features.forEach(f => {
+        next[f.featureCode] = false;
+      });
+    }
+    setFeaturesState(next);
   };
 
   const handleSaveSettings = async (e: React.FormEvent) => {
@@ -427,64 +549,146 @@ export const CollegeDetailPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Card 3: Theme Configuration */}
-        <div className="p-5 rounded-xl bg-white border border-slate-200 space-y-4 shadow-xs">
-          <div className="flex items-center gap-2 text-slate-900 font-bold text-sm border-b border-slate-100 pb-3">
-            <Palette className="w-4 h-4 text-blue-600" />
-            <span>Theme Assignment</span>
-          </div>
-
-          <div className="space-y-3">
-            <label className="block text-xs font-semibold text-slate-700">Select Active Palette</label>
-            <select
-              value={selectedThemeId}
-              onChange={(e) => handleThemeChange(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600"
-            >
-              {themes.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name} ({t.code})
-                </option>
-              ))}
-            </select>
-
-            <p className="text-[11px] text-slate-500 leading-relaxed">
-              When changed, the public website at <code className="text-blue-600 font-mono">{tenant.primaryDomain || `${tenant.tenantCode.toLowerCase()}.localhost`}</code> automatically adjusts its CSS variable variables and design styles.
-            </p>
-          </div>
-        </div>
-
-        {/* Card 4: Feature Flags */}
+        {/* Card 3: Theme & Template Configuration */}
         <div className="p-5 rounded-xl bg-white border border-slate-200 space-y-4 shadow-xs">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
-              <Sliders className="w-4 h-4 text-blue-600" />
-              <span>Feature Flags</span>
+              <Palette className="w-4 h-4 text-blue-600" />
+              <span>Theme & Template Architecture</span>
             </div>
-            <button
-              onClick={handleSaveFeatures}
-              disabled={savingFeatures}
-              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-xs shadow-2xs transition"
-            >
-              {savingFeatures ? 'Saving...' : 'Apply Toggles'}
-            </button>
+            {Boolean(tenant.templateCode) && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-blue-50 text-blue-800 border border-blue-200">
+                <span>⚡</span>
+                <span>{tenant.templateCode}</span>
+              </span>
+            )}
           </div>
 
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            {features.map((f) => (
-              <label
-                key={f.featureCode}
-                className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 cursor-pointer hover:bg-slate-100 transition"
-              >
-                <span className="font-medium text-[11px]">{f.featureCode}</span>
-                <input
-                  type="checkbox"
-                  checked={featuresState[f.featureCode] ?? f.isEnabled}
-                  onChange={(e) => setFeaturesState({ ...featuresState, [f.featureCode]: e.target.checked })}
-                  className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                />
+          <div className="space-y-4 text-xs">
+            {/* Template Package Switcher */}
+            <div className="space-y-1.5">
+              <label className="block font-bold text-slate-700">
+                1. Website Template Package (Packs 1–9)
               </label>
-            ))}
+              <select
+                value={selectedTemplateCode}
+                onChange={(e) => handleTemplateChange(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-600"
+              >
+                {TEMPLATE_OPTIONS.map((opt) => (
+                  <option key={opt.code} value={opt.code}>
+                    {opt.icon} {opt.number}: {opt.name} ({opt.code})
+                  </option>
+                ))}
+              </select>
+              <p className="text-[11px] text-slate-500">
+                Switches the frontend visual archetype, banner stylings, and component animations immediately.
+              </p>
+            </div>
+
+            {/* Theme Color Palette */}
+            <div className="space-y-1.5">
+              <label className="block font-bold text-slate-700">
+                2. Active Color Palette & Typography
+              </label>
+              <select
+                value={selectedThemeId}
+                onChange={(e) => handleThemeChange(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600"
+              >
+                {themes.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    🎨 {t.name} ({t.code})
+                  </option>
+                ))}
+              </select>
+              <p className="text-[11px] text-slate-500 leading-relaxed">
+                Live URL: <code className="text-blue-600 font-mono">{formatDisplayDomain(tenant.primaryDomain, tenant.tenantCode, tenant.slug)}</code>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Card 4: Categorized Feature Flags (22 Modules) */}
+        <div className="p-5 rounded-xl bg-white border border-slate-200 space-y-4 shadow-xs">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3 flex-wrap gap-2">
+            <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
+              <Sliders className="w-4 h-4 text-blue-600" />
+              <span>Platform Modules & Feature Matrix</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleEnableAllFeatures}
+                className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[10px] font-bold transition cursor-pointer"
+              >
+                Enable All
+              </button>
+              <button
+                type="button"
+                onClick={handleDisableAllFeatures}
+                className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[10px] font-bold transition cursor-pointer"
+              >
+                Disable All
+              </button>
+              <button
+                onClick={handleSaveFeatures}
+                disabled={savingFeatures}
+                className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-xs shadow-2xs transition cursor-pointer"
+              >
+                {savingFeatures ? 'Saving...' : 'Apply Flags'}
+              </button>
+            </div>
+          </div>
+
+          {/* Grouped Feature Matrix */}
+          <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+            {FEATURE_GROUPS.map((group) => {
+              // Find matching features for this group from tenant's feature list or standard list
+              const groupFeatures = group.codes.map((code) => {
+                const existing = features.find(f => f.featureCode.toUpperCase() === code.toUpperCase());
+                return {
+                  code,
+                  name: FEATURE_LABEL_MAP[code] || code,
+                  isEnabled: featuresState[code] ?? (existing ? existing.isEnabled : true)
+                };
+              });
+
+              return (
+                <div key={group.category} className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 space-y-2">
+                  <div className="flex items-center justify-between text-[11px] font-bold text-slate-700">
+                    <span className="flex items-center gap-1.5">
+                      <span>{group.icon}</span>
+                      <span>{group.category}</span>
+                    </span>
+                    <span className="text-slate-400 font-normal">
+                      {groupFeatures.filter(f => f.isEnabled).length}/{groupFeatures.length} enabled
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs">
+                    {groupFeatures.map((f) => (
+                      <label
+                        key={f.code}
+                        className={`flex items-center justify-between p-2 rounded-md border text-slate-700 cursor-pointer transition ${
+                          f.isEnabled
+                            ? 'bg-blue-50/60 border-blue-200 text-blue-900 font-semibold'
+                            : 'bg-white border-slate-200 text-slate-500'
+                        }`}
+                      >
+                        <span className="truncate text-[11px]">{f.name}</span>
+                        <input
+                          type="checkbox"
+                          checked={f.isEnabled}
+                          onChange={(e) => setFeaturesState({ ...featuresState, [f.code]: e.target.checked })}
+                          className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 shrink-0"
+                        />
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

@@ -8,6 +8,7 @@ import { DynamicPage } from '../pages/website/DynamicPage';
 import { NewsListPage, NewsDetailPage } from '../pages/website/NewsPages';
 import { EventsListPage, EventDetailPage } from '../pages/website/EventsPages';
 import { DepartmentsPage } from '../pages/website/DepartmentsPage';
+import { DepartmentDetailPage } from '../pages/website/DepartmentDetailPage';
 import { CoursesPage } from '../pages/website/CoursesPage';
 import { FacultyPage } from '../pages/website/FacultyPage';
 import { GalleryPage } from '../pages/website/GalleryPage';
@@ -15,6 +16,12 @@ import { AdmissionsPage } from '../pages/website/AdmissionsPage';
 import { ContactPage } from '../pages/website/ContactPage';
 import { AboutPage } from '../pages/website/AboutPage';
 import { NoticesPage } from '../pages/website/NoticesPage';
+import { PlacementsPage } from '../pages/website/PlacementsPage';
+import { CompliancePage } from '../pages/website/CompliancePage';
+import { TransportPage } from '../pages/website/TransportPage';
+import { HostelsPage } from '../pages/website/HostelsPage';
+import { LibraryPage } from '../pages/website/LibraryPage';
+import { AlumniPage } from '../pages/website/AlumniPage';
 
 import { LoginPage } from '../pages/admin/LoginPage';
 import { DashboardPage } from '../pages/admin/DashboardPage';
@@ -25,6 +32,7 @@ import { FacultyManagementPage, GalleryManagementPage } from '../pages/admin/Fac
 import { BannersManagementPage, AdmissionsManagementPage } from '../pages/admin/BannersAndAdmissionsAdmin';
 import { MenusAdminPage } from '../pages/admin/MenusAdmin';
 import { MarqueeAdminPage } from '../pages/admin/MarqueeAdmin';
+import { TopbarCardAdminPage } from '../pages/admin/TopbarCardAdmin';
 import { SettingsAdminPage } from '../pages/admin/SettingsAdmin';
 import { PagesAdminPage } from '../pages/admin/PagesAdmin';
 import { StatsAdminPage } from '../pages/admin/StatsAdminPage';
@@ -32,6 +40,14 @@ import { QuoteAdminPage } from '../pages/admin/QuoteAdminPage';
 import { ContactSubmissionsAdminPage } from '../pages/admin/ContactSubmissionsAdmin';
 import { ContactInfoAdminPage } from '../pages/admin/ContactInfoAdmin';
 import { NoticesAdminPage } from '../pages/admin/NoticesAdminPage';
+import { PlacementsAdminPage } from '../pages/admin/PlacementsAdminPage';
+import { ComplianceAdminPage } from '../pages/admin/ComplianceAdminPage';
+import { TransportAdminPage } from '../pages/admin/TransportAdminPage';
+import { HostelsAdminPage } from '../pages/admin/HostelsAdminPage';
+import { LibraryAdminPage } from '../pages/admin/LibraryAdminPage';
+import { AlumniAdminPage } from '../pages/admin/AlumniAdminPage';
+import { AboutAdminPage } from '../pages/admin/AboutAdminPage';
+import { PopupAnnouncementsAdmin } from '../pages/admin/PopupAnnouncementsAdmin';
 
 import { SuperAdminLoginPage } from '../pages/superadmin/SuperAdminLoginPage';
 import { SuperAdminDashboard } from '../pages/superadmin/SuperAdminDashboard';
@@ -99,6 +115,7 @@ export const AppRoutes: React.FC = () => {
           <Route index element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="menus" element={<MenusAdminPage />} />
+          <Route path="topbar" element={<TopbarCardAdminPage />} />
           <Route path="marquee" element={<MarqueeAdminPage />} />
           <Route path="departments" element={<DepartmentsManagementPage />} />
           <Route path="courses" element={<CoursesManagementPage />} />
@@ -114,16 +131,27 @@ export const AppRoutes: React.FC = () => {
           <Route path="contact-submissions" element={<ContactSubmissionsAdminPage />} />
           <Route path="contact-info-settings" element={<ContactInfoAdminPage />} />
           <Route path="notices" element={<NoticesAdminPage />} />
+          <Route path="placements" element={<PlacementsAdminPage />} />
+          <Route path="compliance" element={<ComplianceAdminPage />} />
+          <Route path="transport" element={<TransportAdminPage />} />
+          <Route path="hostels" element={<HostelsAdminPage />} />
+          <Route path="library" element={<LibraryAdminPage />} />
+          <Route path="alumni" element={<AlumniAdminPage />} />
+          <Route path="about" element={<AboutAdminPage />} />
+          <Route path="popups" element={<PopupAnnouncementsAdmin />} />
           <Route path="settings" element={<SettingsAdminPage />} />
         </Route>
 
         {/* 3. Root & Dynamic College Website Routing */}
         {isRootPlatform ? (
           <>
-            <Route path="/" element={<PlatformHomePage />} />
+            {/* PlatformHomePage commented out as requested; directly route to SuperAdmin login */}
+            {/* <Route path="/" element={<PlatformHomePage />} /> */}
+            <Route path="/" element={<Navigate to="/superadmin/login" replace />} />
             <Route path="/site" element={<WebsiteLayout />}>
               <Route index element={<DynamicPage />} />
               <Route path="departments" element={<DepartmentsPage />} />
+              <Route path="departments/:code" element={<DepartmentDetailPage />} />
               <Route path="courses" element={<CoursesPage />} />
               <Route path="faculty" element={<FacultyPage />} />
               <Route path="gallery" element={<GalleryPage />} />
@@ -135,6 +163,12 @@ export const AppRoutes: React.FC = () => {
               <Route path="events/:id" element={<EventDetailPage />} />
               <Route path="about" element={<AboutPage />} />
               <Route path="notices" element={<NoticesPage />} />
+              <Route path="placements" element={<PlacementsPage />} />
+              <Route path="compliance" element={<CompliancePage />} />
+              <Route path="transport" element={<TransportPage />} />
+              <Route path="hostels" element={<HostelsPage />} />
+              <Route path="library" element={<LibraryPage />} />
+              <Route path="alumni" element={<AlumniPage />} />
               <Route path=":slug" element={<DynamicPage />} />
             </Route>
           </>
@@ -143,6 +177,7 @@ export const AppRoutes: React.FC = () => {
             <Route path="/" element={<WebsiteLayout />}>
               <Route index element={<DynamicPage />} />
               <Route path="departments" element={<DepartmentsPage />} />
+              <Route path="departments/:code" element={<DepartmentDetailPage />} />
               <Route path="courses" element={<CoursesPage />} />
               <Route path="faculty" element={<FacultyPage />} />
               <Route path="gallery" element={<GalleryPage />} />
@@ -154,6 +189,12 @@ export const AppRoutes: React.FC = () => {
               <Route path="events/:id" element={<EventDetailPage />} />
               <Route path="about" element={<AboutPage />} />
               <Route path="notices" element={<NoticesPage />} />
+              <Route path="placements" element={<PlacementsPage />} />
+              <Route path="compliance" element={<CompliancePage />} />
+              <Route path="transport" element={<TransportPage />} />
+              <Route path="hostels" element={<HostelsPage />} />
+              <Route path="library" element={<LibraryPage />} />
+              <Route path="alumni" element={<AlumniPage />} />
               <Route path=":slug" element={<DynamicPage />} />
             </Route>
             {/* Fallback alias for /site on tenant domain */}

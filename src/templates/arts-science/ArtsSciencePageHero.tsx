@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { TemplatePageHeroProps } from '../contracts/TemplateContracts';
 import { artsScienceConfig } from './config';
 
@@ -12,7 +12,7 @@ export const ArtsSciencePageHero: React.FC<TemplatePageHeroProps> = ({
   const Crest = artsScienceConfig.CrestIcon;
 
   return (
-    <section className={`relative ${artsScienceConfig.heroGradient} text-white py-16 md:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden font-serif`}>
+    <section className={`relative ${artsScienceConfig.heroGradient} text-white pt-10 md:pt-12 pb-14 md:pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden font-serif`}>
       <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
       <div className="max-w-4xl mx-auto relative z-10 text-center">
         {badge && (

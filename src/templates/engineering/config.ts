@@ -1,4 +1,4 @@
-﻿import { Cpu } from 'lucide-react';
+import { Cpu } from 'lucide-react';
 import { TemplateConfig } from '../contracts/TemplateContracts';
 
 export const engineeringConfig: TemplateConfig = {
@@ -10,7 +10,7 @@ export const engineeringConfig: TemplateConfig = {
   nameFont: 'font-sans font-black tracking-tight uppercase',
   titleFont: 'font-sans',
   badgeFont: 'font-sans font-bold text-blue-800',
-  defaultBadge: 'AICTE Approved • NBA Tier-1',
+  defaultBadge: '',
   crestBg: 'bg-blue-800 shadow-blue-900/25',
   CrestIcon: Cpu,
   heroGradient: 'bg-gradient-to-r from-slate-950 via-blue-950 to-slate-900',

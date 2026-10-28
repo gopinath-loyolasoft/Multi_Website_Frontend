@@ -1,19 +1,28 @@
-﻿import { TemplatePackage } from '../contracts/TemplateContracts';
+import { TemplatePackage } from '../contracts/TemplateContracts';
 import { medicalConfig } from './config';
+import { MEDICAL_THEME } from './theme';
 import { MedicalHeader } from './MedicalHeader';
 import { MedicalPageHero } from './MedicalPageHero';
 import { MedicalFooter } from './MedicalFooter';
-import { MedicalHeroTemplate } from '../../components/sections/hero-templates/MedicalHeroTemplate';
+import { MedicalHeroTemplate } from './MedicalHeroTemplate';
 
-export const medicalTemplate: TemplatePackage = {
+export const MedicalTemplatePackage: TemplatePackage = {
   config: medicalConfig,
+  themeStyles: MEDICAL_THEME,
   Header: MedicalHeader,
   PageHero: MedicalPageHero,
   Footer: MedicalFooter,
-  Hero: MedicalHeroTemplate
+  Hero: MedicalHeroTemplate,
 };
 
-export * from './config';
-export * from './MedicalHeader';
-export * from './MedicalPageHero';
-export * from './MedicalFooter';
+export const medicalTemplate = MedicalTemplatePackage;
+export const MEDICAL_CONFIG = medicalConfig;
+
+export {
+  medicalConfig,
+  MEDICAL_THEME,
+  MedicalHeader,
+  MedicalPageHero,
+  MedicalFooter,
+  MedicalHeroTemplate,
+};

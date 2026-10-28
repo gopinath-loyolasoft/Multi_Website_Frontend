@@ -1,11 +1,10 @@
-﻿import React from 'react';
+import React from 'react';
 import { SiteConfig, MenuItem } from '../../types';
+import { ModuleThemeStyles, TemplateCode } from './ThemeStyles';
+import { HeroTemplateProps } from './HeroTypes';
 
-export type TemplateCode = 
-  | 'ENGINEERING_MODERN' 
-  | 'ARTS_SCIENCE_MODERN' 
-  | 'MEDICAL_MODERN' 
-  | 'UNIVERSITY_MODERN';
+export * from './ThemeStyles';
+export * from './HeroTypes';
 
 export interface TemplateConfig {
   code: TemplateCode;
@@ -51,8 +50,9 @@ export interface TemplateFooterProps {
 
 export interface TemplatePackage {
   config: TemplateConfig;
+  themeStyles: ModuleThemeStyles;
   Header: React.FC<TemplateHeaderProps>;
   PageHero: React.FC<TemplatePageHeroProps>;
   Footer: React.FC<TemplateFooterProps>;
-  Hero?: React.FC<any>;
+  Hero: React.FC<HeroTemplateProps>;
 }

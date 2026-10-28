@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Bell, Calendar, Download, AlertCircle } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 import { useActiveTemplate } from '../../templates/templateRegistry';
+import { useTenant } from '../../tenant/TenantContext';
 
 interface NoticeItem {
   title: string;
@@ -12,6 +13,7 @@ interface NoticeItem {
 }
 
 export const NoticesPage: React.FC = () => {
+  const { siteConfig } = useTenant();
   const Template = useActiveTemplate();
   const [notices, setNotices] = useState<NoticeItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,13 +42,18 @@ export const NoticesPage: React.FC = () => {
     fetchNotices();
   }, []);
 
+  const headerConfig = siteConfig?.settings?.socialLinks?.pageHeaders?.notices || siteConfig?.settings?.pageHeaders?.notices;
+  const badgeText = headerConfig?.badge || (Template.config.code === 'ARTS_SCIENCE_MODERN' ? 'Scholarly Circulars & Directives' : Template.config.code === 'MEDICAL_MODERN' ? 'Clinical Bulletins & Directives' : Template.config.code === 'UNIVERSITY_MODERN' ? 'Official Gazette & Circulars' : 'Official Circulars');
+  const titleText = headerConfig?.title || 'Notices & Official Announcements';
+  const subtitleText = headerConfig?.subtitle || 'Circulars, examination schedules, admission updates, and institutional announcements.';
+
   return (
     <div className={`min-h-screen ${Template.config.bodyBgClass}`}>
       {/* Dynamic Modular Template Page Hero */}
       <Template.PageHero
-        badge={Template.config.code === 'ARTS_SCIENCE_MODERN' ? 'Scholarly Circulars & Directives' : Template.config.code === 'MEDICAL_MODERN' ? 'Clinical Bulletins & Directives' : Template.config.code === 'UNIVERSITY_MODERN' ? 'Official Gazette & Circulars' : 'Official Circulars'}
-        title="Notices & Official Announcements"
-        subtitle="Circulars, examination schedules, admission updates, and institutional announcements."
+        badge={badgeText}
+        title={titleText}
+        subtitle={subtitleText}
         icon={<Bell className="w-4 h-4 text-amber-300" />}
       />
 

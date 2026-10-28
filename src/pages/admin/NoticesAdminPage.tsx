@@ -24,8 +24,9 @@ import {
 } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 import { NoticeItem } from '../../types';
-import { FormDrawer, DrawerMode, FileUploadInput, ConfirmDialog, Input, Select, Switch } from '../../UI_Componentes/ui';
+import { FormDrawer, DrawerMode, FileUploadInput, ConfirmDialog, Input, Select, Switch, useToast } from '../../UI_Componentes/ui';
 import { slugify, copyToClipboard } from '../../utils/helpers';
+import { ModulePageHeaderCustomizer } from '../../components/admin/ModulePageHeaderCustomizer';
 
 const CATEGORY_OPTIONS = [
   { value: 'GENERAL', label: 'General' },
@@ -37,6 +38,7 @@ const CATEGORY_OPTIONS = [
 ];
 
 export const NoticesAdminPage: React.FC = () => {
+  const { toast } = useToast();
   const [notices, setNotices] = useState<NoticeItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -44,7 +46,6 @@ export const NoticesAdminPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'PUBLISHED' | 'DRAFT'>('ALL');
-  const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string | number; title: string } | null>(null);
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -85,8 +86,11 @@ export const NoticesAdminPage: React.FC = () => {
   };
 
   const showNotification = (text: string, type: 'success' | 'error' = 'success') => {
-    setMessage({ text, type });
-    setTimeout(() => setMessage(null), 4000);
+    if (type === 'success') {
+      toast.success(text);
+    } else {
+      toast.error(text);
+    }
   };
 
   const fetchNotices = async () => {
@@ -268,54 +272,44 @@ export const NoticesAdminPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Notification */}
-      {message && (
-        <div
-          className={`p-3.5 rounded-lg text-xs font-semibold flex items-center justify-between transition-all ${
-            message.type === 'success'
-              ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900'
-              : 'bg-red-50 dark:bg-red-950/40 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-900'
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            {message.type === 'success' ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
-            <span>{message.text}</span>
-          </div>
-          <button onClick={() => setMessage(null)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      )}
+      {/* Public Page Banner Customizer */}
+      <ModulePageHeaderCustomizer
+        moduleKey="notices"
+        moduleLabel="Administrative & Academic Circulars"
+        defaultBadge="Official Circulars"
+        defaultTitle="Administrative & Academic Circulars"
+        defaultSubtitle="Official notices, examination timetables, registration deadlines, and administrative orders."
+      />
 
-      {/* Live Notices Monitor (LIGHT MODE) */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-        <div className="p-4 flex items-center justify-between border-b border-slate-100 bg-slate-50/75">
+      {/* Live Notices Monitor (DARK & LIGHT MODE) */}
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
+        <div className="p-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-800 bg-slate-50/75 dark:bg-slate-800/60">
           <div className="flex items-center gap-2">
             <div className={`w-2.5 h-2.5 rounded-full ${publishedNotices.length > 0 ? 'bg-emerald-500 animate-ping' : 'bg-slate-400'}`} />
-            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 font-mono">
-              Live Notices Monitor (Light Mode)
+            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 font-mono">
+              Live Notices Monitor
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-[11px] font-semibold text-slate-500">
+            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
               {publishedNotices.length} Published · {notices.length - publishedNotices.length} Draft · {importantNotices.length} Important
             </span>
             <button
               type="button"
               onClick={() => setShowMonitor(!showMonitor)}
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 shadow-2xs transition cursor-pointer"
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-2xs transition cursor-pointer"
             >
               {showMonitor ? 'Hide Preview' : 'Show Preview'}
             </button>
           </div>
         </div>
         {showMonitor && (
-          <div className="p-5 bg-slate-50/50">
+          <div className="p-5 bg-slate-100/90 dark:bg-slate-950/60">
             {loading ? (
-              <div className="text-center text-slate-500 text-xs py-4">Loading notices data...</div>
+              <div className="text-center text-slate-500 dark:text-slate-400 text-xs py-4">Loading notices data...</div>
             ) : notices.length === 0 ? (
-              <div className="text-center text-slate-500 text-xs py-8 space-y-1">
-                <Bell className="w-8 h-8 text-slate-400 mx-auto" />
+              <div className="text-center text-slate-500 dark:text-slate-400 text-xs py-8 space-y-1">
+                <Bell className="w-8 h-8 text-slate-400 dark:text-slate-600 mx-auto" />
                 <p>No notices yet. Create your first notice to see it here.</p>
               </div>
             ) : (
@@ -327,8 +321,8 @@ export const NoticesAdminPage: React.FC = () => {
                       key={n.id}
                       className={`rounded-xl p-3.5 space-y-2 border transition ${
                         isPub
-                          ? 'bg-white border-slate-200 shadow-2xs'
-                          : 'bg-slate-100/70 border-dashed border-slate-300 opacity-60'
+                          ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-2xs'
+                          : 'bg-slate-100/70 dark:bg-slate-800/40 border-dashed border-slate-300 dark:border-slate-700 opacity-60'
                       }`}
                     >
                       <div className="flex items-center justify-between">
@@ -336,14 +330,14 @@ export const NoticesAdminPage: React.FC = () => {
                           <span
                             className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${
                               isPub
-                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                                : 'bg-slate-100 text-slate-600 border-slate-200'
+                                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'
                             }`}
                           >
                             {isPub ? 'Published' : 'Draft'}
                           </span>
                           {n.isImportant && (
-                            <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-red-100 text-red-700 border border-red-200">
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-red-100 dark:bg-red-950/60 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900">
                               Important
                             </span>
                           )}
@@ -353,16 +347,16 @@ export const NoticesAdminPage: React.FC = () => {
                           <span>{formatDate(n.publishDate)}</span>
                         </div>
                       </div>
-                      <p className="text-xs font-bold text-slate-900 leading-snug line-clamp-2">{n.title}</p>
+                      <p className="text-xs font-bold text-slate-900 dark:text-white leading-snug line-clamp-2">{n.title}</p>
                       {n.summary && (
-                        <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">{n.summary}</p>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">{n.summary}</p>
                       )}
                     </div>
                   );
                 })}
               </div>
             )}
-            <p className="text-[11px] text-slate-400 italic text-center pt-4">
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 italic text-center pt-4">
               * Renders dynamically on your campus notices feed. Showing latest {Math.min(notices.length, 3)} of {notices.length} notices.
             </p>
           </div>

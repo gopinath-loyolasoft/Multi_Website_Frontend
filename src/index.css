@@ -780,3 +780,25 @@ html[data-sidenav-size="offcanvas"].sidenav-enable aside {
 .animate-drawer-slide-in {
   animation: drawerSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* ─────────────────────────────────────────────────────────────
+   Right-to-Left Infinite Marquee Animation
+   ───────────────────────────────────────────────────────────── */
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 22s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}

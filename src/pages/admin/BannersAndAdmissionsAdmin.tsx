@@ -29,9 +29,10 @@ import {
 } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 import { useTheme } from '../../themes/ThemeContext';
-import { FormDrawer, DrawerMode, FileUploadInput, ConfirmDialog } from '../../UI_Componentes/ui';
+import { FormDrawer, DrawerMode, FileUploadInput, ConfirmDialog, useToast } from '../../UI_Componentes/ui';
 import { HeroSection } from '../../components/sections/HeroSection';
 import { HeroSliderSection } from '../../components/sections/HeroSliderSection';
+import { ModulePageHeaderCustomizer } from '../../components/admin/ModulePageHeaderCustomizer';
 
 interface Banner {
   id: string;
@@ -61,6 +62,7 @@ interface ContactSubmission {
 }
 
 export const BannersManagementPage: React.FC = () => {
+  const { toast } = useToast();
   const { isArtsAndScience, isMedical } = useTheme();
   const defaultBannerAsset = isArtsAndScience
     ? '/assets/templates/arts/banner1.svg'
@@ -71,7 +73,6 @@ export const BannersManagementPage: React.FC = () => {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
-  const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
 
   // Drawer State (Add, Edit, View)
@@ -90,8 +91,11 @@ export const BannersManagementPage: React.FC = () => {
   const [pillars, setPillars] = useState<string[]>(['', '', '']);
 
   const showNotification = (text: string, type: 'success' | 'error' = 'success') => {
-    setMessage({ text, type });
-    setTimeout(() => setMessage(null), 4000);
+    if (type === 'success') {
+      toast.success(text);
+    } else {
+      toast.error(text);
+    }
   };
 
   const [activeTab, setActiveTab] = useState<'banners' | 'highlights'>('banners');
@@ -366,25 +370,6 @@ export const BannersManagementPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Notification banner */}
-      {message && (
-        <div
-          className={`p-3.5 rounded-lg text-xs font-semibold flex items-center justify-between transition-all ${
-            message.type === 'success'
-              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-              : 'bg-red-50 text-red-800 border border-red-200'
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            {message.type === 'success' ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
-            <span>{message.text}</span>
-          </div>
-          <button onClick={() => setMessage(null)} className="text-slate-400 hover:text-slate-600">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      )}
-
       {/* Navigation Tabs: Hero & Highlights Card vs Slider Banners */}
       <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
         <button
@@ -629,24 +614,56 @@ export const BannersManagementPage: React.FC = () => {
 
               {/* Quick Pillars */}
               <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                  4. Quick Institutional Pillars (Checkmarks below hero)
-                </h3>
-                <p className="text-xs text-slate-500">Separated by comma or enter below:</p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                      4. Quick Institutional Pillars (Checkmarks below hero)
+                    </h3>
+                    <p className="text-xs text-slate-500">Add highlight badges displayed below the hero banner:</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setHeroContent({
+                        ...heroContent,
+                        pillars: [...(heroContent.pillars || []), '']
+                      });
+                    }}
+                    className="px-2.5 py-1 text-xs font-bold bg-primary/10 text-primary hover:bg-primary/20 rounded-lg transition"
+                  >
+                    + Add Pillar
+                  </button>
+                </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  {(heroContent.pillars || ['NAAC Accredited', 'Top Placement Record', 'World-Class Faculty']).map((p: string, idx: number) => (
-                    <input
-                      key={idx}
-                      type="text"
-                      value={p}
-                      onChange={(e) => {
-                        const next = [...(heroContent.pillars || [])];
-                        next[idx] = e.target.value;
-                        setHeroContent({ ...heroContent, pillars: next });
-                      }}
-                      className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold"
-                    />
+                  {(heroContent.pillars || []).map((p: string, idx: number) => (
+                    <div key={idx} className="flex items-center gap-1.5">
+                      <input
+                        type="text"
+                        value={p}
+                        placeholder="e.g. NAAC Accredited"
+                        onChange={(e) => {
+                          const next = [...(heroContent.pillars || [])];
+                          next[idx] = e.target.value;
+                          setHeroContent({ ...heroContent, pillars: next });
+                        }}
+                        className="w-full px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const next = (heroContent.pillars || []).filter((_: any, i: number) => i !== idx);
+                          setHeroContent({ ...heroContent, pillars: next });
+                        }}
+                        className="text-slate-400 hover:text-red-500 p-1"
+                        title="Remove pillar"
+                      >
+                        ✕
+                      </button>
+                    </div>
                   ))}
+                  {(!heroContent.pillars || heroContent.pillars.length === 0) && (
+                    <p className="text-xs text-slate-400 italic col-span-3">No pillars configured. Click '+ Add Pillar' to add highlights.</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -1114,20 +1131,23 @@ export const BannersManagementPage: React.FC = () => {
 };
 
 export const AdmissionsManagementPage: React.FC = () => {
+  const { toast } = useToast();
   const [submissions, setSubmissions] = useState<ContactSubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
   // Drawer State for viewing submission
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedSubmission, setSelectedSubmission] = useState<ContactSubmission | null>(null);
 
   const showNotification = (text: string, type: 'success' | 'error' = 'success') => {
-    setMessage({ text, type });
-    setTimeout(() => setMessage(null), 4000);
+    if (type === 'success') {
+      toast.success(text);
+    } else {
+      toast.error(text);
+    }
   };
 
   const fetchSubmissions = async () => {
@@ -1223,24 +1243,14 @@ export const AdmissionsManagementPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Notification banner */}
-      {message && (
-        <div
-          className={`p-3.5 rounded-lg text-xs font-semibold flex items-center justify-between transition-all ${
-            message.type === 'success'
-              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-              : 'bg-red-50 text-red-800 border border-red-200'
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            {message.type === 'success' ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
-            <span>{message.text}</span>
-          </div>
-          <button onClick={() => setMessage(null)} className="text-slate-400 hover:text-slate-600">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      )}
+      {/* Public Page Banner Customizer */}
+      <ModulePageHeaderCustomizer
+        moduleKey="admissions"
+        moduleLabel="Admissions & Enrollment Portal"
+        defaultBadge="Admissions Open 2026 - 2027"
+        defaultTitle="Begin Your Transformative Journey"
+        defaultSubtitle="Join a vibrant university ecosystem committed to academic distinction, cutting-edge innovation, and global leadership."
+      />
 
       {/* Search & Filter */}
       <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">

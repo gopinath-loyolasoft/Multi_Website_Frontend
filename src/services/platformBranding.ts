@@ -1,3 +1,5 @@
+import { apiClient } from './apiClient';
+
 export interface PlatformBranding {
   platformName: string;
   platformSubtitle: string;
@@ -15,7 +17,8 @@ export const DEFAULT_PLATFORM_BRANDING: PlatformBranding = {
 };
 
 /**
- * Retrieve current platform branding from storage or defaults.
+ * Retrieve current platform branding: server values when signed in (persisted
+ * across browsers), falling back to the localStorage cache and then defaults.
  */
 export const getPlatformBranding = (): PlatformBranding => {
   try {
@@ -36,9 +39,36 @@ export const getPlatformBranding = (): PlatformBranding => {
 };
 
 /**
- * Persist platform branding and dispatch update event across tabs/windows.
+ * Fetch branding from the server and refresh the local cache + browser chrome.
+ * Safe to call anywhere: failures silently keep the cached/default branding.
  */
-export const savePlatformBranding = (branding: Partial<PlatformBranding>): PlatformBranding => {
+export const syncPlatformBrandingFromServer = async (): Promise<PlatformBranding> => {
+  try {
+    const res = await apiClient.get('/superadmin/branding');
+    if (res.data?.success && res.data.data) {
+      const d = res.data.data;
+      const server: PlatformBranding = {
+        platformName: d.platformName || DEFAULT_PLATFORM_BRANDING.platformName,
+        platformSubtitle: d.platformSubtitle || DEFAULT_PLATFORM_BRANDING.platformSubtitle,
+        logoUrl: d.logoUrl || DEFAULT_PLATFORM_BRANDING.logoUrl,
+        faviconUrl: d.faviconUrl || d.logoUrl || DEFAULT_PLATFORM_BRANDING.faviconUrl,
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(server));
+      applyBrowserBranding(server.platformName, server.faviconUrl);
+      window.dispatchEvent(new CustomEvent('platform-branding-updated', { detail: server }));
+      return server;
+    }
+  } catch {
+    // Not authenticated or server unreachable — cached/default branding stays
+  }
+  return getPlatformBranding();
+};
+
+/**
+ * Persist platform branding server-side (shared across all SuperAdmin browsers)
+ * and update the local cache + dispatch update event across tabs/windows.
+ */
+export const savePlatformBranding = async (branding: Partial<PlatformBranding>): Promise<PlatformBranding> => {
   const current = getPlatformBranding();
   const updated: PlatformBranding = {
     platformName: branding.platformName?.trim() || current.platformName,
@@ -46,6 +76,25 @@ export const savePlatformBranding = (branding: Partial<PlatformBranding>): Platf
     logoUrl: branding.logoUrl?.trim() || current.logoUrl,
     faviconUrl: branding.faviconUrl?.trim() || branding.logoUrl?.trim() || current.faviconUrl,
   };
+
+  // Persist server-side first (single source of truth for all admins)
+  try {
+    const res = await apiClient.put('/superadmin/branding', {
+      platformName: updated.platformName,
+      platformSubtitle: updated.platformSubtitle,
+      logoUrl: updated.logoUrl,
+      faviconUrl: updated.faviconUrl,
+    });
+    if (res.data?.success && res.data.data) {
+      const d = res.data.data;
+      updated.platformName = d.platformName || updated.platformName;
+      updated.platformSubtitle = d.platformSubtitle || updated.platformSubtitle;
+      updated.logoUrl = d.logoUrl || updated.logoUrl;
+      updated.faviconUrl = d.faviconUrl || updated.faviconUrl;
+    }
+  } catch (e) {
+    console.error('Failed to persist platform branding server-side; cached locally only', e);
+  }
 
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
@@ -63,13 +112,25 @@ export const savePlatformBranding = (branding: Partial<PlatformBranding>): Platf
 };
 
 /**
- * Reset platform branding to factory defaults.
+ * Reset platform branding to factory defaults (server + local cache).
  */
-export const resetPlatformBranding = (): PlatformBranding => {
+export const resetPlatformBranding = async (): Promise<PlatformBranding> => {
   try {
     localStorage.removeItem(STORAGE_KEY);
   } catch (e) {
     console.error('Failed to clear platform branding', e);
+  }
+
+  // Reset server-side to defaults too
+  try {
+    await apiClient.put('/superadmin/branding', {
+      platformName: DEFAULT_PLATFORM_BRANDING.platformName,
+      platformSubtitle: DEFAULT_PLATFORM_BRANDING.platformSubtitle,
+      logoUrl: DEFAULT_PLATFORM_BRANDING.logoUrl,
+      faviconUrl: DEFAULT_PLATFORM_BRANDING.faviconUrl,
+    });
+  } catch (e) {
+    console.error('Failed to reset platform branding server-side', e);
   }
 
   applyBrowserBranding(DEFAULT_PLATFORM_BRANDING.platformName, DEFAULT_PLATFORM_BRANDING.faviconUrl);

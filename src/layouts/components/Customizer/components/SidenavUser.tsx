@@ -1,4 +1,4 @@
-import { useLayoutContext } from '@/context/useLayoutContext'
+import { useLayoutContext } from '@/contexts/useLayoutContext'
 
 const SidenavUser = () => {
   const { updateSettings, sidenavUser } = useLayoutContext()

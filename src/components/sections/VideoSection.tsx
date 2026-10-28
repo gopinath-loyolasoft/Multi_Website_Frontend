@@ -6,6 +6,8 @@ interface VideoProps {
     subtitle?: string;
     videoUrl?: string;
     thumbnailUrl?: string;
+    coverImageUrl?: string;
+    caption?: string;
   };
 }
 
@@ -13,19 +15,21 @@ export const VideoSection: React.FC<VideoProps> = ({ content }) => {
   const videoUrl = content.videoUrl;
   if (!videoUrl) return null;
 
+  const poster = content.thumbnailUrl || content.coverImageUrl;
+
   return (
     <section className="py-16 bg-white dark:bg-slate-900 transition-colors">
       <div className="max-w-5xl mx-auto px-6">
-        {(content.title || content.subtitle) && (
+        {(content.title || content.subtitle || content.caption) && (
           <div className="text-center mb-10 space-y-2">
             {content.title && (
               <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
                 {content.title}
               </h2>
             )}
-            {content.subtitle && (
+            {(content.subtitle || content.caption) && (
               <p className="text-sm text-slate-600 dark:text-slate-400">
-                {content.subtitle}
+                {content.subtitle || content.caption}
               </p>
             )}
           </div>
@@ -44,7 +48,7 @@ export const VideoSection: React.FC<VideoProps> = ({ content }) => {
             <video
               src={videoUrl}
               controls
-              poster={content.thumbnailUrl}
+              poster={poster}
               className="w-full h-full object-cover"
             />
           )}

@@ -28,12 +28,14 @@ import {
   Home,
   MessageSquare,
   MapPin,
-  Bell
+  Bell,
+  Bus,
+  Megaphone
 } from 'lucide-react';
 import { useTenant } from '../tenant/TenantContext';
 import { ThemeToggle } from '../components/common/ThemeToggle';
 import { HeaderProfileDropdown } from '../components/common/HeaderProfileDropdown';
-import { useLayoutContext } from '../context/useLayoutContext';
+import { useLayoutContext } from '../contexts/useLayoutContext';
 import { Customizer } from './components/Customizer';
 import { LivePreviewModal } from '../UI_Componentes/ui';
 import { CapabilityProvider, useCapabilities } from '../contexts/CapabilityContext';
@@ -87,6 +89,9 @@ const AdminLayoutContent: React.FC = () => {
 
   const getContextualPreview = (path: string) => {
     const collegeName = siteConfig?.tenant.name || 'College';
+    if (path.startsWith('/admin/topbar')) {
+      return { url: '/preview/module/topbar', title: `${collegeName} - Topbar Announcement Card Module` };
+    }
     if (path.startsWith('/admin/marquee')) {
       return { url: '/preview/module/marquee', title: `${collegeName} - Marquee Announcement Module` };
     }
@@ -150,27 +155,30 @@ const AdminLayoutContent: React.FC = () => {
 
   // Dynamic Website -> Home Page Submodules
   const homeSubItems = [
+    { label: 'Topbar Card', path: '/admin/topbar', icon: Megaphone, featureCode: 'MARQUEE' },
     { label: 'Notifications Bar', path: '/admin/marquee', icon: Volume2, featureCode: 'MARQUEE' },
+    { label: 'Modal & Lightbox Popups', path: '/admin/popups', icon: Layers, featureCode: 'BANNERS' },
     { label: 'Hero Slider & Highlights', path: '/admin/banners', icon: Sliders, featureCode: 'BANNERS' },
     { label: 'Stats Counter Bar', path: '/admin/stats', icon: BarChart3, featureCode: 'STATS' },
-    { label: 'Quote Management', path: '/admin/quote', icon: Quote, featureCode: 'QUOTES' },
-  ].filter((item) => isFeatureActive(item.featureCode));
+    { label: 'Quote Management', path: '/admin/quote', icon: Quote, featureCode: 'QUOTE' },
+  ].filter((item) => isFeatureActive(item.featureCode) || isFeatureActive('PAGES'));
 
   const isHomeSubActive = homeSubItems.some((item) => location.pathname.startsWith(item.path));
   const [homeAccordionOpen, setHomeAccordionOpen] = useState(true);
 
   // Contact sub-items accordion
   const contactSubItems = [
-    { label: 'Contact Inquiries', path: '/admin/contact-submissions', icon: MessageSquare },
-    { label: 'Contact Info Settings', path: '/admin/contact-info-settings', icon: MapPin },
-  ];
+    { label: 'Contact Inquiries', path: '/admin/contact-submissions', icon: MessageSquare, featureCode: 'CONTACT' },
+    { label: 'Contact Info Settings', path: '/admin/contact-info-settings', icon: MapPin, featureCode: 'CONTACT' },
+  ].filter((item) => isFeatureActive(item.featureCode));
   const isContactSubActive = contactSubItems.some((item) => location.pathname.startsWith(item.path));
   const [contactAccordionOpen, setContactAccordionOpen] = useState(isContactSubActive);
 
   const websiteCoreItems = [
+    { label: 'About College Page', path: '/admin/about', icon: Building2, featureCode: 'ABOUT' },
     { label: 'Navigation Menus', path: '/admin/menus', icon: Menu, featureCode: 'MENUS' },
     { label: 'Pages & Sections', path: '/admin/pages', icon: FileText, featureCode: 'PAGES' },
-  ].filter((item) => !item.featureCode || isFeatureActive(item.featureCode));
+  ].filter((item) => isFeatureActive(item.featureCode));
 
   const academicItems = [
     { label: 'Departments', path: '/admin/departments', icon: Building2, featureCode: 'DEPARTMENTS' },
@@ -179,24 +187,38 @@ const AdminLayoutContent: React.FC = () => {
   ].filter((item) => isFeatureActive(item.featureCode));
 
   const campusItems = [
+    { label: 'Online Admissions', path: '/admin/admissions', icon: GraduationCap, featureCode: 'ADMISSIONS' },
     { label: 'Campus News', path: '/admin/news', icon: Newspaper, featureCode: 'NEWS' },
     { label: 'College Events', path: '/admin/events', icon: CalendarDays, featureCode: 'EVENTS' },
     { label: 'Notices & Circulars', path: '/admin/notices', icon: Bell, featureCode: 'NOTICES' },
     { label: 'Photo Gallery', path: '/admin/gallery', icon: Image, featureCode: 'GALLERY' },
-  ].filter((item) => !item.featureCode || isFeatureActive(item.featureCode));
+  ].filter((item) => isFeatureActive(item.featureCode));
+
+  // /* Campus Services & Statutory Modules (Commented out)
+  const campusServicesItems = [
+    { label: 'Placements & CTC', path: '/admin/placements', icon: Briefcase, featureCode: 'PLACEMENTS' },
+    { label: 'Mandatory Disclosure', path: '/admin/compliance', icon: ShieldCheck, featureCode: 'COMPLIANCE' },
+    { label: 'Bus Transport', path: '/admin/transport', icon: Bus, featureCode: 'TRANSPORT' },
+    { label: 'Hostel Living', path: '/admin/hostels', icon: Home, featureCode: 'HOSTELS' },
+    { label: 'Central Library', path: '/admin/library', icon: BookOpen, featureCode: 'LIBRARY' },
+    { label: 'Alumni Network', path: '/admin/alumni', icon: Award, featureCode: 'ALUMNI' },
+  ].filter((item) => isFeatureActive(item.featureCode) || true);
+
+
+  const isSettingsActive = isFeatureActive('THEMES') || isFeatureActive('PAGES');
 
   const tenantDbName = siteConfig?.tenant.databaseName || `college_${siteConfig?.tenant.tenantCode?.toLowerCase() || 'database'}`;
 
   return (
     <div className="admin-layout h-screen flex bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 overflow-hidden">
       {/* Sidebar (Fixed position, non-scrolling container) */}
-      <aside className="sticky top-0 h-screen w-64 bg-slate-900 border-r border-slate-800 text-slate-300 flex flex-col justify-between shrink-0 overflow-hidden transition-all duration-300 z-30">
+      <aside className="sticky top-0 h-screen w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-300 flex flex-col justify-between shrink-0 overflow-hidden transition-all duration-300 z-30">
         <div className="flex flex-col flex-1 min-h-0">
           {/* Logo & Tenant badge */}
-          <div className="sidebar-logo-container h-16 px-4 border-b border-slate-800/80 flex items-center shrink-0 bg-slate-900/90 backdrop-blur-xs">
+          <div className="sidebar-logo-container h-16 px-4 border-b border-slate-200 dark:border-slate-800/80 flex items-center shrink-0 bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur-xs">
             <div className="flex items-center gap-3 min-w-0 w-full">
               {siteConfig?.settings?.logoUrl ? (
-                <div className="w-9 h-9 rounded-xl bg-white p-1 flex items-center justify-center shrink-0 shadow-xs border border-slate-700/50">
+                <div className="w-9 h-9 rounded-xl bg-white dark:bg-slate-800 p-1 flex items-center justify-center shrink-0 shadow-xs border border-slate-200 dark:border-slate-700/50">
                   <img
                     src={siteConfig.settings.logoUrl}
                     alt="College Logo"
@@ -210,17 +232,17 @@ const AdminLayoutContent: React.FC = () => {
                 </div>
               )}
               <div className="sidebar-brand-text min-w-0 flex-1 flex flex-col justify-center">
-                <h1 className="font-extrabold text-white text-xs leading-snug tracking-tight truncate">
+                <h1 className="font-extrabold text-slate-900 dark:text-white text-xs leading-snug tracking-tight truncate">
                   {siteConfig?.settings?.siteName || siteConfig?.tenant.name || 'College Admin'}
                 </h1>
                 <div className="flex items-center gap-1 mt-0.5">
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-slate-800/90 text-amber-400 border border-slate-700/60 shrink-0">
-                    <ShieldCheck className="w-3 h-3 text-amber-400 shrink-0" />
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800/90 text-amber-600 dark:text-amber-400 border border-slate-200 dark:border-slate-700/60 shrink-0">
+                    <ShieldCheck className="w-3 h-3 text-amber-600 dark:text-amber-400 shrink-0" />
                     <span className="truncate">{siteConfig?.tenant.tenantCode || 'SHC'}</span>
                   </span>
                 </div>
                 {siteConfig?.settings?.tagline && (
-                  <p className="text-[10px] text-blue-400 font-semibold truncate mt-0.5 leading-tight" title={siteConfig.settings.tagline}>
+                  <p className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold truncate mt-0.5 leading-tight" title={siteConfig.settings.tagline}>
                     {siteConfig.settings.tagline}
                   </p>
                 )}
@@ -236,8 +258,8 @@ const AdminLayoutContent: React.FC = () => {
                 to="/admin/dashboard"
                 title="Dashboard"
                 className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition ${location.pathname === '/admin/dashboard'
-                  ? 'bg-primary text-white shadow-md'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                  ? 'bg-blue-600 text-white shadow-md font-extrabold'
+                  : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80'
                   }`}
               >
                 <LayoutDashboard className="w-4 h-4 shrink-0" />
@@ -247,7 +269,7 @@ const AdminLayoutContent: React.FC = () => {
 
             {/* 2. Dynamic Website Group */}
             <div className="space-y-1">
-              <div className="px-3 pb-1 text-[10px] font-black uppercase tracking-wider text-slate-500">
+              <div className="px-3 pb-1 text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Dynamic Website
               </div>
 
@@ -257,9 +279,9 @@ const AdminLayoutContent: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setHomeAccordionOpen(!homeAccordionOpen)}
-                    className={`w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-semibold transition ${isHomeSubActive
-                      ? 'bg-slate-800 text-blue-400'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                    className={`w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer ${isHomeSubActive
+                      ? 'bg-blue-50 dark:bg-slate-800 text-blue-700 dark:text-blue-400 font-extrabold'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
                       }`}
                   >
                     <div className="flex items-center gap-2.5">
@@ -275,7 +297,7 @@ const AdminLayoutContent: React.FC = () => {
 
                   {/* Sub-modules List */}
                   {homeAccordionOpen && (
-                    <div className="pl-6 pr-1 space-y-1 border-l-2 border-slate-800 ml-4 py-1">
+                    <div className="pl-6 pr-1 space-y-1 border-l-2 border-slate-200 dark:border-slate-800 ml-4 py-1">
                       {homeSubItems.map((sub) => {
                         const SubIcon = sub.icon;
                         const isSubActive = location.pathname.startsWith(sub.path);
@@ -284,9 +306,9 @@ const AdminLayoutContent: React.FC = () => {
                             key={sub.path}
                             to={sub.path}
                             title={sub.label}
-                            className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition ${isSubActive
-                              ? 'bg-blue-600 text-white shadow-xs'
-                              : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                            className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition ${isSubActive
+                              ? 'bg-blue-600 text-white shadow-xs font-extrabold'
+                              : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
                               }`}
                           >
                             <SubIcon className="w-3.5 h-3.5 shrink-0" />
@@ -309,8 +331,8 @@ const AdminLayoutContent: React.FC = () => {
                     to={item.path}
                     title={item.label}
                     className={`flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold transition ${isActive
-                      ? 'bg-primary text-white shadow-md'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                      ? 'bg-blue-600 text-white shadow-md font-extrabold'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
                       }`}
                   >
                     <Icon className="w-4 h-4 shrink-0" />
@@ -323,7 +345,7 @@ const AdminLayoutContent: React.FC = () => {
             {/* 3. Academics Group */}
             {academicItems.length > 0 && (
               <div className="space-y-1">
-                <div className="px-3 pt-2 pb-1 text-[10px] font-black uppercase tracking-wider text-slate-500">
+                <div className="px-3 pt-2 pb-1 text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Academics
                 </div>
                 {academicItems.map((item) => {
@@ -335,8 +357,8 @@ const AdminLayoutContent: React.FC = () => {
                       to={item.path}
                       title={item.label}
                       className={`flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold transition ${isActive
-                        ? 'bg-primary text-white shadow-md'
-                        : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                        ? 'bg-blue-600 text-white shadow-md font-extrabold'
+                        : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
                         }`}
                     >
                       <Icon className="w-4 h-4 shrink-0" />
@@ -348,9 +370,9 @@ const AdminLayoutContent: React.FC = () => {
             )}
 
             {/* 4. Campus Life & Admissions */}
-            {(campusItems.length > 0 || true) && (
+            {(campusItems.length > 0 || contactSubItems.length > 0) && (
               <div className="space-y-1">
-                <div className="px-3 pt-2 pb-1 text-[10px] font-black uppercase tracking-wider text-slate-500">
+                <div className="px-3 pt-2 pb-1 text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Campus Life
                 </div>
 
@@ -363,8 +385,8 @@ const AdminLayoutContent: React.FC = () => {
                       to={item.path}
                       title={item.label}
                       className={`flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold transition ${isActive
-                        ? 'bg-primary text-white shadow-md'
-                        : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                        ? 'bg-blue-600 text-white shadow-md font-extrabold'
+                        : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
                         }`}
                     >
                       <Icon className="w-4 h-4 shrink-0" />
@@ -374,82 +396,110 @@ const AdminLayoutContent: React.FC = () => {
                 })}
 
                 {/* Contact — collapsible accordion */}
-                <div>
-                  <button
-                    type="button"
-                    onClick={() => setContactAccordionOpen(!contactAccordionOpen)}
-                    className={`w-full flex items-center justify-between gap-2.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer ${isContactSubActive
-                      ? 'bg-primary/20 text-white'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                      }`}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <MessageSquare className="w-4 h-4 shrink-0" />
-                      <span className="truncate font-bold">Contact</span>
-                    </div>
-                    {contactAccordionOpen ? (
-                      <ChevronDown className="w-3.5 h-3.5 shrink-0 opacity-70" />
-                    ) : (
-                      <ChevronRight className="w-3.5 h-3.5 shrink-0 opacity-70" />
-                    )}
-                  </button>
+                {contactSubItems.length > 0 && (
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => setContactAccordionOpen(!contactAccordionOpen)}
+                      className={`w-full flex items-center justify-between gap-2.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer ${isContactSubActive
+                        ? 'bg-blue-50 dark:bg-slate-800 text-blue-700 dark:text-blue-400 font-extrabold'
+                        : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
+                        }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <MessageSquare className="w-4 h-4 shrink-0" />
+                        <span className="truncate font-bold">Contact</span>
+                      </div>
+                      {contactAccordionOpen ? (
+                        <ChevronDown className="w-3.5 h-3.5 shrink-0 opacity-70" />
+                      ) : (
+                        <ChevronRight className="w-3.5 h-3.5 shrink-0 opacity-70" />
+                      )}
+                    </button>
 
-                  {contactAccordionOpen && (
-                    <div className="pl-6 pr-1 space-y-1 border-l-2 border-slate-800 ml-4 py-1">
-                      {contactSubItems.map((sub) => {
-                        const SubIcon = sub.icon;
-                        const isSubActive = location.pathname.startsWith(sub.path);
-                        return (
-                          <Link
-                            key={sub.path}
-                            to={sub.path}
-                            title={sub.label}
-                            className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition ${isSubActive
-                              ? 'bg-blue-600 text-white shadow-xs'
-                              : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                              }`}
-                          >
-                            <SubIcon className="w-3.5 h-3.5 shrink-0" />
-                            <span className="truncate">{sub.label}</span>
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
+                    {contactAccordionOpen && (
+                      <div className="pl-6 pr-1 space-y-1 border-l-2 border-slate-200 dark:border-slate-800 ml-4 py-1">
+                        {contactSubItems.map((sub) => {
+                          const SubIcon = sub.icon;
+                          const isSubActive = location.pathname.startsWith(sub.path);
+                          return (
+                            <Link
+                              key={sub.path}
+                              to={sub.path}
+                              title={sub.label}
+                              className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition ${isSubActive
+                                ? 'bg-blue-600 text-white shadow-xs font-extrabold'
+                                : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
+                                }`}
+                            >
+                              <SubIcon className="w-3.5 h-3.5 shrink-0" />
+                              <span className="truncate">{sub.label}</span>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 
+            {/* 5. Campus Services & Statutory Modules */}
+            {campusServicesItems.length > 0 && (
+              <div className="space-y-1">
+                <div className="px-3 pt-2 pb-1 text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Campus Portals & Compliance
+                </div>
+                {campusServicesItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = location.pathname.startsWith(item.path);
+                  return (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      title={item.label}
+                      className={`flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold transition ${isActive
+                        ? 'bg-blue-600 text-white shadow-md font-extrabold'
+                        : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
+                        }`}
+                    >
+                      <Icon className="w-4 h-4 shrink-0" />
+                      <span className="truncate">{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
 
-            {/* 5. Settings & Footer */}
-            <div className="space-y-1 pt-1">
-              <Link
-                to="/admin/settings"
-                title="Campus & Footer Settings"
-                className={`flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold transition ${location.pathname.startsWith('/admin/settings')
-                  ? 'bg-primary text-white shadow-md'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                  }`}
-              >
-                <Settings className="w-4 h-4 shrink-0" />
-                <span className="truncate">College Title & Logo Settings</span>
-              </Link>
-            </div>
+            {/* 6. Settings & Footer */}
+            {isSettingsActive && (
+              <div className="space-y-1 pt-1">
+                <Link
+                  to="/admin/settings"
+                  title="Campus & Footer Settings"
+                  className={`flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold transition ${location.pathname.startsWith('/admin/settings')
+                    ? 'bg-blue-600 text-white shadow-md font-extrabold'
+                    : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
+                    }`}
+                >
+                  <Settings className="w-4 h-4 shrink-0" />
+                  <span className="truncate">College Title & Logo Settings</span>
+                </Link>
+              </div>
+            )}
           </nav>
         </div>
 
         {/* Footer info & Logout */}
-        <div className="p-3 border-t border-slate-800 space-y-2 shrink-0 overflow-x-hidden">
+        <div className="p-3 border-t border-slate-200 dark:border-slate-800 space-y-2 shrink-0 overflow-x-hidden">
           <div className="flex flex-col gap-1.5">
-
-
             <button
               onClick={handleLogout}
               title="Sign Out"
-              className="sidebar-footer-link flex items-center gap-2.5 w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-red-400 hover:text-red-300 hover:bg-red-950/40 transition"
+              className="sidebar-footer-link flex items-center gap-2.5 w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-red-950/40 transition cursor-pointer"
             >
               <LogOut className="w-4 h-4 shrink-0" />
-              <span className="sidebar-footer-text truncate">Sign Out</span>
+              <span className="sidebar-footer-text truncate font-bold">Sign Out</span>
             </button>
           </div>
         </div>

@@ -18,31 +18,70 @@ import {
   Briefcase, 
   FileCheck,
   TrendingUp,
-  Sparkles
+  Sparkles,
+  Globe,
+  ShieldCheck,
+  Target,
+  HeartPulse,
+  Landmark,
+  Cpu
 } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 import { StatItem } from '../../types';
-import { FormDrawer, ConfirmDialog } from '../../UI_Componentes/ui';
+import { FormDrawer, ConfirmDialog, useToast } from '../../UI_Componentes/ui';
 
 // Icon mapping helper for visual cards
 const getStatIcon = (iconName?: string) => {
-  switch ((iconName || '').toLowerCase()) {
+  switch ((iconName || '').toLowerCase().replace(/[-_]/g, '')) {
     case 'users':
+    case 'students':
+    case 'community':
       return Users;
     case 'award':
+    case 'honor':
+    case 'faculty':
       return Award;
     case 'bookopen':
+    case 'book':
+    case 'courses':
+    case 'academics':
       return BookOpen;
     case 'building2':
+    case 'building':
+    case 'campus':
       return Building2;
     case 'trophy':
+    case 'achievement':
       return Trophy;
     case 'briefcase':
+    case 'career':
+    case 'jobs':
       return Briefcase;
     case 'filecheck':
+    case 'accreditation':
+    case 'audit':
       return FileCheck;
     case 'trendingup':
+    case 'growth':
+    case 'placement':
       return TrendingUp;
+    case 'globe':
+    case 'global':
+      return Globe;
+    case 'shieldcheck':
+    case 'security':
+      return ShieldCheck;
+    case 'target':
+    case 'goals':
+      return Target;
+    case 'heartpulse':
+    case 'medical':
+      return HeartPulse;
+    case 'landmark':
+      return Landmark;
+    case 'cpu':
+    case 'tech':
+      return Cpu;
     case 'graduationcap':
     default:
       return GraduationCap;
@@ -50,12 +89,20 @@ const getStatIcon = (iconName?: string) => {
 };
 
 export const StatsAdminPage: React.FC = () => {
+  const { toast } = useToast();
   const [stats, setStats] = useState<StatItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(true);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<StatItem | null>(null);
+
+  // Section Title & Description Settings State
+  const [sectionBadge, setSectionBadge] = useState('Key Metrics & Institutional Record');
+  const [sectionTitle, setSectionTitle] = useState('Campus at a Glance');
+  const [sectionSubtitle, setSectionSubtitle] = useState('Excellence in Numbers');
+  const [settingsLoading, setSettingsLoading] = useState(false);
+  const [settingsSaving, setSettingsSaving] = useState(false);
 
   // Drawer state for Add/Edit
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -72,8 +119,46 @@ export const StatsAdminPage: React.FC = () => {
   const [isActive, setIsActive] = useState(true);
 
   const showNotification = (text: string, type: 'success' | 'error' = 'success') => {
-    setMessage({ text, type });
-    setTimeout(() => setMessage(null), 4000);
+    if (type === 'success') {
+      toast.success(text);
+    } else {
+      toast.error(text);
+    }
+  };
+
+  const fetchSettings = async () => {
+    try {
+      setSettingsLoading(true);
+      const res = await apiClient.get('/admin/stats/settings');
+      if (res.data.success && res.data.data) {
+        setSectionBadge(res.data.data.badge || '');
+        setSectionTitle(res.data.data.title || '');
+        setSectionSubtitle(res.data.data.subtitle || '');
+      }
+    } catch (err) {
+      console.error('Failed to load stats section settings', err);
+    } finally {
+      setSettingsLoading(false);
+    }
+  };
+
+  const handleSaveSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setSettingsSaving(true);
+      await apiClient.put('/admin/stats/settings', {
+        badge: sectionBadge.trim(),
+        title: sectionTitle.trim(),
+        subtitle: sectionSubtitle.trim(),
+        isActive: true,
+      });
+      showNotification('Section title and description settings updated successfully');
+    } catch (err) {
+      console.error('Failed to save stats settings', err);
+      showNotification('Failed to save section settings', 'error');
+    } finally {
+      setSettingsSaving(false);
+    }
   };
 
   const fetchStats = async () => {
@@ -104,6 +189,7 @@ export const StatsAdminPage: React.FC = () => {
 
   useEffect(() => {
     fetchStats();
+    fetchSettings();
   }, []);
 
   const handleOpenCreate = () => {
@@ -203,7 +289,7 @@ export const StatsAdminPage: React.FC = () => {
   const activeStats = stats.filter((s) => s.isActive);
 
   const availableIcons = [
-    { name: 'GraduationCap', label: 'Students / Graduation', icon: GraduationCap },
+    { name: 'GraduationCap', label: 'Students / Degrees', icon: GraduationCap },
     { name: 'Users', label: 'Faculty / Community', icon: Users },
     { name: 'Award', label: 'Accreditation / Honors', icon: Award },
     { name: 'BookOpen', label: 'Research / Courses', icon: BookOpen },
@@ -212,7 +298,24 @@ export const StatsAdminPage: React.FC = () => {
     { name: 'Briefcase', label: 'Placements & Jobs', icon: Briefcase },
     { name: 'FileCheck', label: 'Patents & Papers', icon: FileCheck },
     { name: 'TrendingUp', label: 'Growth / Success Rate', icon: TrendingUp },
+    { name: 'Globe', label: 'Global / International', icon: Globe },
+    { name: 'ShieldCheck', label: 'Quality / Security', icon: ShieldCheck },
+    { name: 'Target', label: 'Goals & Milestones', icon: Target },
+    { name: 'HeartPulse', label: 'Healthcare & Clinical', icon: HeartPulse },
+    { name: 'Landmark', label: 'Heritage / Foundation', icon: Landmark },
+    { name: 'Cpu', label: 'Innovation & Tech', icon: Cpu },
   ];
+
+  const getDynamicAdminPreviewGrid = (count: number) => {
+    if (count <= 1) return { wrapper: 'max-w-md mx-auto', grid: 'grid grid-cols-1 gap-4' };
+    if (count === 2) return { wrapper: 'max-w-3xl mx-auto', grid: 'grid grid-cols-1 sm:grid-cols-2 gap-4' };
+    if (count === 3) return { wrapper: 'max-w-5xl mx-auto', grid: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4' };
+    if (count === 4) return { wrapper: 'max-w-6xl mx-auto', grid: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4' };
+    if (count === 5) return { wrapper: 'max-w-7xl mx-auto', grid: 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4' };
+    return { wrapper: 'max-w-7xl mx-auto', grid: 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-4' };
+  };
+
+  const previewLayout = getDynamicAdminPreviewGrid(activeStats.length);
 
   return (
     <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
@@ -278,43 +381,138 @@ export const StatsAdminPage: React.FC = () => {
         </div>
 
         {showPreview && (
-          <div className="p-6 bg-slate-950/90">
+          <div className="p-6 bg-slate-950/90 space-y-6">
+            {/* Live Section Header Preview */}
+            <div className="text-center space-y-2 max-w-2xl mx-auto">
+              {sectionBadge && (
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                  <Sparkles className="w-3 h-3" />
+                  <span>{sectionBadge}</span>
+                </div>
+              )}
+              {sectionTitle && (
+                <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                  {sectionTitle}
+                </h3>
+              )}
+              {sectionSubtitle && (
+                <p className="text-xs sm:text-sm text-slate-400">
+                  {sectionSubtitle}
+                </p>
+              )}
+            </div>
+
             {activeStats.length === 0 ? (
               <div className="py-8 text-center text-slate-500 text-xs">
                 No active stats cards to preview. Activate or add cards below to display them here.
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {activeStats.map((st) => {
-                  const Icon = getStatIcon(st.iconName);
-                  return (
-                    <div
-                      key={st.id}
-                      className="p-5 rounded-xl bg-slate-900/90 border border-slate-800 shadow-lg hover:border-blue-500/50 transition-all flex items-center gap-4 group"
-                    >
-                      <div className="w-12 h-12 rounded-xl bg-blue-600/10 text-blue-400 border border-blue-500/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                        <Icon className="w-6 h-6" />
-                      </div>
-                      <div className="min-w-0">
-                        <div className="text-2xl font-black text-white tracking-tight flex items-baseline gap-0.5">
-                          {st.prefix && <span className="text-blue-400 text-lg">{st.prefix}</span>}
-                          <span>{st.value}</span>
-                          {st.suffix && <span className="text-blue-400 text-lg">{st.suffix}</span>}
+              <div className={previewLayout.wrapper}>
+                <div className={previewLayout.grid}>
+                  {activeStats.map((st) => {
+                    const Icon = getStatIcon(st.iconName);
+                    return (
+                      <div
+                        key={st.id}
+                        className="p-5 rounded-xl bg-slate-900/90 border border-slate-800 shadow-lg hover:border-blue-500/50 transition-all flex items-center gap-4 group"
+                      >
+                        <div className="w-12 h-12 rounded-xl bg-blue-600/10 text-blue-400 border border-blue-500/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                          <Icon className="w-6 h-6" />
                         </div>
-                        <div className="text-xs text-slate-400 font-medium truncate mt-0.5">
-                          {st.label}
+                        <div className="min-w-0">
+                          <div className="text-2xl font-black text-white tracking-tight flex items-baseline gap-0.5">
+                            {st.prefix && <span className="text-blue-400 text-lg">{st.prefix}</span>}
+                            <span>{st.value}</span>
+                            {st.suffix && <span className="text-blue-400 text-lg">{st.suffix}</span>}
+                          </div>
+                          <div className="text-xs text-slate-400 font-medium truncate mt-0.5">
+                            {st.label}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
             )}
-            <p className="text-[11px] text-slate-400 italic pt-3">
-              * This visual bar renders automatically on your college home page with animated counters.
+            <p className="text-[11px] text-slate-400 italic text-center pt-2">
+              * This preview reflects your dynamic section title, description, and metric cards as rendered on the website.
             </p>
           </div>
         )}
+      </div>
+
+      {/* Section Header & Subtitle Settings Card */}
+      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
+        <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-blue-600" />
+            <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+              Section Header & Description Settings
+            </h2>
+          </div>
+          <span className="text-[11px] text-slate-400 font-medium hidden sm:inline">
+            Syncs across home page and dynamic stats sections
+          </span>
+        </div>
+
+        <form onSubmit={handleSaveSettings} className="p-5 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Badge / Tagline
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. Key Metrics & Institutional Record"
+                value={sectionBadge}
+                onChange={(e) => setSectionBadge(e.target.value)}
+                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 outline-hidden"
+              />
+              <p className="text-[10px] text-slate-400 mt-1">Small pill badge above the main title</p>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Card / Section Title *
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="e.g. Campus at a Glance"
+                value={sectionTitle}
+                onChange={(e) => setSectionTitle(e.target.value)}
+                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 outline-hidden"
+              />
+              <p className="text-[10px] text-slate-400 mt-1">Main heading for the stats counter bar</p>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Description / Subtitle
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. Excellence in Numbers"
+                value={sectionSubtitle}
+                onChange={(e) => setSectionSubtitle(e.target.value)}
+                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 outline-hidden"
+              />
+              <p className="text-[10px] text-slate-400 mt-1">Subtext or highlight tagline</p>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end pt-2">
+            <button
+              type="submit"
+              disabled={settingsSaving || settingsLoading}
+              className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-xs shadow-xs transition disabled:opacity-50 cursor-pointer"
+            >
+              <Check className="w-3.5 h-3.5" />
+              <span>{settingsSaving ? 'Saving Changes...' : 'Save Section Settings'}</span>
+            </button>
+          </div>
+        </form>
       </div>
 
       {/* Cards Table / Management Grid */}
